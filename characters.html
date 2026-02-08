@@ -6,133 +6,117 @@
 
 <style>
 *{box-sizing:border-box}
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  color: white;
-  min-height: 100vh;
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:white;
+  min-height:100vh;
   background:
     linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.75)),
-    url("assets/characters-bg.jpg") center / cover no-repeat fixed;
+    url("characters-bg.jpg") center/cover no-repeat fixed;
 }
 
-/* верх */
-.top {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  padding: 14px;
+.top{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  padding:14px;
+}
+.balance{
+  background:rgba(0,0,0,.65);
+  padding:10px 16px;
+  border-radius:20px;
+  font-weight:900;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.coin{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
+}
+.crystal{
+  width:16px;height:16px;
+  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
 
-.balance {
-  background: rgba(0,0,0,.65);
-  padding: 10px 16px;
-  border-radius: 20px;
-  font-weight: 900;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+h1{text-align:center;margin:6px 0 12px}
+
+.shop{
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:18px;
+  padding-bottom:100px;
 }
 
-.coin {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d);
+.card{
+  background:rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+  transition:.25s;
+}
+.card:hover{transform:scale(1.04)}
+
+.common{border:2px solid #9ca3af}
+.rare{border:2px solid #3b82f6}
+.epic{border:2px solid #a855f7}
+.legendary{
+  border:2px solid gold;
+  box-shadow:0 0 14px gold;
 }
 
-.crystal {
-  width: 16px;
-  height: 16px;
-  clip-path: polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
-  background: linear-gradient(135deg,#7dd3fc,#38bdf8);
+.card img{
+  width:100%;
+  max-width:140px;
+  margin-bottom:6px;
 }
 
-h1 {
-  text-align: center;
-  margin: 6px 0 12px;
+button{
+  margin-top:8px;
+  padding:8px 18px;
+  border-radius:20px;
+  border:none;
+  font-weight:bold;
+  background:gold;
+  cursor:pointer;
+}
+button:disabled{
+  background:#666;
+  color:#aaa;
 }
 
-/* список */
-.shop {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(190px,1fr));
-  gap: 18px;
-  padding-bottom: 100px;
+.active{
+  outline:3px solid #22c55e;
+  animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 #22c55e}
+  50%{box-shadow:0 0 15px #22c55e}
+  100%{box-shadow:0 0 0 #22c55e}
 }
 
-/* карточка */
-.card {
-  background: rgba(255,255,255,.14);
-  border-radius: 18px;
-  padding: 14px;
-  text-align: center;
-  transition: .25s ease;
+.lock{
+  color:#ff7b7b;
+  font-size:13px;
+  margin-top:6px;
 }
 
-.card:hover { transform: scale(1.04); }
-
-.common { border: 2px solid #9ca3af; }
-.rare { border: 2px solid #3b82f6; }
-.epic { border: 2px solid #a855f7; }
-.legendary {
-  border: 2px solid gold;
-  box-shadow: 0 0 14px gold;
+.bottom{
+  position:fixed;
+  bottom:10px;
+  width:100%;
+  text-align:center;
 }
-
-.card img {
-  width: 100%;
-  max-width: 140px;
-  margin-bottom: 6px;
-}
-
-button {
-  margin-top: 8px;
-  padding: 8px 18px;
-  border-radius: 20px;
-  border: none;
-  font-weight: bold;
-  background: gold;
-  cursor: pointer;
-}
-
-button:disabled {
-  background: #666;
-  color: #aaa;
-}
-
-.active {
-  outline: 3px solid #22c55e;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 #22c55e; }
-  50% { box-shadow: 0 0 15px #22c55e; }
-  100% { box-shadow: 0 0 0 #22c55e; }
-}
-
-.lock {
-  color: #ff7b7b;
-  font-size: 13px;
-  margin-top: 6px;
-}
-
-.bottom {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
-}
-
-.back {
-  background: gold;
-  padding: 8px 22px;
-  border-radius: 22px;
-  color: black;
-  font-weight: bold;
-  text-decoration: none;
+.back{
+  background:gold;
+  padding:8px 22px;
+  border-radius:22px;
+  color:black;
+  font-weight:bold;
+  text-decoration:none;
 }
 </style>
 </head>
@@ -157,23 +141,17 @@ let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
 
-let owned = JSON.parse(localStorage.getItem("characters"));
-if(!owned){
-  owned = { default:true };
-  localStorage.setItem("characters", JSON.stringify(owned));
-}
-
+let owned = JSON.parse(localStorage.getItem("characters")) || { default:true };
 let active = localStorage.getItem("activeCharacter") || "default";
 
 const level = Math.floor(clicks / 100) + 1;
 
-/* ВАЖНО: порядок = индекс для index.html */
 const characters = [
-  { id:"default", name:"👦 Новичок", img:"assets/player.png", price:0, currency:"free", rarity:"common" },
-  { id:"clicker", name:"⚡ Кликер", img:"assets/character_clicker.png", price:5000, currency:"coins", rarity:"rare" },
-  { id:"business", name:"🏪 Бизнесмен", img:"assets/character_business.png", price:25000, currency:"coins", rarity:"epic" },
-  { id:"magnate", name:"🏦 Магнат", img:"assets/character_magnate.png", price:50, currency:"crystals", level:50, rarity:"legendary" },
-  { id:"legendary", name:"👑 Легенда", img:"assets/character_legendary.png", price:100, currency:"crystals", level:100, rarity:"legendary" }
+  { id:"default", name:"👦 Новичок", img:"character_default.png", price:0, currency:"free", rarity:"common" },
+  { id:"clicker", name:"⚡ Кликер", img:"character_clicker.png", price:5000, currency:"coins", rarity:"rare" },
+  { id:"business", name:"🏪 Бизнесмен", img:"character_business.png", price:25000, currency:"coins", rarity:"epic" },
+  { id:"magnate", name:"🏦 Магнат", img:"character_magnate.png", price:50, currency:"crystals", level:50, rarity:"legendary" },
+  { id:"legendary", name:"👑 Легенда", img:"character_legendary.png", price:100, currency:"crystals", level:100, rarity:"legendary" }
 ];
 
 document.getElementById("coins").textContent = coins;
@@ -182,40 +160,39 @@ document.getElementById("crystals").textContent = crystals;
 const list = document.getElementById("list");
 
 function render(){
-  list.innerHTML = "";
-
-  characters.forEach((c, index)=>{
+  list.innerHTML="";
+  characters.forEach(c=>{
     const ownedChar = owned[c.id];
     const locked = c.level && level < c.level;
 
-    const card = document.createElement("div");
-    card.className = `card ${c.rarity} ${active===c.id?"active":""}`;
+    const card=document.createElement("div");
+    card.className=`card ${c.rarity} ${active===c.id?"active":""}`;
 
-    let price = "Бесплатно";
-    if(c.currency==="coins") price = c.price+" 🪙";
-    if(c.currency==="crystals") price = c.price+" 💎";
+    let price="Бесплатно";
+    if(c.currency==="coins") price=c.price+" 🪙";
+    if(c.currency==="crystals") price=c.price+" 💎";
 
-    card.innerHTML = `
+    card.innerHTML=`
       <img src="${c.img}">
       <h3>${c.name}</h3>
       <p>${price}</p>
       ${locked?`<div class="lock">Нужен ${c.level} уровень</div>`:""}
     `;
 
-    const btn = document.createElement("button");
+    const btn=document.createElement("button");
 
     if(active===c.id){
       btn.textContent="Выбран";
       btn.disabled=true;
     } else if(ownedChar){
       btn.textContent="Выбрать";
-      btn.onclick=()=>select(c.id, index);
+      btn.onclick=()=>select(c.id);
     } else if(locked){
       btn.textContent="Заблокирован";
       btn.disabled=true;
     } else {
       btn.textContent="Купить";
-      btn.onclick=()=>buy(c, index);
+      btn.onclick=()=>buy(c);
     }
 
     card.appendChild(btn);
@@ -223,28 +200,27 @@ function render(){
   });
 }
 
-function buy(c, index){
+function buy(c){
   if(c.currency==="coins" && coins<c.price) return;
   if(c.currency==="crystals" && crystals<c.price) return;
 
-  if(c.currency==="coins") coins -= c.price;
-  else crystals -= c.price;
+  if(c.currency==="coins") coins-=c.price;
+  else crystals-=c.price;
 
-  owned[c.id] = true;
-  select(c.id, index);
+  owned[c.id]=true;
+  select(c.id);
 }
 
-function select(id, index){
-  active = id;
-  localStorage.setItem("activeCharacter", id);
-  localStorage.setItem("character", index); // для index.html
+function select(id){
+  active=id;
+  localStorage.setItem("activeCharacter",id);
   save();
 }
 
 function save(){
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("crystals", crystals);
-  localStorage.setItem("characters", JSON.stringify(owned));
+  localStorage.setItem("coins",coins);
+  localStorage.setItem("crystals",crystals);
+  localStorage.setItem("characters",JSON.stringify(owned));
   render();
 }
 
