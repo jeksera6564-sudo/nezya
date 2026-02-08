@@ -22,42 +22,88 @@ body {
   user-select: none;
 }
 
-/* затемнение */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
 }
 
-/* верх */
-.top-bar {
+/* ВЕРХ */
+.top-ui {
   position: absolute;
-  top: 16px;
+  top: 14px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   z-index: 3;
+  width: 90%;
+  max-width: 420px;
 }
 
-.coins {
-  background: rgba(0,0,0,0.65);
-  padding: 10px 18px;
-  border-radius: 20px;
-  color: #fff;
-  font-weight: 900;
-  font-size: 20px;
+.top-bar {
   display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.balance {
+  background: rgba(0,0,0,0.65);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 10px;
 }
 
 .coin {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d);
 }
 
-/* игра */
+.crystal {
+  width: 16px;
+  height: 16px;
+  clip-path: polygon(50% 0%, 90% 25%, 70% 100%, 30% 100%, 10% 25%);
+  background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+}
+
+/* УРОВЕНЬ */
+.level-box {
+  background: rgba(0,0,0,0.55);
+  border-radius: 14px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lvl {
+  font-weight: 900;
+  font-size: 14px;
+}
+
+.xp-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.xp-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #fde047, #f59e0b);
+  transition: width 0.3s ease;
+}
+
+/* ИГРА */
 .game {
   position: relative;
   width: 100%;
@@ -71,32 +117,28 @@ body {
 .character {
   width: 320px;
   max-width: 85vw;
-  transition: transform 0.12s ease;
+  transition: transform .12s ease;
   cursor: pointer;
 }
 
-/* цифры */
+/* ЧИСЛА */
 .float {
   position: absolute;
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 900;
-  color: rgba(255,235,59,0.9);
+  color: gold;
   pointer-events: none;
-  animation: fly 2.3s ease-out forwards;
+  animation: fly 2s ease-out forwards;
 }
 
 @keyframes fly {
-  from {
-    opacity: 1;
-    transform: translate(0,0) scale(1);
-  }
   to {
     opacity: 0;
-    transform: translate(var(--x), var(--y)) scale(1.6);
+    transform: translate(var(--x), var(--y)) scale(1.4);
   }
 }
 
-/* низ */
+/* НИЗ */
 .bottom-menu {
   position: absolute;
   bottom: 16px;
@@ -111,7 +153,7 @@ body {
   padding: 12px 16px;
   border-radius: 18px;
   background: rgba(0,0,0,0.65);
-  color: #fff;
+  color: white;
   font-weight: 900;
   text-decoration: none;
 }
@@ -122,10 +164,17 @@ body {
 
 <div class="overlay"></div>
 
-<div class="top-bar">
-  <div class="coins">
-    <div class="coin"></div>
-    <span id="coins">0</span>
+<div class="top-ui">
+  <div class="top-bar">
+    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
+    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+  </div>
+
+  <div class="level-box">
+    <div class="lvl">LVL <span id="level">1</span></div>
+    <div class="xp-bar">
+      <div class="xp-fill" id="xpFill"></div>
+    </div>
   </div>
 </div>
 
@@ -134,59 +183,112 @@ body {
 </div>
 
 <div class="bottom-menu">
-  <!-- ВОТ ТУТ ПОДКЛЮЧЁН МАГАЗИН -->
   <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-  <a class="menu-btn">🧍 Персонажи</a>
-  <a class="menu-btn">🏆 Достижения</a>
 </div>
 
 <script>
-/* фон */
-const bg = localStorage.getItem("background") || "assets/bg.jpg";
-document.body.style.backgroundImage = `url(${bg})`;
+/* ===== ДАННЫЕ ===== */
+let coins = +localStorage.getItem("coins") || 0;
+let crystals = +localStorage.getItem("crystals") || 0;
+let clicks = +localStorage.getItem("clicks") || 0;
 
-/* данные */
-let coins = Number(localStorage.getItem("coins")) || 0;
-let combo = Number(localStorage.getItem("combo")) || 1;
+let level = +localStorage.getItem("level") || 1;
+let xp = +localStorage.getItem("xp") || 0;
 
+let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
+
+let lastOnline = +localStorage.getItem("lastOnline") || Date.now();
+
+/* ===== UI ===== */
 const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const levelEl = document.getElementById("level");
+const xpFill = document.getElementById("xpFill");
 const character = document.getElementById("character");
 
-coinsEl.textContent = coins;
+function xpNeed() {
+  return level * 100;
+}
 
-character.addEventListener("click", () => {
-  combo = Math.random() < 0.7 ? combo + 1 : 1;
-  coins += combo;
-
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("combo", combo);
-
+function updateUI() {
   coinsEl.textContent = coins;
+  crystalsEl.textContent = crystals;
+  levelEl.textContent = level;
+  xpFill.style.width = Math.min(100, xp / xpNeed() * 100) + "%";
+}
 
-  character.style.transform = "scale(0.9)";
-  setTimeout(() => character.style.transform = "scale(1)", 120);
+/* ===== КЛИК ===== */
+character.onclick = () => {
+  clicks++;
 
-  spawnNumber("+" + combo);
-});
+  let power = 1 + (upgrades.clickPower || 0);
+  coins += power;
+  xp += 1;
 
-function spawnNumber(text) {
-  const rect = character.getBoundingClientRect();
+  checkLevel();
+  spawn("+" + power);
+
+  save();
+  updateUI();
+};
+
+/* ===== АВТОДОХОД ===== */
+const incomeList = {
+  lemonade: 3, shop: 30, factory: 300, bank: 3000,
+  corporation: 9000, residential: 15000, business: 30000
+};
+
+function incomePerSecond() {
+  let sum = 0;
+  for (let k in incomes) sum += (incomeList[k] || 0) * incomes[k];
+  return sum;
+}
+
+setInterval(() => {
+  let inc = incomePerSecond();
+  coins += inc;
+  xp += inc * 0.05;
+  checkLevel();
+  updateUI();
+  save();
+}, 1000);
+
+/* ===== УРОВЕНЬ ===== */
+function checkLevel() {
+  while (xp >= xpNeed()) {
+    xp -= xpNeed();
+    level++;
+    spawn("LVL UP!");
+  }
+}
+
+/* ===== ЭФФЕКТ ===== */
+function spawn(text) {
+  const r = character.getBoundingClientRect();
   const el = document.createElement("div");
-
   el.className = "float";
   el.textContent = text;
-  el.style.left = rect.left + rect.width / 2 + "px";
-  el.style.top = rect.top + rect.height / 2 + "px";
-
-  const angle = Math.random() * Math.PI * 2;
-  const dist = 160;
-
-  el.style.setProperty("--x", Math.cos(angle) * dist + "px");
-  el.style.setProperty("--y", Math.sin(angle) * dist + "px");
-
+  el.style.left = r.left + r.width / 2 + "px";
+  el.style.top = r.top + r.height / 2 + "px";
+  el.style.setProperty("--x", (Math.random()*200-100)+"px");
+  el.style.setProperty("--y", (-Math.random()*150-50)+"px");
   document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2300);
+  setTimeout(()=>el.remove(),2000);
 }
+
+/* ===== СОХРАНЕНИЕ ===== */
+function save() {
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("crystals", crystals);
+  localStorage.setItem("clicks", clicks);
+  localStorage.setItem("level", level);
+  localStorage.setItem("xp", xp);
+  localStorage.setItem("lastOnline", Date.now());
+}
+
+updateUI();
+save();
 </script>
 
 </body>
