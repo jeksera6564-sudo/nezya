@@ -3,110 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Магазин персонажей</title>
+<title>Nezya</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-
-body{
-  width:100vw;
-  height:100vh;
-  background:url(bg.jpg) center/cover no-repeat;
-  font-family:Arial,sans-serif;
-  overflow:hidden;
-  color:white;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.55);
+body {
+  width: 100vw;
+  height: 100vh;
+  background: center / cover no-repeat;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
 }
 
-.top{
-  position:absolute;
-  top:14px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:14px;
-  z-index:2;
+/* затемнение */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
 }
 
-.balance{
-  background:rgba(0,0,0,.65);
-  padding:10px 16px;
-  border-radius:20px;
-  font-weight:900;
-  display:flex;
-  gap:8px;
-  align-items:center;
+/* верх */
+.top-bar {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+  align-items: center;
 }
 
-.coin{width:18px;height:18px;border-radius:50%;background:gold}
-.crystal{
-  width:16px;height:16px;
-  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
-  background:#4fc3f7;
+.balances {
+  display: flex;
+  gap: 12px;
 }
 
-.shop{
-  position:absolute;
-  inset:80px 10px 20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:14px;
-  z-index:2;
+.balance {
+  background: rgba(0,0,0,0.65);
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.card{
-  background:rgba(0,0,0,.65);
-  border-radius:18px;
-  padding:10px;
-  text-align:center;
-  position:relative;
+.coin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d);
 }
 
-.card img{
-  width:100%;
-  border-radius:12px;
+.crystal {
+  width: 18px;
+  height: 18px;
+  clip-path: polygon(50% 0%, 90% 25%, 70% 100%, 30% 100%, 10% 25%);
+  background: linear-gradient(135deg, #7dd3fc, #38bdf8);
 }
 
-.name{font-weight:900;margin:6px 0}
-.rarity{font-size:13px;opacity:.85}
-
-.price{
-  margin-top:6px;
-  font-weight:900;
+/* уровень */
+.level-wrap {
+  width: 200px;
+  background: rgba(0,0,0,0.6);
+  border-radius: 10px;
+  padding: 4px;
 }
 
-.buy{
-  margin-top:8px;
-  padding:8px;
-  border-radius:14px;
-  background:gold;
-  color:black;
-  font-weight:900;
-  cursor:pointer;
+.level-bar {
+  height: 10px;
+  width: 0%;
+  background: gold;
+  border-radius: 6px;
 }
 
-.lock{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  border-radius:18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
+.level-text {
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  margin-top: 4px;
 }
 
-.buy.anim{
-  animation:pop .4s ease;
+/* игра */
+.game {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes pop{
-  50%{transform:scale(1.15)}
+.character {
+  width: 320px;
+  max-width: 85vw;
+  transition: transform 0.12s ease;
+  cursor: pointer;
+}
+
+/* цифры */
+.float {
+  position: absolute;
+  font-size: 36px;
+  font-weight: 900;
+  color: gold;
+  pointer-events: none;
+  animation: fly 2s ease-out forwards;
+}
+
+@keyframes fly {
+  to {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) scale(1.5);
+  }
+}
+
+/* меню */
+.bottom-menu {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 3;
+}
+
+.menu-btn {
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.65);
+  color: white;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* персонажи */
+.characters {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  z-index: 5;
+  padding: 20px;
+}
+
+.char {
+  background: rgba(255,255,255,0.15);
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  color: white;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -115,81 +176,101 @@ body{
 
 <div class="overlay"></div>
 
-<div class="top">
-  <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-  <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+<div class="top-bar">
+  <div class="balances">
+    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
+    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+  </div>
+
+  <div class="level-wrap">
+    <div class="level-bar" id="levelBar"></div>
+    <div class="level-text">Уровень <span id="level">1</span></div>
+  </div>
 </div>
 
-<div class="shop" id="shop"></div>
+<div class="game">
+  <img src="character.png" class="character" id="character">
+</div>
+
+<div class="bottom-menu">
+  <div class="menu-btn" onclick="openShop()">🛒 Магазин</div>
+  <div class="menu-btn" onclick="openCharacters()">🧍 Персонажи</div>
+</div>
+
+<div class="characters" id="characters">
+  <div class="char" onclick="selectChar(0)">🙂 Обычный — +1</div>
+  <div class="char" onclick="selectChar(1)">🔥 Огненный — +2</div>
+  <div class="char" onclick="selectChar(2)">⚡ Электро — +3</div>
+  <div class="char" onclick="selectChar(3)">💎 Кристалл — +5</div>
+  <div class="char" onclick="selectChar(4)">🌟 Легенда — +10</div>
+  <div class="menu-btn" onclick="closeCharacters()">Закрыть</div>
+</div>
 
 <script>
+/* фон */
+document.body.style.backgroundImage = "url(bg.jpg)";
+
+/* данные */
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
+let currentChar = +localStorage.getItem("char") || 0;
 
-const level = Math.floor(clicks / 100) + 1;
+const effects = [1,2,3,5,10];
 
-const characters = [
- {id:1,name:"Nezya",img:"char1.png",price:0,currency:"coin",rarity:"Обычный",level:1},
- {id:2,name:"Aiko",img:"char2.png",price:500,currency:"coin",rarity:"Редкий",level:10},
- {id:3,name:"Rin",img:"char3.png",price:2000,currency:"coin",rarity:"Эпический",level:25},
- {id:4,name:"Kira",img:"char4.png",price:1000,currency:"crystal",rarity:"Легендарный",level:50},
- {id:5,name:"Yume",img:"char5.png",price:1500,currency:"crystal",rarity:"Мифический",level:100}
-];
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const levelEl = document.getElementById("level");
+const levelBar = document.getElementById("levelBar");
+const character = document.getElementById("character");
 
-const owned = JSON.parse(localStorage.getItem("ownedChars")) || [1];
-const shop = document.getElementById("shop");
+function updateUI() {
+  coinsEl.textContent = coins;
+  crystalsEl.textContent = crystals;
+  const level = Math.floor(clicks / 100) + 1;
+  levelEl.textContent = level;
+  levelBar.style.width = (clicks % 100) + "%";
+}
 
-document.getElementById("coins").textContent = coins;
-document.getElementById("crystals").textContent = crystals;
+character.onclick = () => {
+  clicks++;
+  const gain = effects[currentChar];
+  coins += gain;
 
-characters.forEach(c=>{
-  const card=document.createElement("div");
-  card.className="card";
+  character.style.transform = "scale(0.9)";
+  setTimeout(()=>character.style.transform="scale(1)",120);
 
-  card.innerHTML=`
-    <img src="${c.img}">
-    <div class="name">${c.name}</div>
-    <div class="rarity">${c.rarity}</div>
-    <div class="price">${c.price===0?"Бесплатно":c.price+" "+(c.currency==="coin"?"🪙":"💎")}</div>
-  `;
+  spawn("+" + gain);
+  save();
+  updateUI();
+};
 
-  if(owned.includes(c.id)){
-    const btn=document.createElement("div");
-    btn.className="buy";
-    btn.textContent="Выбрать";
-    btn.onclick=()=>{
-      localStorage.setItem("character",c.img);
-      btn.classList.add("anim");
-    };
-    card.appendChild(btn);
-  }else if(level<c.level){
-    const lock=document.createElement("div");
-    lock.className="lock";
-    lock.textContent="🔒 Уровень "+c.level;
-    card.appendChild(lock);
-  }else{
-    const btn=document.createElement("div");
-    btn.className="buy";
-    btn.textContent="Купить";
-    btn.onclick=()=>{
-      if(c.currency==="coin" && coins>=c.price){
-        coins-=c.price;
-      }else if(c.currency==="crystal" && crystals>=c.price){
-        crystals-=c.price;
-      }else return;
+function spawn(text) {
+  const r = character.getBoundingClientRect();
+  const el = document.createElement("div");
+  el.className = "float";
+  el.textContent = text;
+  el.style.left = r.left + r.width/2 + "px";
+  el.style.top = r.top + r.height/2 + "px";
+  el.style.setProperty("--x",(Math.random()*200-100)+"px");
+  el.style.setProperty("--y",(-Math.random()*150-50)+"px");
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2000);
+}
 
-      owned.push(c.id);
-      localStorage.setItem("ownedChars",JSON.stringify(owned));
-      localStorage.setItem("coins",coins);
-      localStorage.setItem("crystals",crystals);
-      location.reload();
-    };
-    card.appendChild(btn);
-  }
+function openCharacters(){ document.getElementById("characters").style.display="block"; }
+function closeCharacters(){ document.getElementById("characters").style.display="none"; }
+function selectChar(i){ currentChar=i; localStorage.setItem("char",i); closeCharacters(); }
 
-  shop.appendChild(card);
-});
+function openShop(){ alert("Магазин подключим следующим шагом 😉"); }
+
+function save(){
+  localStorage.setItem("coins",coins);
+  localStorage.setItem("crystals",crystals);
+  localStorage.setItem("clicks",clicks);
+}
+
+updateUI();
 </script>
 
 </body>
