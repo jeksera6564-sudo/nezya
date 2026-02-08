@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Магазин — Nezi</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+  background:
+    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
+    url("shop-bg.jpg") center / cover no-repeat fixed;
+}
+
+.top {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+
+.coins {
+  background: rgba(0,0,0,0.6);
+  padding: 8px 22px;
+  border-radius: 20px;
+  font-size: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.shop {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  padding-bottom: 90px;
+}
+
+.item {
+  background: rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 16px;
+  text-align: center;
+}
+
+.item button {
+  margin-top: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background: gold;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.item button:disabled {
+  background: #666;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.lock {
+  color: #ff6b6b;
+  font-size: 13px;
+}
+
+.bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 12px;
+  background: rgba(0,0,0,0.65);
+  text-align: center;
+}
+
+.back {
+  background: gold;
+  padding: 10px 24px;
+  border-radius: 22px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <div class="coins">🪙 <span id="coins">0</span></div>
+</div>
+
+<h1>🏦 Источники дохода</h1>
+
+<div class="shop" id="shop"></div>
+
+<div class="bottom">
+  <a href="index.html" class="back">⬅ Назад</a>
+</div>
+
+<script>
+let coins = parseInt(localStorage.getItem("coins")) || 0;
+let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+
+let incomes = JSON.parse(localStorage.getItem("incomes")) || {
+  lemonade: 0,
+  shop: 0,
+  factory: 0,
+  bank: 0,
+  corporation: 0,
+  legendary: 0
+};
+
+const incomeList = {
+  lemonade: { name: "🍋 Лимонад", basePrice: 300, income: 3 },
+  shop: { name: "🏪 Магазин", basePrice: 3000, income: 30 },
+  factory: { name: "🏭 Фабрика", basePrice: 30000, income: 300 },
+  bank: { name: "🏦 Банк", basePrice: 300000, income: 3000 },
+  corporation: { name: "🏢 Корпорация", basePrice: 900000, income: 9000 },
+  legendary: {
+    name: "👑 Легендарная корпорация",
+    basePrice: 1000000,
+    income: 50000,
+    legendary: true
+  }
+};
+
+const coinsEl = document.getElementById("coins");
+const shopEl = document.getElementById("shop");
+
+coinsEl.textContent = coins;
+
+function getPrice(base, level) {
+  return Math.floor(base * (1 + level * 0.6));
+}
+
+function render() {
+  shopEl.innerHTML = "";
+
+  for (let key in incomeList) {
+    const lvl = incomes[key];
+    const data = incomeList[key];
+    const price = getPrice(data.basePrice, lvl);
+
+    let locked = false;
+    if (data.legendary && (coins < 1000000 || clicks < 1000)) {
+      locked = true;
+    }
+
+    const item = document.createElement("div");
+    item.className = "item";
+
+    item.innerHTML = `
+      <h3>${data.name}</h3>
+      <p>Уровень: ${lvl}</p>
+      <p>Доход: +${data.income * lvl} 🪙 / сек</p>
+      <p><b>${price.toLocaleString()} 🪙</b></p>
+      ${locked ? `<div class="lock">Нужно:<br>1000 кликов<br>1 000 000 монет</div>` : ""}
+      <button ${locked || coins < price ? "disabled" : ""}>Купить</button>
+    `;
+
+    if (!locked && coins >= price) {
+      item.querySelector("button").onclick = () => buy(key, price);
+    }
+
+    shopEl.appendChild(item);
+  }
+}
+
+function buy(key, price) {
+  coins -= price;
+  incomes[key]++;
+
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("incomes", JSON.stringify(incomes));
+
+  coinsEl.textContent = coins;
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
