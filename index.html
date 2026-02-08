@@ -23,10 +23,8 @@ body{
 .top-bar{
   position:absolute;top:12px;left:50%;
   transform:translateX(-50%);
-  display:flex;flex-direction:column;gap:6px;
-  align-items:center;z-index:5;
+  z-index:5;
 }
-.balances{display:flex;gap:12px}
 .balance{
   background:rgba(0,0,0,.65);
   padding:8px 14px;border-radius:18px;
@@ -35,53 +33,69 @@ body{
 }
 .coin{width:18px;height:18px;border-radius:50%;background:gold}
 
-.game{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.character{width:260px;cursor:pointer;transition:.12s}
+.game{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center
+}
+.character{width:260px;cursor:pointer}
 
 .bottom-menu{
   position:absolute;bottom:20%;left:50%;
   transform:translateX(-50%);
-  display:flex;gap:12px;
 }
 .menu-btn{
   padding:12px 18px;border-radius:18px;
   background:rgba(0,0,0,.65);
-  color:white;font-weight:900;
+  color:white;font-weight:900;border:none;
 }
 
+/* РЕГИСТРАЦИЯ */
 #register{
   position:fixed;inset:0;
   background:#000d;
-  display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
   z-index:50;
 }
 #register input{
-  padding:12px;border-radius:12px;
-  border:none;font-size:18px;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  font-size:18px;
 }
 #register button{
   margin-top:10px;
   padding:12px 20px;
-  border:none;border-radius:12px;
-  font-size:18px;font-weight:bold;
+  border:none;
+  border-radius:12px;
+  font-size:18px;
+  font-weight:bold;
 }
 
+/* ЛИДЕРБОРД */
 #leaderboard{
   position:fixed;inset:0;
-  background:url("assets/kubok.jpg") center/cover no-repeat;
-  display:none;flex-direction:column;
-  padding:20px;z-index:40;
+  background:rgba(0,0,0,.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:40;
 }
 .lb-box{
-  background:rgba(0,0,0,.75);
+  background:#111;
   border-radius:16px;
-  padding:16px;color:white;
-  max-height:80vh;overflow:auto;
+  padding:16px;
+  color:white;
+  width:80%;
+  max-width:400px;
 }
 .lb-row{
-  display:flex;justify-content:space-between;
-  padding:6px 0;border-bottom:1px solid #fff2;
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid #fff2;
 }
 </style>
 </head>
@@ -92,23 +106,24 @@ body{
 
 <!-- РЕГИСТРАЦИЯ -->
 <div id="register">
-  <h2 style="color:white;margin-bottom:10px">Введите ник</h2>
+  <h2 style="color:white;margin-bottom:10px">Введите никнейм</h2>
   <input id="nickInput" placeholder="Ваш ник">
-  <button onclick="saveNick()">Начать</button>
+  <button onclick="register()">Начать игру</button>
 </div>
 
-<!-- ТОП -->
+<!-- ЛИДЕРЫ -->
 <div id="leaderboard">
   <div class="lb-box">
-    <h2 style="text-align:center">🏆 TOP-20</h2>
+    <h2 style="text-align:center">🏆 TOP-10</h2>
     <div id="lbList"></div>
     <button class="menu-btn" onclick="closeLB()">Закрыть</button>
   </div>
 </div>
 
 <div class="top-bar">
-  <div class="balances">
-    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
+  <div class="balance">
+    <div class="coin"></div>
+    <span id="coins">0</span>
   </div>
 </div>
 
@@ -121,61 +136,92 @@ body{
 </div>
 
 <script>
-/* 🔥 FIREBASE */
-const firebaseConfig = {
+/* FIREBASE */
+firebase.initializeApp({
   apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
   authDomain: "nezya-game.firebaseapp.com",
   projectId: "nezya-game",
-};
-firebase.initializeApp(firebaseConfig);
+});
 const db = firebase.firestore();
 
 /* ИГРОК */
 let nickname = localStorage.getItem("nickname");
 let coins = 0;
 
+const coinsEl = document.getElementById("coins");
+
+/* ПРИ ВХОДЕ */
 if(nickname){
   document.getElementById("register").style.display="none";
   loadPlayer();
 }
 
-function saveNick(){
-  const n=document.getElementById("nickInput").value.trim();
-  if(n.length<2) return;
-  nickname=n;
-  localStorage.setItem("nickname",n);
-  document.getElementById("register").style.display="none";
-  db.collection("players").doc(n).set({coins:0});
-}
+/* РЕГИСТРАЦИЯ */
+function register(){
+  const nick = document.getElementById("nickInput").value.trim();
+  if(nick.length < 3){
+    alert("Ник минимум 3 символа");
+    return;
+  }
 
-function loadPlayer(){
-  db.collection("players").doc(nickname).get().then(d=>{
-    if(d.exists){coins=d.data().coins;updateUI();}
+  nickname = nick;
+  localStorage.setItem("nickname", nick);
+  document.getElementById("register").style.display="none";
+
+  db.collection("players").doc(nick).get().then(doc=>{
+    if(doc.exists){
+      coins = doc.data().coins;
+    }else{
+      coins = 0;
+      db.collection("players").doc(nick).set({ coins: 0 });
+    }
+    updateUI();
   });
 }
 
-const coinsEl=document.getElementById("coins");
-function updateUI(){coinsEl.textContent=coins;}
+function loadPlayer(){
+  db.collection("players").doc(nickname).get().then(doc=>{
+    if(doc.exists){
+      coins = doc.data().coins;
+      updateUI();
+    }
+  });
+}
 
-document.getElementById("character").onclick=()=>{
-  coins+=1;
+function updateUI(){
+  coinsEl.textContent = coins;
+}
+
+/* КЛИК */
+document.getElementById("character").onclick = ()=>{
+  if(!nickname) return;
+  coins++;
   updateUI();
-  db.collection("players").doc(nickname).set({coins});
+  db.collection("players").doc(nickname).update({ coins });
 };
 
 /* ЛИДЕРЫ */
 function openLB(){
-  const list=document.getElementById("lbList");
-  list.innerHTML="";
-  db.collection("players").orderBy("coins","desc").limit(20).get()
-  .then(s=>{
-    let i=1;
-    s.forEach(d=>{
-      list.innerHTML+=`<div class="lb-row"><span>${i++}. ${d.id}</span><span>${d.data().coins}</span></div>`;
+  const list = document.getElementById("lbList");
+  list.innerHTML = "";
+
+  db.collection("players")
+    .orderBy("coins","desc")
+    .limit(10)
+    .get()
+    .then(snap=>{
+      let i = 1;
+      snap.forEach(doc=>{
+        list.innerHTML += `
+          <div class="lb-row">
+            <span>${i++}. ${doc.id}</span>
+            <span>${doc.data().coins} 💰</span>
+          </div>`;
+      });
+      document.getElementById("leaderboard").style.display="flex";
     });
-    document.getElementById("leaderboard").style.display="flex";
-  });
 }
+
 function closeLB(){
   document.getElementById("leaderboard").style.display="none";
 }
