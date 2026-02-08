@@ -15,7 +15,6 @@ body{
     url("assets/shop-bg.jpg") center/cover no-repeat fixed;
 }
 
-/* верх */
 .top{
   display:flex;
   justify-content:center;
@@ -28,12 +27,8 @@ body{
   padding:8px 18px;
   border-radius:20px;
   font-size:18px;
-  display:flex;
-  align-items:center;
-  gap:6px;
 }
 
-/* назад */
 .back-wrap{text-align:center;margin:6px 0}
 .back{
   background:gold;
@@ -44,7 +39,6 @@ body{
   text-decoration:none;
 }
 
-/* магазин */
 .shop{
   padding:20px;
   display:grid;
@@ -71,13 +65,7 @@ body{
   background:#666;
   color:#aaa;
 }
-.lock{
-  color:#ff7b7b;
-  font-size:13px;
-  margin-top:6px;
-}
 
-/* анимация дохода */
 .float{
   position:fixed;
   font-size:22px;
@@ -87,8 +75,8 @@ body{
   z-index:9999;
 }
 @keyframes fly{
-  from{opacity:1;transform:translateY(0) scale(1)}
-  to{opacity:0;transform:translateY(-60px) scale(1.3)}
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(-60px)}
 }
 </style>
 </head>
@@ -112,10 +100,9 @@ body{
 <div class="shop" id="upgradeShop"></div>
 
 <script>
-/* ========= ДАННЫЕ ========= */
+/* ===== СОХРАНЕНИЯ ===== */
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
-let clicks = +localStorage.getItem("clicks") || 0;
 
 let incomes = JSON.parse(localStorage.getItem("incomes")) || {
   lemonade:0, shop:0, factory:0, bank:0, corporation:0, legendary:0
@@ -127,37 +114,36 @@ let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
   ultraBoost:0
 };
 
-/* ========= СПИСКИ ========= */
-const incomeList={
-  lemonade:{name:"🍋 Лимонад",basePrice:300,income:3},
-  shop:{name:"🏪 Магазин",basePrice:3000,income:30},
-  factory:{name:"🏭 Фабрика",basePrice:30000,income:300},
-  bank:{name:"🏦 Банк",basePrice:300000,income:3000},
-  corporation:{name:"🏢 Корпорация",basePrice:900000,income:9000},
-  legendary:{name:"👑 Легендарная корпорация",basePrice:1000000,income:50000}
+/* ===== ДАННЫЕ ===== */
+const incomeList = {
+  lemonade:{name:"🍋 Лимонад", basePrice:300, income:3},
+  shop:{name:"🏪 Магазин", basePrice:3000, income:30},
+  factory:{name:"🏭 Фабрика", basePrice:30000, income:300},
+  bank:{name:"🏦 Банк", basePrice:300000, income:3000},
+  corporation:{name:"🏢 Корпорация", basePrice:900000, income:9000},
+  legendary:{name:"👑 Легендарная корпорация", basePrice:3000000, income:50000}
 };
 
-const crystalUpgrades={
-  crystalClick:{name:"💎 Кристаллы с клика",price:30},
-  crystalIncome:{name:"💠 Кристаллы с дохода",price:40},
-  ultraBoost:{name:"🚀 Ультра x2",price:50}
+const crystalUpgrades = {
+  crystalClick:{name:"💎 Кристаллы с клика", price:30},
+  crystalIncome:{name:"💠 Кристаллы с дохода", price:40},
+  ultraBoost:{name:"🚀 Ультра x2", price:50}
 };
 
-/* ========= ФУНКЦИИ ========= */
-function price(base,lvl){return Math.floor(base*(1+lvl*0.6))}
+/* ===== ЛОГИКА ===== */
+const price = (base,lvl)=>Math.floor(base*(1+lvl*0.6));
 
 function getIncomePerSecond(){
-  let sum=0;
+  let sum = 0;
   for(let k in incomeList){
-    sum+=incomeList[k].income*incomes[k];
+    sum += incomeList[k].income * incomes[k];
   }
-  if(upgrades.ultraBoost) sum*=2;
+  if(upgrades.ultraBoost) sum *= 2;
   return sum;
 }
 
 function getCrystalIncome(coins){
-  if(!upgrades.crystalIncome) return 0;
-  return Math.floor(coins/5000);
+  return upgrades.crystalIncome ? Math.floor(coins/5000) : 0;
 }
 
 function float(text,x,y,color){
@@ -171,46 +157,48 @@ function float(text,x,y,color){
   setTimeout(()=>e.remove(),1000);
 }
 
-/* ========= ОФФЛАЙН ========= */
-const last=+localStorage.getItem("lastTime")||Date.now();
-const now=Date.now();
-const offlineSec=Math.floor((now-last)/1000);
+/* ===== ОФФЛАЙН ===== */
+const last = +localStorage.getItem("lastTime") || Date.now();
+const now = Date.now();
+const offlineSec = Math.floor((now-last)/1000);
 if(offlineSec>5){
-  const offCoins=getIncomePerSecond()*offlineSec;
-  const offCrystals=getCrystalIncome(offCoins);
-  coins+=offCoins;
-  crystals+=offCrystals;
+  const offCoins = getIncomePerSecond()*offlineSec;
+  const offCrystals = getCrystalIncome(offCoins);
+  coins += offCoins;
+  crystals += offCrystals;
   alert(`Офлайн доход:\n🪙 +${offCoins}\n💎 +${offCrystals}`);
 }
 
-/* ========= РЕНДЕР ========= */
-const coinsEl=coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
-const incomeEl=document.getElementById("incomePerSec");
-const incomeShop=document.getElementById("incomeShop");
-const upgradeShop=document.getElementById("upgradeShop");
+/* ===== UI ===== */
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const incomeEl = document.getElementById("incomePerSec");
+const incomeShop = document.getElementById("incomeShop");
+const upgradeShop = document.getElementById("upgradeShop");
 
 function render(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
-  incomeEl.textContent=getIncomePerSecond();
+  coinsEl.textContent = coins;
+  crystalsEl.textContent = crystals;
+  incomeEl.textContent = getIncomePerSecond();
 
   incomeShop.innerHTML="";
   for(let k in incomeList){
-    const d=incomeList[k];
-    const lvl=incomes[k];
-    const cost=price(d.basePrice,lvl);
-    const el=document.createElement("div");
+    const d = incomeList[k];
+    const lvl = incomes[k];
+    const cost = price(d.basePrice,lvl);
+
+    const el = document.createElement("div");
     el.className="item";
     el.innerHTML=`
       <h3>${d.name}</h3>
-      <p>Уровень: ${lvl}</p>
-      <p>+${d.income*lvl} 🪙/сек</p>
+      <p>Куплено: ${lvl}</p>
+      <p>Доход: +${d.income*lvl} 🪙/сек</p>
       <p><b>${cost} 🪙</b></p>
       <button ${coins<cost?"disabled":""}>Купить</button>
     `;
     el.querySelector("button").onclick=()=>{
-      coins-=cost;
+      if(coins<cost) return;
+      coins -= cost;
       incomes[k]++;
       save();
     };
@@ -219,9 +207,9 @@ function render(){
 
   upgradeShop.innerHTML="";
   for(let k in crystalUpgrades){
-    const u=crystalUpgrades[k];
-    const bought=upgrades[k];
-    const el=document.createElement("div");
+    const u = crystalUpgrades[k];
+    const bought = upgrades[k];
+    const el = document.createElement("div");
     el.className="item";
     el.innerHTML=`
       <h3>${u.name}</h3>
@@ -231,7 +219,8 @@ function render(){
       </button>
     `;
     el.querySelector("button").onclick=()=>{
-      crystals-=u.price;
+      if(crystals<u.price) return;
+      crystals -= u.price;
       upgrades[k]=1;
       save();
     };
@@ -248,20 +237,20 @@ function save(){
   render();
 }
 
-/* ========= ТАЙМЕР ========= */
+/* ===== ТИК ===== */
 setInterval(()=>{
-  const inc=getIncomePerSecond();
+  const inc = getIncomePerSecond();
   if(inc>0){
-    coins+=inc;
-    const cry=getCrystalIncome(inc);
-    crystals+=cry;
+    coins += inc;
+    const cry = getCrystalIncome(inc);
+    crystals += cry;
     float("+"+inc+" 🪙",window.innerWidth/2,80,"gold");
     if(cry>0) float("+"+cry+" 💎",window.innerWidth/2,120,"cyan");
     save();
   }
 },1000);
 
-/* ========= КРИСТАЛЛЫ С КЛИКА ========= */
+/* ===== КРИСТАЛЛ С КЛИКА ===== */
 document.addEventListener("click",e=>{
   if(upgrades.crystalClick && Math.random()<0.1){
     crystals++;
@@ -272,6 +261,5 @@ document.addEventListener("click",e=>{
 
 render();
 </script>
-
 </body>
 </html>
