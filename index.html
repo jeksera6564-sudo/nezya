@@ -89,7 +89,7 @@ body{
 .character-wrap{position:relative}
 
 .character{
-  width:280px;
+  width:260px;
   max-width:80vw;
   cursor:pointer;
   transition:transform .12s ease;
@@ -125,20 +125,65 @@ body{
 
 .bottom-menu{
   position:absolute;
-  bottom:22%;
+  bottom:18%;
   left:50%;
   transform:translateX(-50%);
   display:flex;
-  gap:14px;
+  gap:12px;
+  z-index:6;
 }
 
 .menu-btn{
-  padding:12px 18px;
+  padding:12px 16px;
   border-radius:18px;
   background:rgba(0,0,0,.65);
   color:white;
   font-weight:900;
   text-decoration:none;
+}
+
+/* 🏆 ЛИДЕРЫ */
+.leaderboard{
+  position:fixed;
+  inset:0;
+  background:url("assets/kubok.jpg") center/cover no-repeat;
+  display:none;
+  flex-direction:column;
+  padding:20px;
+  color:white;
+  z-index:20;
+}
+
+.lb-box{
+  background:rgba(0,0,0,.7);
+  border-radius:16px;
+  padding:16px;
+  max-height:80vh;
+  overflow:auto;
+}
+
+.lb-title{
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.lb-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.15);
+  font-weight:bold;
+}
+
+.lb-close{
+  margin-top:12px;
+  text-align:center;
+  padding:10px;
+  border-radius:14px;
+  background:#ef4444;
+  font-weight:900;
 }
 </style>
 </head>
@@ -146,7 +191,6 @@ body{
 <body>
 
 <script>
-/* 🔒 ПРОВЕРКА НИКА */
 if(!localStorage.getItem("nickname")){
   location.href="register.html";
 }
@@ -177,12 +221,20 @@ if(!localStorage.getItem("nickname")){
 <div class="bottom-menu">
   <a href="shop.html" class="menu-btn">🛒 Магазин</a>
   <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
+  <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
+</div>
+
+<div class="leaderboard" id="lb">
+  <div class="lb-box">
+    <div class="lb-title">🏆 TOP-20 игроков</div>
+    <div id="lbList"></div>
+    <div class="lb-close" onclick="closeLB()">Закрыть</div>
+  </div>
 </div>
 
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-/* ПЕРСОНАЖИ */
 const characters={
   default:{img:"assets/player.png",power:1,crystal:0},
   clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
@@ -196,6 +248,8 @@ let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
 let combo=1,lastClick=0;
+
+const nickname=localStorage.getItem("nickname");
 
 const character=document.getElementById("character");
 const wrap=document.getElementById("charWrap");
@@ -243,26 +297,38 @@ character.onclick=()=>{
   crystals+=ch.crystal;
   clicks++;
 
-  spawn("+"+gain,mult>=10?"#fb7185":"gold");
-  save();updateUI();
+  saveScore();
+  save();
+  updateUI();
 };
-
-function spawn(text,color){
-  const e=document.createElement("div");
-  e.className="float";
-  e.textContent=text;
-  e.style.color=color;
-  e.style.left=Math.random()*80+10+"vw";
-  e.style.top=Math.random()*40+30+"vh";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),1600);
-}
 
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
   localStorage.setItem("activeCharacter",active);
+}
+
+function saveScore(){
+  let lb=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  lb=lb.filter(p=>p.nick!==nickname);
+  lb.push({nick:nickname,coins});
+  lb.sort((a,b)=>b.coins-a.coins);
+  lb=lb.slice(0,20);
+  localStorage.setItem("leaderboard",JSON.stringify(lb));
+}
+
+function openLB(){
+  const lb=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  const list=document.getElementById("lbList");
+  list.innerHTML="";
+  lb.forEach((p,i)=>{
+    list.innerHTML+=`<div class="lb-row"><span>${i+1}. ${p.nick}</span><span>${p.coins}</span></div>`;
+  });
+  document.getElementById("lb").style.display="flex";
+}
+function closeLB(){
+  document.getElementById("lb").style.display="none";
 }
 
 updateUI();
