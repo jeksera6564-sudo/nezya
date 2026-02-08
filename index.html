@@ -9,313 +9,254 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
   width:100vw;height:100vh;
+  background:center/cover no-repeat;
   font-family:Arial,sans-serif;
-  background:#0b0b0b;
   overflow:hidden;
-  color:white;
   user-select:none;
 }
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
-/* ===== ФОН ===== */
-.bg{
-  position:fixed;inset:0;
-  background:
-    linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.7)),
-    url("assets/bg.jpg") center/cover no-repeat;
-  z-index:-1;
-}
-
-/* ===== ВЕРХ ===== */
-.top{
-  position:absolute;top:10px;left:50%;
+.top-bar{
+  position:absolute;top:12px;left:50%;
   transform:translateX(-50%);
   display:flex;flex-direction:column;
-  align-items:center;gap:6px;
+  gap:6px;align-items:center;z-index:5;
 }
 
-.balances{display:flex;gap:10px}
+.balances{display:flex;gap:12px}
 .balance{
   background:rgba(0,0,0,.65);
-  padding:8px 14px;
-  border-radius:18px;
-  font-weight:900;
-  display:flex;gap:6px;align-items:center
+  padding:8px 14px;border-radius:18px;
+  font-weight:900;color:#fff;
+  display:flex;gap:6px;align-items:center;
 }
-.coin{width:18px;height:18px;border-radius:50%;background:gold}
-.crystal{width:16px;height:16px;clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);background:#38bdf8}
+
+.coin{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
+}
+.crystal{
+  width:16px;height:16px;
+  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
+}
 
 .level-wrap{
-  width:200px;
-  background:rgba(0,0,0,.6);
-  border-radius:12px;
-  padding:5px;
+  width:200px;background:rgba(0,0,0,.6);
+  border-radius:12px;padding:5px;
 }
-.level-bar{height:10px;background:gold;border-radius:8px;width:0%}
-.level-text{text-align:center;font-size:12px;font-weight:bold}
+.level-bar{
+  height:10px;background:gold;
+  border-radius:8px;width:0%;
+}
+.level-text{
+  text-align:center;font-size:12px;
+  font-weight:bold;color:white;margin-top:3px;
+}
 
 .combo{
-  font-weight:900;
+  font-weight:900;font-size:13px;
   color:#22c55e;
   text-shadow:0 0 10px #22c55e;
 }
 
-/* ===== ИГРА ===== */
 .game{
-  width:100%;
-  height:100%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  position:relative;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
 }
+
+.character-wrap{position:relative}
+
 .character{
-  width:260px;
-  max-width:80vw;
-  cursor:pointer;
-  transition:.12s;
-}
-.character:active{transform:scale(.95)}
-
-/* ===== КНОПКИ ===== */
-.menu{
-  position:absolute;
-  bottom:20%;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:12px;
-}
-.menu button{
-  padding:12px 18px;
-  border-radius:18px;
-  border:none;
-  background:rgba(0,0,0,.65);
-  color:white;
-  font-weight:900;
+  width:280px;max-width:80vw;
+  cursor:pointer;transition:transform .12s ease;
 }
 
-/* ===== ЭКРАНЫ ===== */
-.screen{
+.aura{
+  position:absolute;inset:-40px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,.7),transparent 70%);
+  opacity:0;pointer-events:none;
+  animation:aura .5s ease-out forwards;
+}
+@keyframes aura{
+  from{transform:scale(.5);opacity:1}
+  to{transform:scale(1.6);opacity:0}
+}
+
+.float{
   position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.92);
-  display:none;
-  overflow:auto;
-  z-index:50;
+  font-size:26px;font-weight:900;
+  pointer-events:none;
+  animation:fly 1.8s ease-out forwards;
+  z-index:9999;
+}
+@keyframes fly{
+  to{opacity:0;transform:translateY(-100px) scale(1.5)}
 }
 
-/* ===== ПЕРСОНАЖИ / МАГАЗИН ===== */
-.list{
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:14px;
+.bottom-menu{
+  position:absolute;bottom:22%;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:14px;
 }
-.card{
-  background:rgba(255,255,255,.12);
-  border-radius:16px;
-  padding:12px;
-  text-align:center;
-}
-.card img{
-  width:100%;
-  max-width:120px;
-}
-.card button{
-  margin-top:6px;
-  padding:6px 14px;
-  border-radius:14px;
-  border:none;
-  background:gold;
-  font-weight:bold;
-}
-.card.active{outline:3px solid #22c55e}
-
-/* ===== ТОП ===== */
-.lb{
-  padding:20px;
-}
-.lb-row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px solid #fff2;
-}
-
-/* ===== ЗАКРЫТЬ ===== */
-.close{
-  display:block;
-  margin:10px auto;
-  padding:10px 20px;
-  border-radius:20px;
-  border:none;
-  font-weight:bold;
+.menu-btn{
+  padding:12px 18px;border-radius:18px;
+  background:rgba(0,0,0,.65);
+  color:white;font-weight:900;text-decoration:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="bg"></div>
+<script>
+if(!localStorage.getItem("nickname")){
+  location.href="register.html";
+}
+</script>
 
-<!-- ВЕРХ -->
-<div class="top">
+<div class="overlay"></div>
+
+<div class="top-bar">
   <div class="balances">
     <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
     <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
+
   <div class="level-wrap">
     <div class="level-bar" id="levelBar"></div>
     <div class="level-text">Уровень <span id="level">1</span></div>
   </div>
+
   <div class="combo" id="combo">Комбо x1</div>
 </div>
 
-<!-- ИГРА -->
 <div class="game">
-  <img id="character" class="character">
+  <div class="character-wrap" id="charWrap">
+    <img id="character" class="character">
+  </div>
 </div>
 
-<!-- МЕНЮ -->
-<div class="menu">
-  <button onclick="openScreen('characters')">🧍</button>
-  <button onclick="openScreen('shop')">🛒</button>
-  <button onclick="openScreen('top')">🏆</button>
+<div class="bottom-menu">
+  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
 </div>
 
-<!-- ПЕРСОНАЖИ -->
-<div class="screen" id="characters">
-  <h2 style="text-align:center">Персонажи</h2>
-  <div class="list" id="charList"></div>
-  <button class="close" onclick="closeScreens()">Закрыть</button>
-</div>
-
-<!-- МАГАЗИН -->
-<div class="screen" id="shop">
-  <h2 style="text-align:center">Магазин</h2>
-  <div class="list" id="shopList"></div>
-  <button class="close" onclick="closeScreens()">Закрыть</button>
-</div>
-
-<!-- ТОП -->
-<div class="screen" id="top">
-  <h2 style="text-align:center">Локальный топ</h2>
-  <div class="lb" id="topList"></div>
-  <button class="close" onclick="closeScreens()">Закрыть</button>
-</div>
+<!-- 🔊 ЗВУК -->
+<audio id="clickSound" src="click.mp3" preload="auto"></audio>
 
 <script>
-/* ===== ДАННЫЕ ===== */
+document.body.style.backgroundImage="url('assets/bg.jpg')";
+
+/* ПЕРСОНАЖИ */
+const characters={
+  default:{img:"assets/player.png",power:1,crystal:0},
+  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
+  business:{img:"assets/character_business.png",power:4,crystal:1},
+  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
+  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+};
+
+let active=localStorage.getItem("activeCharacter")||"default";
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
 let combo=1,lastClick=0;
 
-const characters=[
- {id:"default",name:"Новичок",img:"assets/player.png",power:1,price:0},
- {id:"clicker",name:"Кликер",img:"assets/character_clicker.png",power:2,price:5000},
- {id:"business",name:"Бизнес",img:"assets/character_business.png",power:4,price:25000}
-];
+/* ПАССИВ */
+let passive=+localStorage.getItem("passive")||1;
+let expFloat=+localStorage.getItem("expFloat")||0;
 
-let owned=JSON.parse(localStorage.getItem("owned"))||{default:true};
-let active=localStorage.getItem("active")||"default";
-
-/* ===== UI ===== */
 const character=document.getElementById("character");
+const wrap=document.getElementById("charWrap");
+character.src=characters[active].img;
+
 const coinsEl=document.getElementById("coins");
 const crystalsEl=document.getElementById("crystals");
 const levelEl=document.getElementById("level");
 const levelBar=document.getElementById("levelBar");
 const comboEl=document.getElementById("combo");
+const clickSound=document.getElementById("clickSound");
 
-/* ===== ИГРА ===== */
-function update(){
-  coinsEl.textContent=coins;
+function updateUI(){
+  coinsEl.textContent=Math.floor(coins);
   crystalsEl.textContent=crystals;
   const lvl=Math.floor(clicks/100)+1;
   levelEl.textContent=lvl;
   levelBar.style.width=(clicks%100)+"%";
   comboEl.textContent="Комбо x"+combo;
-  character.src=characters.find(c=>c.id===active).img;
 }
 
+/* КЛИК */
 character.onclick=()=>{
+  clickSound.currentTime=0;
+  clickSound.play();
+
+  character.style.transform="scale(.9)";
+  setTimeout(()=>character.style.transform="scale(1)",120);
+
+  const a=document.createElement("div");
+  a.className="aura";
+  wrap.appendChild(a);
+  setTimeout(()=>a.remove(),500);
+
   const now=Date.now();
-  combo=(now-lastClick<700)?Math.min(combo+1,10):1;
+  combo=(now-lastClick<800)?Math.min(combo+1,25):1;
   lastClick=now;
-  coins+=characters.find(c=>c.id===active).power*combo;
-  clicks++;
-  update();
+
+  let mult=1;
+  const r=Math.random();
+  if(r<0.01) mult=20;
+  else if(r<0.04) mult=10;
+  else if(r<0.1) mult=5;
+  else if(r<0.2) mult=2;
+
+  const ch=characters[active];
+  const gain=ch.power*combo*mult;
+
+  coins+=gain;
+  crystals+=ch.crystal;
+  clicks+=1;
+
+  spawn("+"+gain,mult>=10?"#fb7185":mult>=5?"#a855f7":"gold",mult);
+  save();updateUI();
 };
 
-/* ===== ЭКРАНЫ ===== */
-function openScreen(id){
-  document.getElementById(id).style.display="block";
-  if(id==="characters")renderChars();
-  if(id==="shop")renderShop();
-  if(id==="top")renderTop();
-}
-function closeScreens(){
-  document.querySelectorAll(".screen").forEach(s=>s.style.display="none");
+/* ПАССИВНЫЙ ДОХОД */
+setInterval(()=>{
+  const gain=passive;
+  coins+=gain;
+  expFloat+=0.2;     // медленный рост уровня
+  clicks+=expFloat>=1?1:0;
+  if(expFloat>=1) expFloat=0;
+  updateUI();
+},1000);
+
+/* FLOAT */
+function spawn(text,color,m){
+  const e=document.createElement("div");
+  e.className="float";
+  e.textContent=text;
+  e.style.color=color;
+  e.style.fontSize=24+m*2+"px";
+  e.style.left=Math.random()*80+10+"vw";
+  e.style.top=Math.random()*40+40+"vh";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),1800);
 }
 
-/* ===== ПЕРСОНАЖИ ===== */
-function renderChars(){
-  const list=document.getElementById("charList");
-  list.innerHTML="";
-  characters.forEach(c=>{
-    if(!owned[c.id])return;
-    const d=document.createElement("div");
-    d.className="card"+(active===c.id?" active":"");
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    const b=document.createElement("button");
-    b.textContent=active===c.id?"Выбран":"Выбрать";
-    b.onclick=()=>{active=c.id;save()};
-    d.appendChild(b);
-    list.appendChild(d);
-  });
-}
-
-/* ===== МАГАЗИН ===== */
-function renderShop(){
-  const list=document.getElementById("shopList");
-  list.innerHTML="";
-  characters.forEach(c=>{
-    if(owned[c.id])return;
-    const d=document.createElement("div");
-    d.className="card";
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p><p>${c.price} 🪙</p>`;
-    const b=document.createElement("button");
-    b.textContent="Купить";
-    b.onclick=()=>{
-      if(coins<c.price)return;
-      coins-=c.price;
-      owned[c.id]=true;
-      active=c.id;
-      save();
-    };
-    d.appendChild(b);
-    list.appendChild(d);
-  });
-}
-
-/* ===== ТОП ===== */
-function renderTop(){
-  const list=document.getElementById("topList");
-  list.innerHTML=`<div class="lb-row"><span>Вы</span><span>${coins}</span></div>`;
-}
-
-/* ===== SAVE ===== */
+/* SAVE */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
-  localStorage.setItem("owned",JSON.stringify(owned));
-  localStorage.setItem("active",active);
-  update();
+  localStorage.setItem("activeCharacter",active);
+  localStorage.setItem("passive",passive);
+  localStorage.setItem("expFloat",expFloat);
 }
 
-setInterval(save,3000);
-update();
+updateUI();
 </script>
 
 </body>
