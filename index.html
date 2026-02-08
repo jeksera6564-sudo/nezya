@@ -2,242 +2,184 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>Nezya Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Nezya</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
-  height:100vh;
-  background:#020617;
-  color:white;
-  font-family:Arial;
+  width:100vw;height:100vh;
+  background:center/cover no-repeat;
+  font-family:Arial,sans-serif;
   overflow:hidden;
+  user-select:none;
 }
-.hidden{display:none}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
-/* UI */
-.top{
-  position:absolute;
-  top:10px;
-  left:50%;
+.top-bar{
+  position:absolute;top:12px;left:50%;
   transform:translateX(-50%);
-  display:flex;
-  gap:14px;
-  z-index:5;
+  display:flex;flex-direction:column;gap:6px;
+  align-items:center;z-index:5;
 }
-.stat{
-  background:#000a;
-  padding:10px 16px;
-  border-radius:20px;
-  font-weight:900;
+.balances{display:flex;gap:12px}
+.balance{
+  background:rgba(0,0,0,.65);
+  padding:8px 14px;border-radius:18px;
+  font-weight:900;color:#fff;
+  display:flex;gap:6px;align-items:center;
+}
+.coin{width:18px;height:18px;border-radius:50%;background:gold}
+
+.game{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.character{width:260px;cursor:pointer;transition:.12s}
+
+.bottom-menu{
+  position:absolute;bottom:20%;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:12px;
+}
+.menu-btn{
+  padding:12px 18px;border-radius:18px;
+  background:rgba(0,0,0,.65);
+  color:white;font-weight:900;
 }
 
-/* Game */
-.center{
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-#char{
-  width:260px;
-  max-width:80vw;
-  transition:transform .08s;
-}
-
-/* Bottom */
-.bottom{
-  position:absolute;
-  bottom:15%;
-  width:100%;
-  display:flex;
-  justify-content:center;
-  gap:12px;
-}
-button{
-  background:#000a;
-  border:none;
-  border-radius:16px;
-  padding:12px 16px;
-  color:white;
-  font-weight:900;
-}
-
-/* Modal */
-.modal{
-  position:fixed;
-  inset:0;
-  background:#000c;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-}
-.modal-box{
-  background:#020617;
-  padding:18px;
-  border-radius:16px;
-  width:90%;
-  max-width:360px;
-}
-.modal-box h3{text-align:center;margin-bottom:10px}
-
-/* Register */
 #register{
-  position:fixed;
-  inset:0;
-  background:#020617;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  z-index:20;
+  position:fixed;inset:0;
+  background:#000d;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  z-index:50;
 }
-.reg-box{
-  background:#000;
-  padding:24px;
-  border-radius:18px;
-  width:90%;
-  max-width:320px;
-  text-align:center;
+#register input{
+  padding:12px;border-radius:12px;
+  border:none;font-size:18px;
 }
-.reg-box input{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:none;
-  margin:12px 0;
-  font-size:18px;
+#register button{
+  margin-top:10px;
+  padding:12px 20px;
+  border:none;border-radius:12px;
+  font-size:18px;font-weight:bold;
+}
+
+#leaderboard{
+  position:fixed;inset:0;
+  background:url("assets/kubok.jpg") center/cover no-repeat;
+  display:none;flex-direction:column;
+  padding:20px;z-index:40;
+}
+.lb-box{
+  background:rgba(0,0,0,.75);
+  border-radius:16px;
+  padding:16px;color:white;
+  max-height:80vh;overflow:auto;
+}
+.lb-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;border-bottom:1px solid #fff2;
 }
 </style>
 </head>
 
 <body>
 
-<!-- REGISTER -->
-<div id="register" class="hidden">
-  <div class="reg-box">
-    <h2>Введите ник</h2>
-    <input id="nickInput" placeholder="Ваш ник">
-    <button onclick="saveNick()">Начать</button>
+<div class="overlay"></div>
+
+<!-- РЕГИСТРАЦИЯ -->
+<div id="register">
+  <h2 style="color:white;margin-bottom:10px">Введите ник</h2>
+  <input id="nickInput" placeholder="Ваш ник">
+  <button onclick="saveNick()">Начать</button>
+</div>
+
+<!-- ТОП -->
+<div id="leaderboard">
+  <div class="lb-box">
+    <h2 style="text-align:center">🏆 TOP-20</h2>
+    <div id="lbList"></div>
+    <button class="menu-btn" onclick="closeLB()">Закрыть</button>
   </div>
 </div>
 
-<!-- GAME -->
-<div class="top">
-  <div class="stat">💰 <span id="coins">0</span></div>
-  <div class="stat">💎 <span id="crystals">0</span></div>
-</div>
-
-<div class="center">
-  <img src="assets/player.png" id="char">
-</div>
-
-<div class="bottom">
-  <button onclick="openLB()">🏆 Таблица лидеров</button>
-</div>
-
-<!-- LEADERBOARD -->
-<div class="modal" id="lb">
-  <div class="modal-box">
-    <h3>🏆 TOP-20</h3>
-    <ol id="lbList"></ol>
-    <button onclick="closeLB()">Закрыть</button>
+<div class="top-bar">
+  <div class="balances">
+    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
   </div>
 </div>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<div class="game">
+  <img src="assets/player.png" id="character" class="character">
+</div>
 
+<div class="bottom-menu">
+  <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
+</div>
+
+<script>
+/* 🔥 FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
   authDomain: "nezya-game.firebaseapp.com",
   projectId: "nezya-game",
-  storageBucket: "nezya-game.firebasestorage.app",
-  messagingSenderId: "866470790249",
-  appId: "1:866470790249:web:8c7bfa8b351e8e5d354ef8"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// GAME STATE
-let coins = 0;
-let crystals = 0;
+/* ИГРОК */
 let nickname = localStorage.getItem("nickname");
+let coins = 0;
 
-const coinsEl = document.getElementById("coins");
-const crystalsEl = document.getElementById("crystals");
-const char = document.getElementById("char");
-
-// REGISTER
-if(!nickname){
-  document.getElementById("register").classList.remove("hidden");
+if(nickname){
+  document.getElementById("register").style.display="none";
+  loadPlayer();
 }
 
-window.saveNick = ()=>{
-  const n = document.getElementById("nickInput").value.trim();
-  if(n.length<2) return alert("Слишком короткий ник");
-  nickname = n;
+function saveNick(){
+  const n=document.getElementById("nickInput").value.trim();
+  if(n.length<2) return;
+  nickname=n;
   localStorage.setItem("nickname",n);
-  document.getElementById("register").classList.add("hidden");
-};
-
-// CLICK
-char.addEventListener("pointerdown",()=>{
-  coins += 1;
-  crystals += 0.1;
-  char.style.transform="scale(.92)";
-  setTimeout(()=>char.style.transform="scale(1)",80);
-  update();
-});
-
-// PASSIVE
-setInterval(()=>{
-  coins += 1;
-  crystals += 0.1;
-  update();
-},1000);
-
-// UPDATE
-function update(){
-  coinsEl.textContent = Math.floor(coins);
-  crystalsEl.textContent = crystals.toFixed(1);
-  saveOnline();
+  document.getElementById("register").style.display="none";
+  db.collection("players").doc(n).set({coins:0});
 }
 
-// SAVE ONLINE
-async function saveOnline(){
-  if(!nickname) return;
-  await setDoc(doc(db,"players",nickname),{
-    nick:nickname,
-    coins:Math.floor(coins),
-    crystals:Math.floor(crystals),
-    time:Date.now()
+function loadPlayer(){
+  db.collection("players").doc(nickname).get().then(d=>{
+    if(d.exists){coins=d.data().coins;updateUI();}
   });
 }
 
-// LEADERBOARD
-window.openLB = async ()=>{
-  const q = query(collection(db,"players"),orderBy("coins","desc"),limit(20));
-  const snap = await getDocs(q);
-  const list = document.getElementById("lbList");
+const coinsEl=document.getElementById("coins");
+function updateUI(){coinsEl.textContent=coins;}
+
+document.getElementById("character").onclick=()=>{
+  coins+=1;
+  updateUI();
+  db.collection("players").doc(nickname).set({coins});
+};
+
+/* ЛИДЕРЫ */
+function openLB(){
+  const list=document.getElementById("lbList");
   list.innerHTML="";
-  snap.forEach(d=>{
-    const p=d.data();
-    const li=document.createElement("li");
-    li.textContent = `${p.nick} — ${p.coins}`;
-    list.appendChild(li);
+  db.collection("players").orderBy("coins","desc").limit(20).get()
+  .then(s=>{
+    let i=1;
+    s.forEach(d=>{
+      list.innerHTML+=`<div class="lb-row"><span>${i++}. ${d.id}</span><span>${d.data().coins}</span></div>`;
+    });
+    document.getElementById("leaderboard").style.display="flex";
   });
-  document.getElementById("lb").style.display="flex";
-};
-
-window.closeLB = ()=>{
-  document.getElementById("lb").style.display="none";
-};
-
+}
+function closeLB(){
+  document.getElementById("leaderboard").style.display="none";
+}
 </script>
+
 </body>
 </html>
