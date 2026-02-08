@@ -41,8 +41,9 @@ body{
 .character{width:260px;cursor:pointer}
 
 .bottom-menu{
-  position:absolute;bottom:20%;left:50%;
+  position:absolute;bottom:18%;left:50%;
   transform:translateX(-50%);
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
 }
 .menu-btn{
   padding:12px 18px;border-radius:18px;
@@ -108,7 +109,7 @@ body{
 <div id="register">
   <h2>Введите никнейм</h2>
   <input id="nickInput" placeholder="Ваш ник">
-  <button onclick="register()">Начать</button>
+  <button onclick="register()">Начать игру</button>
 </div>
 
 <!-- ЛИДЕРБОРД -->
@@ -131,12 +132,16 @@ body{
   <img src="assets/player.png" id="character" class="character">
 </div>
 
+<!-- КНОПКИ -->
 <div class="bottom-menu">
+  <button class="menu-btn" onclick="go('index.html')">🎮 Игра</button>
+  <button class="menu-btn" onclick="go('characters.html')">🧙 Персонажи</button>
+  <button class="menu-btn" onclick="go('shop.html')">🛒 Магазин</button>
   <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
 </div>
 
 <script>
-/* FIREBASE */
+/* 🔥 FIREBASE */
 firebase.initializeApp({
   apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
   authDomain: "nezya-game.firebaseapp.com",
@@ -154,7 +159,7 @@ const lbList = document.getElementById("lbList");
 
 /* АВТОВХОД */
 if(nickname){
-  document.getElementById("register").style.display="none";
+  document.getElementById("register").style.display = "none";
   loadPlayer();
 }
 
@@ -168,23 +173,22 @@ function register(){
 
   nickname = nick;
   localStorage.setItem("nickname", nick);
-  document.getElementById("register").style.display="none";
+  document.getElementById("register").style.display = "none";
 
-  db.collection("players").doc(nick).get().then(doc=>{
-    if(doc.exists){
-      coins = doc.data().coins;
-    }else{
-      coins = 0;
-      db.collection("players").doc(nick).set({ coins: 0 });
-    }
+  db.collection("players").doc(nick).set(
+    { coins: 0 },
+    { merge: true }
+  ).then(()=>{
+    coins = 0;
     updateUI();
   });
 }
 
+/* ЗАГРУЗКА ИГРОКА */
 function loadPlayer(){
   db.collection("players").doc(nickname).get().then(doc=>{
     if(doc.exists){
-      coins = doc.data().coins;
+      coins = doc.data().coins || 0;
       updateUI();
     }
   });
@@ -199,13 +203,16 @@ document.getElementById("character").onclick = ()=>{
   if(!nickname) return;
   coins++;
   updateUI();
-  db.collection("players").doc(nickname).update({ coins });
+
+  db.collection("players").doc(nickname).set(
+    { coins },
+    { merge: true }
+  );
 };
 
-/* 🟢 ONLINE ЛИДЕРБОРД */
+/* ONLINE ЛИДЕРБОРД */
 function openLB(){
-  document.getElementById("leaderboard").style.display="flex";
-
+  document.getElementById("leaderboard").style.display = "flex";
   if(unsubLB) unsubLB();
 
   unsubLB = db.collection("players")
@@ -214,11 +221,10 @@ function openLB(){
     .onSnapshot(snapshot=>{
       lbList.innerHTML = "";
       let place = 1;
-
       snapshot.forEach(doc=>{
-        const isMe = doc.id === nickname ? "me" : "";
+        const me = doc.id === nickname ? "me" : "";
         lbList.innerHTML += `
-          <div class="lb-row ${isMe}">
+          <div class="lb-row ${me}">
             <span>${place++}. ${doc.id}</span>
             <span>${doc.data().coins} 💰</span>
           </div>`;
@@ -227,8 +233,13 @@ function openLB(){
 }
 
 function closeLB(){
-  document.getElementById("leaderboard").style.display="none";
+  document.getElementById("leaderboard").style.display = "none";
   if(unsubLB) unsubLB();
+}
+
+/* НАВИГАЦИЯ */
+function go(page){
+  window.location.href = page;
 }
 </script>
 
