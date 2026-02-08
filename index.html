@@ -41,10 +41,8 @@ body{
   background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
 
-.sound-toggle{
+.sound-toggle, .vibe-toggle{
   position:fixed;
-  top:16px;
-  right:16px;
   background:rgba(0,0,0,.65);
   color:white;
   padding:10px 14px;
@@ -53,6 +51,8 @@ body{
   cursor:pointer;
   z-index:10;
 }
+.sound-toggle{top:16px;right:16px}
+.vibe-toggle{top:60px;right:16px}
 
 .game{
   position:relative;width:100%;height:100%;
@@ -67,10 +67,13 @@ body{
   transition:.12s;
 }
 
-/* АУРЫ */
+/* AURA */
 .aura{
-  position:absolute;inset:-40px;border-radius:50%;
-  opacity:0;filter:blur(18px);
+  position:absolute;
+  inset:-40px;
+  border-radius:50%;
+  opacity:0;
+  filter:blur(18px);
   animation:aura .45s ease-out forwards;
   z-index:-1;
 }
@@ -80,12 +83,16 @@ body{
   100%{opacity:0;transform:scale(1.4)}
 }
 
+/* ULTRA */
 .ultra-aura{
-  position:absolute;inset:-120px;border-radius:50%;
+  position:absolute;
+  inset:-120px;
+  border-radius:50%;
   background:conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red);
   filter:blur(40px);
   animation:ultra 1s ease-out forwards;
-  opacity:0;z-index:-2;
+  opacity:0;
+  z-index:-2;
 }
 @keyframes ultra{
   0%{transform:scale(.3);opacity:0}
@@ -93,9 +100,12 @@ body{
   100%{transform:scale(1.6);opacity:0}
 }
 
+/* SHOCKWAVE */
 .shockwave{
-  position:fixed;left:50%;top:50%;
-  width:20px;height:20px;border-radius:50%;
+  position:fixed;
+  left:50%;top:50%;
+  width:20px;height:20px;
+  border-radius:50%;
   border:4px solid rgba(255,255,255,.8);
   transform:translate(-50%,-50%);
   animation:wave .6s ease-out forwards;
@@ -105,10 +115,13 @@ body{
   to{width:220vw;height:220vw;opacity:0}
 }
 
+/* FLOAT */
 .float{
-  position:absolute;font-size:28px;font-weight:900;
+  position:absolute;
+  font-size:26px;
+  font-weight:900;
   pointer-events:none;
-  animation:fly 1.8s ease-out forwards;
+  animation:fly 1.6s ease-out forwards;
 }
 @keyframes fly{
   to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.4)}
@@ -131,6 +144,7 @@ body{
 
 <div class="overlay"></div>
 <div class="sound-toggle" id="soundBtn">🔊 ON</div>
+<div class="vibe-toggle" id="vibeBtn">📳 ON</div>
 
 <div class="top-bar">
   <div class="balances">
@@ -153,20 +167,33 @@ body{
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-/* ===== ЗВУК ===== */
-const soundBtn = document.getElementById("soundBtn");
+/* НАСТРОЙКИ */
 let soundEnabled = localStorage.getItem("sound") !== "off";
-const clickSound = new Audio("click.mp3");
+let vibeEnabled  = localStorage.getItem("vibe")  !== "off";
 
-soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
+const soundBtn=document.getElementById("soundBtn");
+const vibeBtn=document.getElementById("vibeBtn");
+soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
+vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
 
-soundBtn.onclick = () => {
-  soundEnabled = !soundEnabled;
-  localStorage.setItem("sound", soundEnabled ? "on" : "off");
-  soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
+/* ЗВУК */
+const clickSound=new Audio("click.mp3");
+clickSound.preload="auto";
+let soundUnlocked=false;
+
+soundBtn.onclick=()=>{
+  soundEnabled=!soundEnabled;
+  localStorage.setItem("sound",soundEnabled?"on":"off");
+  soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
 };
 
-/* ===== ПЕРСОНАЖИ ===== */
+vibeBtn.onclick=()=>{
+  vibeEnabled=!vibeEnabled;
+  localStorage.setItem("vibe",vibeEnabled?"on":"off");
+  vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
+};
+
+/* ПЕРСОНАЖИ */
 const characters={
   default:{img:"assets/player.png",power:1,crystal:0,aura:"#ffd54f"},
   clicker:{img:"assets/character_clicker.png",power:2,crystal:0,aura:"#ffeb3b"},
@@ -175,35 +202,37 @@ const characters={
   legendary:{img:"assets/character_legendary.png",power:15,crystal:5,aura:"#ffd700"}
 };
 
-let active = localStorage.getItem("activeCharacter") || "default";
-if(!characters[active]) active="default";
+let active=localStorage.getItem("activeCharacter")||"default";
+let coins=+localStorage.getItem("coins")||0;
+let crystals=+localStorage.getItem("crystals")||0;
+let lastTick=+localStorage.getItem("lastTick")||Date.now();
 
-let coins = +localStorage.getItem("coins") || 0;
-let crystals = +localStorage.getItem("crystals") || 0;
+const character=document.getElementById("character");
+const charWrap=document.getElementById("charWrap");
+character.src=characters[active].img;
 
-const coinsEl = document.getElementById("coins");
-const crystalsEl = document.getElementById("crystals");
-coinsEl.textContent = coins;
-crystalsEl.textContent = crystals;
+/* UI */
+function updateUI(){
+  coinsEl.textContent=coins;
+  crystalsEl.textContent=crystals;
+}
+const coinsEl=document.getElementById("coins");
+const crystalsEl=document.getElementById("crystals");
 
-const character = document.getElementById("character");
-const charWrap = document.getElementById("charWrap");
-character.src = characters[active].img;
-
-/* ===== ЭФФЕКТЫ ===== */
+/* ЭФФЕКТЫ */
 function spawn(text,color){
+  const r=character.getBoundingClientRect();
   const el=document.createElement("div");
   el.className="float";
   el.textContent=text;
   el.style.color=color;
-  el.style.left=Math.random()*innerWidth+"px";
-  el.style.top=Math.random()*innerHeight+"px";
-  el.style.setProperty("--x",(Math.random()*200-100)+"px");
-  el.style.setProperty("--y",(-Math.random()*200-60)+"px");
+  el.style.left=r.left+r.width/2+"px";
+  el.style.top=r.top+r.height/2+"px";
+  el.style.setProperty("--x",(Math.random()*160-80)+"px");
+  el.style.setProperty("--y",(-Math.random()*140-60)+"px");
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1800);
+  setTimeout(()=>el.remove(),1600);
 }
-
 function aura(color){
   const a=document.createElement("div");
   a.className="aura";
@@ -211,14 +240,12 @@ function aura(color){
   charWrap.appendChild(a);
   setTimeout(()=>a.remove(),450);
 }
-
 function ultraAura(){
   const u=document.createElement("div");
   u.className="ultra-aura";
   charWrap.appendChild(u);
   setTimeout(()=>u.remove(),1000);
 }
-
 function shockwave(){
   const s=document.createElement("div");
   s.className="shockwave";
@@ -226,8 +253,36 @@ function shockwave(){
   setTimeout(()=>s.remove(),600);
 }
 
-/* ===== КЛИК ===== */
+/* ПАССИВНЫЙ ДОХОД */
+function getIncomePerSec(){
+  const base={lemonade:3,shop:30,factory:300,bank:3000,corporation:9000,legendary:50000};
+  const incomes=JSON.parse(localStorage.getItem("incomes"))||{};
+  let sum=0;
+  for(let k in base) sum+=(incomes[k]||0)*base[k];
+  return Math.floor(sum/10); // УМЕНЬШЕН
+}
+
+function passiveTick(){
+  const now=Date.now();
+  const diff=Math.floor((now-lastTick)/1000);
+  if(diff<=0) return;
+  const earned=getIncomePerSec()*diff;
+  coins+=earned;
+  lastTick=now;
+  localStorage.setItem("lastTick",now);
+  localStorage.setItem("coins",coins);
+  updateUI();
+}
+setInterval(passiveTick,1000);
+passiveTick();
+
+/* КЛИК */
 character.onclick=()=>{
+  if(!soundUnlocked){
+    clickSound.play().catch(()=>{});
+    clickSound.pause();clickSound.currentTime=0;
+    soundUnlocked=true;
+  }
   if(soundEnabled){
     clickSound.currentTime=0;
     clickSound.play();
@@ -236,17 +291,18 @@ character.onclick=()=>{
   character.style.transform="scale(.88)";
   setTimeout(()=>character.style.transform="scale(1)",120);
 
-  const ch = characters[active];
-  const mult = Math.random() < 0.02 ? 20 : 1;
+  const ch=characters[active];
+  let mult=Math.random()<0.005?20:1;
 
-  const gain = ch.power * mult;
-  coins += gain;
-  crystals += ch.crystal * mult;
+  const gain=ch.power*mult;
+  coins+=gain;
+  crystals+=ch.crystal*mult;
 
-  coinsEl.textContent = coins;
-  crystalsEl.textContent = crystals;
+  if(vibeEnabled && navigator.vibrate){
+    navigator.vibrate(mult===20?[80,40,80]:30);
+  }
 
-  spawn("+"+gain+(mult>1?" x"+mult:""), mult>1?"#ff00ff":"gold");
+  spawn("+"+gain+(mult>1?" x"+mult:""),mult===20?"#ff00ff":"gold");
   aura(ch.aura);
 
   if(mult===20){
@@ -256,7 +312,10 @@ character.onclick=()=>{
 
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
+  updateUI();
 };
+
+updateUI();
 </script>
 
 </body>
