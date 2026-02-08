@@ -41,7 +41,6 @@ body{
   background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
 
-/* 🔊 КНОПКА ЗВУКА */
 .sound-toggle{
   position:fixed;
   top:16px;
@@ -61,12 +60,72 @@ body{
   z-index:2;
 }
 
+/* ПЕРСОНАЖ */
+.character-wrapper{position:relative}
 .character{
   width:320px;max-width:85vw;
   cursor:pointer;
   transition:.12s;
 }
 
+/* ОБЫЧНАЯ АУРА */
+.aura{
+  position:absolute;
+  inset:-40px;
+  border-radius:50%;
+  opacity:0;
+  filter:blur(18px);
+  animation:aura .45s ease-out forwards;
+  z-index:-1;
+}
+
+@keyframes aura{
+  0%{opacity:0;transform:scale(.6)}
+  50%{opacity:.9}
+  100%{opacity:0;transform:scale(1.4)}
+}
+
+/* 🔥 ULTRA AURA */
+.ultra-aura{
+  position:absolute;
+  inset:-120px;
+  border-radius:50%;
+  background:conic-gradient(
+    red, orange, yellow, lime, cyan, blue, violet, red
+  );
+  filter:blur(40px);
+  animation:ultra 1s ease-out forwards;
+  opacity:0;
+  z-index:-2;
+}
+
+@keyframes ultra{
+  0%{transform:scale(.3);opacity:0}
+  40%{opacity:1}
+  100%{transform:scale(1.6);opacity:0}
+}
+
+/* 💥 SHOCKWAVE */
+.shockwave{
+  position:fixed;
+  left:50%;top:50%;
+  width:20px;height:20px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.8);
+  transform:translate(-50%,-50%);
+  animation:wave .6s ease-out forwards;
+  z-index:20;
+}
+
+@keyframes wave{
+  to{
+    width:220vw;
+    height:220vw;
+    opacity:0;
+  }
+}
+
+/* ЦИФРЫ */
 .float{
   position:absolute;
   font-size:28px;
@@ -74,7 +133,6 @@ body{
   pointer-events:none;
   animation:fly 1.8s ease-out forwards;
 }
-
 @keyframes fly{
   to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.4)}
 }
@@ -96,7 +154,6 @@ body{
 <body>
 
 <div class="overlay"></div>
-
 <div class="sound-toggle" id="soundBtn">🔊 ON</div>
 
 <div class="top-bar">
@@ -107,7 +164,9 @@ body{
 </div>
 
 <div class="game">
-  <img id="character" class="character">
+  <div class="character-wrapper" id="charWrap">
+    <img id="character" class="character">
+  </div>
 </div>
 
 <div class="bottom-menu">
@@ -116,126 +175,95 @@ body{
 </div>
 
 <script>
-/* ФОН */
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-/* 🔊 ЗВУК */
+/* ЗВУК */
 let soundEnabled = localStorage.getItem("sound") !== "off";
 const clickSound = new Audio("click.mp3");
-clickSound.volume = 0.6;
 
-const soundBtn = document.getElementById("soundBtn");
-soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
-
-soundBtn.onclick = () => {
-  soundEnabled = !soundEnabled;
-  localStorage.setItem("sound", soundEnabled ? "on" : "off");
-  soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
+document.getElementById("soundBtn").onclick=()=>{
+  soundEnabled=!soundEnabled;
+  localStorage.setItem("sound",soundEnabled?"on":"off");
+  soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
 };
 
 /* ПЕРСОНАЖИ */
 const characters={
-  default:{img:"assets/player.png",power:1,crystal:0},
-  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
-  business:{img:"assets/character_business.png",power:4,crystal:1},
-  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
-  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+  default:{img:"assets/player.png",power:1,crystal:0,aura:"#ffd54f"},
+  clicker:{img:"assets/character_clicker.png",power:2,crystal:0,aura:"#ffeb3b"},
+  business:{img:"assets/character_business.png",power:4,crystal:1,aura:"#4fc3f7"},
+  magnate:{img:"assets/character_magnate.png",power:7,crystal:2,aura:"#ba68c8"},
+  legendary:{img:"assets/character_legendary.png",power:15,crystal:5,aura:"#ffd700"}
 };
 
 let active=localStorage.getItem("activeCharacter")||"default";
-
-/* ДАННЫЕ */
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 
-/* ЭЛЕМЕНТЫ */
-const coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
 const character=document.getElementById("character");
-
-/* ПЕРСОНАЖ */
+const charWrap=document.getElementById("charWrap");
 character.src=characters[active].img;
 
-/* UI */
-function updateUI(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
-}
-updateUI();
-
-/* ЭФФЕКТ */
 function spawn(text,color){
   const el=document.createElement("div");
   el.className="float";
   el.textContent=text;
   el.style.color=color;
-  el.style.left=Math.random()*window.innerWidth+"px";
-  el.style.top=Math.random()*window.innerHeight+"px";
+  el.style.left=Math.random()*innerWidth+"px";
+  el.style.top=Math.random()*innerHeight+"px";
   el.style.setProperty("--x",(Math.random()*200-100)+"px");
   el.style.setProperty("--y",(-Math.random()*200-60)+"px");
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),1800);
 }
 
+function aura(color){
+  const a=document.createElement("div");
+  a.className="aura";
+  a.style.background=color;
+  charWrap.appendChild(a);
+  setTimeout(()=>a.remove(),450);
+}
+
+function ultraAura(){
+  const u=document.createElement("div");
+  u.className="ultra-aura";
+  charWrap.appendChild(u);
+  setTimeout(()=>u.remove(),1000);
+}
+
+function shockwave(){
+  const s=document.createElement("div");
+  s.className="shockwave";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),600);
+}
+
 /* КЛИК */
 character.onclick=()=>{
+  if(soundEnabled){clickSound.currentTime=0;clickSound.play();}
   character.style.transform="scale(.88)";
   setTimeout(()=>character.style.transform="scale(1)",120);
 
-  if(soundEnabled){
-    clickSound.currentTime = 0;
-    clickSound.play();
+  const ch=characters[active];
+  let mult=Math.random()<0.02?20:1;
+
+  let gain=ch.power*mult;
+  coins+=gain;
+  crystals+=ch.crystal*mult;
+
+  spawn("+"+gain+(mult>1?" x"+mult:""),mult>1?"#ff00ff":"gold");
+
+  aura(ch.aura);
+
+  if(mult===20){
+    ultraAura();
+    shockwave();
   }
 
-  const ch=characters[active];
-  coins+=ch.power;
-  crystals+=ch.crystal;
-
-  spawn("+"+ch.power,"gold");
-  if(ch.crystal) spawn("+"+ch.crystal,"cyan");
-
-  save();
-};
-
-/* ПАССИВНЫЙ ДОХОД */
-let lastTick=+localStorage.getItem("lastTick")||Date.now();
-
-function getIncomePerSecond(){
-  const base={lemonade:3,shop:30,factory:300,bank:3000,corporation:9000,legendary:50000};
-  const incomes=JSON.parse(localStorage.getItem("incomes"))||{};
-  let sum=0;
-  for(let k in base) sum+=(incomes[k]||0)*base[k];
-  return Math.floor(sum/10);
-}
-
-function applyPassive(){
-  const now=Date.now();
-  const diff=Math.floor((now-lastTick)/1000);
-  if(diff<=0) return;
-
-  const income=getIncomePerSecond()*diff;
-  coins+=income;
-
-  const crystalGain=Math.floor(income/25000);
-  crystals+=crystalGain;
-
-  if(income>0) spawn("+"+income,"gold");
-  if(crystalGain>0) spawn("+"+crystalGain+" 💎","cyan");
-
-  lastTick=now;
-  save();
-}
-
-setInterval(applyPassive,1000);
-applyPassive();
-
-/* SAVE */
-function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
-  localStorage.setItem("lastTick",lastTick);
-  updateUI();
-}
+};
 </script>
 
 </body>
