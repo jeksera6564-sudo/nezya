@@ -42,6 +42,7 @@ body{
 }
 .level-bar{height:10px;width:0%;background:gold;border-radius:6px}
 .level-text{text-align:center;font-size:13px;font-weight:bold;color:white;margin-top:4px}
+
 .game{
   position:relative;width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;z-index:2
@@ -50,13 +51,56 @@ body{
   width:320px;max-width:85vw;
   cursor:pointer;transition:.12s
 }
+
+/* СИЯНИЕ */
+.glow{
+  filter:drop-shadow(0 0 30px gold);
+}
+
+/* ВЫЛЕТАЮЩИЕ ЦИФРЫ */
 .float{
-  position:absolute;font-size:34px;font-weight:900;
-  pointer-events:none;animation:fly 2s ease-out forwards
+  position:absolute;
+  font-size:34px;
+  font-weight:900;
+  pointer-events:none;
+  animation:fly 1.8s ease-out forwards;
+  text-shadow:0 0 12px currentColor;
 }
 @keyframes fly{
-  to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.5)}
+  to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.6)}
 }
+
+/* КОМБО */
+.combo{
+  position:fixed;
+  top:120px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:28px;
+  font-weight:900;
+  color:#ffeb3b;
+  text-shadow:0 0 15px gold;
+  opacity:0;
+  transition:.2s;
+  z-index:5
+}
+.combo.show{opacity:1}
+
+/* КНОПКА ЗВУКА */
+.sound-btn{
+  position:fixed;
+  right:16px;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,.7);
+  color:white;
+  font-size:22px;
+  padding:14px;
+  border-radius:50%;
+  cursor:pointer;
+  z-index:10;
+}
+
 .bottom-menu{
   position:absolute;bottom:16px;left:50%;
   transform:translateX(-50%);
@@ -73,6 +117,8 @@ body{
 <body>
 
 <div class="overlay"></div>
+<div class="combo" id="combo">COMBO x1</div>
+<div class="sound-btn" id="soundBtn">🔊</div>
 
 <div class="top-bar">
   <div class="balances">
@@ -95,16 +141,19 @@ body{
 </div>
 
 <script>
-/* ФОН */
 document.body.style.backgroundImage = "url('assets/bg.jpg')";
 
-/* ПЕРСОНАЖИ */
+/* ЗВУК */
+const clickSound = new Audio("assets/click.mp3");
+let soundOn = localStorage.getItem("sound") !== "off";
+
+/* ДАННЫЕ */
 const characters = [
-  { img:"assets/player.png", power:1, color:"gold" },
-  { img:"assets/character_clicker.png", power:2, color:"#ffeb3b" },
-  { img:"assets/character_business.png", power:4, color:"#4caf50" },
-  { img:"assets/character_magnate.png", power:7, color:"#03a9f4" },
-  { img:"assets/character_legendary.png", power:15, color:"#e040fb" }
+  { img:"assets/player.png", power:1 },
+  { img:"assets/character_clicker.png", power:2 },
+  { img:"assets/character_business.png", power:4 },
+  { img:"assets/character_magnate.png", power:7 },
+  { img:"assets/character_legendary.png", power:15 }
 ];
 
 let currentChar = +localStorage.getItem("character") || 0;
@@ -112,29 +161,85 @@ let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
 
+/* КОМБО */
+let combo = 0;
+let lastClick = 0;
+
 const coinsEl = document.getElementById("coins");
 const crystalsEl = document.getElementById("crystals");
 const levelEl = document.getElementById("level");
 const levelBar = document.getElementById("levelBar");
 const character = document.getElementById("character");
+const comboEl = document.getElementById("combo");
+const soundBtn = document.getElementById("soundBtn");
 
 character.src = characters[currentChar].img;
 
-function updateUI(){
-  coinsEl.textContent = coins;
-  crystalsEl.textContent = crystals;
-  const lvl = Math.floor(clicks/100)+1;
-  levelEl.textContent = lvl;
-  levelBar.style.width = (clicks%100)+"%";
+/* МНОЖИТЕЛИ */
+function getMultiplier(){
+  const r = Math.random();
+  if(r < 0.005) return 20;
+  if(r < 0.02) return 10;
+  if(r < 0.06) return 5;
+  if(r < 0.15) return 2;
+  return 1;
 }
 
-character.onclick = ()=>{
+function colorByMult(m){
+  return m>=20?"#e040fb":m>=10?"#ff1744":m>=5?"#ff9800":m>=2?"#ffee58":"#fff";
+}
+
+function spawnFloat(text,color,x,y){
+  const el=document.createElement("div");
+  el.className="float";
+  el.textContent=text;
+  el.style.color=color;
+  el.style.left=x+"px";
+  el.style.top=y+"px";
+  el.style.setProperty("--x",(Math.random()*200-100)+"px");
+  el.style.setProperty("--y",(-200-Math.random()*100)+"px");
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1800);
+}
+
+character.onclick = e =>{
+  const now = Date.now();
+  combo = (now-lastClick < 600) ? combo+1 : 1;
+  lastClick = now;
+
+  comboEl.textContent = "COMBO x"+combo;
+  comboEl.classList.add("show");
+  setTimeout(()=>comboEl.classList.remove("show"),500);
+
+  const mult = getMultiplier();
+  const gain = characters[currentChar].power * mult * combo;
+
+  coins += gain;
   clicks++;
-  coins += characters[currentChar].power;
+
+  character.classList.add("glow");
+  setTimeout(()=>character.classList.remove("glow"),150);
+
   character.style.transform="scale(.9)";
   setTimeout(()=>character.style.transform="scale(1)",120);
-  save(); updateUI();
+
+  spawnFloat(`+${gain}${mult>1?" x"+mult:""}`,colorByMult(mult),e.clientX,e.clientY);
+
+  if(soundOn){
+    clickSound.currentTime=0;
+    clickSound.play();
+  }
+
+  save();
+  updateUI();
 };
+
+function updateUI(){
+  coinsEl.textContent=coins;
+  crystalsEl.textContent=crystals;
+  levelEl.textContent=Math.floor(clicks/100)+1;
+  levelBar.style.width=(clicks%100)+"%";
+}
 
 function save(){
   localStorage.setItem("coins",coins);
@@ -143,6 +248,13 @@ function save(){
   localStorage.setItem("character",currentChar);
 }
 
+soundBtn.onclick=()=>{
+  soundOn=!soundOn;
+  soundBtn.textContent=soundOn?"🔊":"🔇";
+  localStorage.setItem("sound",soundOn?"on":"off");
+};
+
+soundBtn.textContent=soundOn?"🔊":"🔇";
 updateUI();
 </script>
 
