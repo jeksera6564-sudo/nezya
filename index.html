@@ -60,7 +60,6 @@ body{
   z-index:2;
 }
 
-/* ПЕРСОНАЖ */
 .character-wrapper{position:relative}
 .character{
   width:320px;max-width:85vw;
@@ -68,68 +67,46 @@ body{
   transition:.12s;
 }
 
-/* ОБЫЧНАЯ АУРА */
+/* АУРЫ */
 .aura{
-  position:absolute;
-  inset:-40px;
-  border-radius:50%;
-  opacity:0;
-  filter:blur(18px);
+  position:absolute;inset:-40px;border-radius:50%;
+  opacity:0;filter:blur(18px);
   animation:aura .45s ease-out forwards;
   z-index:-1;
 }
-
 @keyframes aura{
   0%{opacity:0;transform:scale(.6)}
   50%{opacity:.9}
   100%{opacity:0;transform:scale(1.4)}
 }
 
-/* 🔥 ULTRA AURA */
 .ultra-aura{
-  position:absolute;
-  inset:-120px;
-  border-radius:50%;
-  background:conic-gradient(
-    red, orange, yellow, lime, cyan, blue, violet, red
-  );
+  position:absolute;inset:-120px;border-radius:50%;
+  background:conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red);
   filter:blur(40px);
   animation:ultra 1s ease-out forwards;
-  opacity:0;
-  z-index:-2;
+  opacity:0;z-index:-2;
 }
-
 @keyframes ultra{
   0%{transform:scale(.3);opacity:0}
   40%{opacity:1}
   100%{transform:scale(1.6);opacity:0}
 }
 
-/* 💥 SHOCKWAVE */
 .shockwave{
-  position:fixed;
-  left:50%;top:50%;
-  width:20px;height:20px;
-  border-radius:50%;
+  position:fixed;left:50%;top:50%;
+  width:20px;height:20px;border-radius:50%;
   border:4px solid rgba(255,255,255,.8);
   transform:translate(-50%,-50%);
   animation:wave .6s ease-out forwards;
   z-index:20;
 }
-
 @keyframes wave{
-  to{
-    width:220vw;
-    height:220vw;
-    opacity:0;
-  }
+  to{width:220vw;height:220vw;opacity:0}
 }
 
-/* ЦИФРЫ */
 .float{
-  position:absolute;
-  font-size:28px;
-  font-weight:900;
+  position:absolute;font-size:28px;font-weight:900;
   pointer-events:none;
   animation:fly 1.8s ease-out forwards;
 }
@@ -142,7 +119,6 @@ body{
   transform:translateX(-50%);
   display:flex;gap:14px;z-index:5;
 }
-
 .menu-btn{
   padding:12px 18px;border-radius:18px;
   background:rgba(0,0,0,.65);
@@ -177,17 +153,20 @@ body{
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-/* ЗВУК */
+/* ===== ЗВУК ===== */
+const soundBtn = document.getElementById("soundBtn");
 let soundEnabled = localStorage.getItem("sound") !== "off";
 const clickSound = new Audio("click.mp3");
 
-document.getElementById("soundBtn").onclick=()=>{
-  soundEnabled=!soundEnabled;
-  localStorage.setItem("sound",soundEnabled?"on":"off");
-  soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
+soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
+
+soundBtn.onclick = () => {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("sound", soundEnabled ? "on" : "off");
+  soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
 };
 
-/* ПЕРСОНАЖИ */
+/* ===== ПЕРСОНАЖИ ===== */
 const characters={
   default:{img:"assets/player.png",power:1,crystal:0,aura:"#ffd54f"},
   clicker:{img:"assets/character_clicker.png",power:2,crystal:0,aura:"#ffeb3b"},
@@ -196,14 +175,22 @@ const characters={
   legendary:{img:"assets/character_legendary.png",power:15,crystal:5,aura:"#ffd700"}
 };
 
-let active=localStorage.getItem("activeCharacter")||"default";
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
+let active = localStorage.getItem("activeCharacter") || "default";
+if(!characters[active]) active="default";
 
-const character=document.getElementById("character");
-const charWrap=document.getElementById("charWrap");
-character.src=characters[active].img;
+let coins = +localStorage.getItem("coins") || 0;
+let crystals = +localStorage.getItem("crystals") || 0;
 
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+coinsEl.textContent = coins;
+crystalsEl.textContent = crystals;
+
+const character = document.getElementById("character");
+const charWrap = document.getElementById("charWrap");
+character.src = characters[active].img;
+
+/* ===== ЭФФЕКТЫ ===== */
 function spawn(text,color){
   const el=document.createElement("div");
   el.className="float";
@@ -239,21 +226,27 @@ function shockwave(){
   setTimeout(()=>s.remove(),600);
 }
 
-/* КЛИК */
+/* ===== КЛИК ===== */
 character.onclick=()=>{
-  if(soundEnabled){clickSound.currentTime=0;clickSound.play();}
+  if(soundEnabled){
+    clickSound.currentTime=0;
+    clickSound.play();
+  }
+
   character.style.transform="scale(.88)";
   setTimeout(()=>character.style.transform="scale(1)",120);
 
-  const ch=characters[active];
-  let mult=Math.random()<0.02?20:1;
+  const ch = characters[active];
+  const mult = Math.random() < 0.02 ? 20 : 1;
 
-  let gain=ch.power*mult;
-  coins+=gain;
-  crystals+=ch.crystal*mult;
+  const gain = ch.power * mult;
+  coins += gain;
+  crystals += ch.crystal * mult;
 
-  spawn("+"+gain+(mult>1?" x"+mult:""),mult>1?"#ff00ff":"gold");
+  coinsEl.textContent = coins;
+  crystalsEl.textContent = crystals;
 
+  spawn("+"+gain+(mult>1?" x"+mult:""), mult>1?"#ff00ff":"gold");
   aura(ch.aura);
 
   if(mult===20){
