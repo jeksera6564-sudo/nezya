@@ -40,88 +40,18 @@ body{
   align-items:center;
 }
 
-.coin{
-  width:18px;height:18px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
-}
-.crystal{
-  width:16px;height:16px;
-  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
-  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
-}
+.coin{width:18px;height:18px;border-radius:50%;background:gold}
+.crystal{width:16px;height:16px;background:#38bdf8}
 
 .level-wrap{
-  width:200px;
-  background:rgba(0,0,0,.6);
-  border-radius:12px;
-  padding:5px;
+  width:200px;background:rgba(0,0,0,.6);
+  border-radius:12px;padding:5px;
 }
-.level-bar{
-  height:10px;
-  background:gold;
-  border-radius:8px;
-  width:0%;
-}
-.level-text{
-  text-align:center;
-  font-size:12px;
-  font-weight:bold;
-  color:white;
-  margin-top:3px;
-}
+.level-bar{height:10px;background:gold;border-radius:8px;width:0%}
+.level-text{text-align:center;font-size:12px;font-weight:bold;color:white;margin-top:3px}
 
-.combo{
-  font-weight:900;
-  color:#22c55e;
-  text-shadow:0 0 10px #22c55e;
-  font-size:13px;
-}
-
-.game{
-  position:relative;
-  width:100%;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.character-wrap{position:relative}
-
-.character{
-  width:260px;
-  max-width:80vw;
-  cursor:pointer;
-  transition:transform .12s ease;
-}
-
-.aura{
-  position:absolute;
-  inset:-30px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
-  opacity:0;
-  animation:aura .4s ease-out forwards;
-  pointer-events:none;
-}
-
-@keyframes aura{
-  from{transform:scale(.6);opacity:.9}
-  to{transform:scale(1.4);opacity:0}
-}
-
-.float{
-  position:fixed;
-  font-size:26px;
-  font-weight:900;
-  pointer-events:none;
-  animation:fly 1.6s ease-out forwards;
-  z-index:9999;
-}
-
-@keyframes fly{
-  to{opacity:0;transform:translateY(-80px) scale(1.4)}
-}
+.game{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.character{width:260px;max-width:80vw}
 
 .bottom-menu{
   position:absolute;
@@ -132,58 +62,35 @@ body{
   gap:12px;
   z-index:6;
 }
-
 .menu-btn{
   padding:12px 16px;
   border-radius:18px;
   background:rgba(0,0,0,.65);
   color:white;
   font-weight:900;
-  text-decoration:none;
+  border:none;
 }
 
 /* 🏆 ЛИДЕРЫ */
 .leaderboard{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:url("assets/kubok.jpg") center/cover no-repeat;
-  display:none;
-  flex-direction:column;
-  padding:20px;
-  color:white;
-  z-index:20;
+  display:none;flex-direction:column;
+  padding:20px;z-index:20;color:white;
 }
-
 .lb-box{
-  background:rgba(0,0,0,.7);
-  border-radius:16px;
-  padding:16px;
-  max-height:80vh;
-  overflow:auto;
+  background:rgba(0,0,0,.75);
+  border-radius:16px;padding:16px;
+  max-height:80vh;overflow:auto;
 }
-
-.lb-title{
-  text-align:center;
-  font-size:22px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
 .lb-row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px solid rgba(255,255,255,.15);
-  font-weight:bold;
+  display:flex;justify-content:space-between;
+  padding:6px 0;border-bottom:1px solid rgba(255,255,255,.15);
 }
-
 .lb-close{
-  margin-top:12px;
-  text-align:center;
-  padding:10px;
-  border-radius:14px;
-  background:#ef4444;
-  font-weight:900;
+  margin-top:12px;text-align:center;
+  padding:10px;border-radius:14px;
+  background:#ef4444;font-weight:900;
 }
 </style>
 </head>
@@ -200,66 +107,53 @@ if(!localStorage.getItem("nickname")){
 
 <div class="top-bar">
   <div class="balances">
-    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+    <div class="balance">💰 <span id="coins">0</span></div>
+    <div class="balance">💎 <span id="crystals">0</span></div>
   </div>
-
   <div class="level-wrap">
     <div class="level-bar" id="levelBar"></div>
     <div class="level-text">Уровень <span id="level">1</span></div>
   </div>
-
-  <div class="combo" id="combo">Комбо x1</div>
 </div>
 
 <div class="game">
-  <div class="character-wrap" id="charWrap">
-    <img id="character" class="character">
-  </div>
+  <img id="character" class="character" src="assets/player.png">
 </div>
 
 <div class="bottom-menu">
-  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
   <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
 </div>
 
 <div class="leaderboard" id="lb">
   <div class="lb-box">
-    <div class="lb-title">🏆 TOP-20 игроков</div>
+    <h2 style="text-align:center">🏆 TOP-20</h2>
     <div id="lbList"></div>
     <div class="lb-close" onclick="closeLB()">Закрыть</div>
   </div>
 </div>
 
+<!-- 🔥 FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-document.body.style.backgroundImage="url('assets/bg.jpg')";
-
-const characters={
-  default:{img:"assets/player.png",power:1,crystal:0},
-  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
-  business:{img:"assets/character_business.png",power:4,crystal:1},
-  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
-  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+const firebaseConfig = {
+  apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
+  authDomain: "nezya-game.firebaseapp.com",
+  projectId: "nezya-game"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-let active=localStorage.getItem("activeCharacter")||"default";
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
-let clicks=+localStorage.getItem("clicks")||0;
-let combo=1,lastClick=0;
-
-const nickname=localStorage.getItem("nickname");
-
-const character=document.getElementById("character");
-const wrap=document.getElementById("charWrap");
-character.src=characters[active].img;
+let coins = +localStorage.getItem("coins") || 0;
+let crystals = +localStorage.getItem("crystals") || 0;
+let clicks = +localStorage.getItem("clicks") || 0;
+const nickname = localStorage.getItem("nickname");
 
 const coinsEl=document.getElementById("coins");
 const crystalsEl=document.getElementById("crystals");
 const levelEl=document.getElementById("level");
 const levelBar=document.getElementById("levelBar");
-const comboEl=document.getElementById("combo");
 
 function updateUI(){
   coinsEl.textContent=coins;
@@ -267,38 +161,13 @@ function updateUI(){
   const lvl=Math.floor(clicks/100)+1;
   levelEl.textContent=lvl;
   levelBar.style.width=(clicks%100)+"%";
-  comboEl.textContent="Комбо x"+combo;
 }
 
-character.onclick=()=>{
-  character.style.transform="scale(.9)";
-  setTimeout(()=>character.style.transform="scale(1)",120);
-
-  const a=document.createElement("div");
-  a.className="aura";
-  wrap.appendChild(a);
-  setTimeout(()=>a.remove(),400);
-
-  const now=Date.now();
-  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
-  lastClick=now;
-
-  let mult=1;
-  const r=Math.random();
-  if(r<0.01) mult=20;
-  else if(r<0.03) mult=10;
-  else if(r<0.07) mult=5;
-  else if(r<0.15) mult=2;
-
-  const ch=characters[active];
-  const gain=ch.power*combo*mult;
-
-  coins+=gain;
-  crystals+=ch.crystal;
+document.getElementById("character").onclick=()=>{
+  coins++;
   clicks++;
-
-  saveScore();
   save();
+  saveScore();
   updateUI();
 };
 
@@ -306,25 +175,31 @@ function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
-  localStorage.setItem("activeCharacter",active);
 }
 
 function saveScore(){
-  let lb=JSON.parse(localStorage.getItem("leaderboard")||"[]");
-  lb=lb.filter(p=>p.nick!==nickname);
-  lb.push({nick:nickname,coins});
-  lb.sort((a,b)=>b.coins-a.coins);
-  lb=lb.slice(0,20);
-  localStorage.setItem("leaderboard",JSON.stringify(lb));
+  db.collection("leaderboard").doc(nickname).set({
+    nick:nickname,
+    coins:coins
+  });
 }
 
 function openLB(){
-  const lb=JSON.parse(localStorage.getItem("leaderboard")||"[]");
   const list=document.getElementById("lbList");
-  list.innerHTML="";
-  lb.forEach((p,i)=>{
-    list.innerHTML+=`<div class="lb-row"><span>${i+1}. ${p.nick}</span><span>${p.coins}</span></div>`;
-  });
+  list.innerHTML="Загрузка...";
+  db.collection("leaderboard")
+    .orderBy("coins","desc")
+    .limit(20)
+    .get()
+    .then(snap=>{
+      list.innerHTML="";
+      let i=1;
+      snap.forEach(d=>{
+        const p=d.data();
+        list.innerHTML+=`<div class="lb-row"><span>${i}. ${p.nick}</span><span>${p.coins}</span></div>`;
+        i++;
+      });
+    });
   document.getElementById("lb").style.display="flex";
 }
 function closeLB(){
