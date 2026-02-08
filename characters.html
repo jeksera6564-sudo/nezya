@@ -13,7 +13,7 @@ body {
   min-height: 100vh;
   background:
     linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.75)),
-    url("./characters-bg.jpg") center / cover no-repeat fixed;
+    url("assets/characters-bg.jpg") center / cover no-repeat fixed;
 }
 
 /* верх */
@@ -73,7 +73,6 @@ h1 {
 
 .card:hover { transform: scale(1.04); }
 
-/* редкости */
 .common { border: 2px solid #9ca3af; }
 .rare { border: 2px solid #3b82f6; }
 .epic { border: 2px solid #a855f7; }
@@ -88,7 +87,6 @@ h1 {
   margin-bottom: 6px;
 }
 
-/* кнопки */
 button {
   margin-top: 8px;
   padding: 8px 18px;
@@ -102,10 +100,8 @@ button {
 button:disabled {
   background: #666;
   color: #aaa;
-  cursor: not-allowed;
 }
 
-/* активный */
 .active {
   outline: 3px solid #22c55e;
   animation: pulse 1.5s infinite;
@@ -123,7 +119,6 @@ button:disabled {
   margin-top: 6px;
 }
 
-/* низ */
 .bottom {
   position: fixed;
   bottom: 10px;
@@ -162,18 +157,23 @@ let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
 
-let owned = JSON.parse(localStorage.getItem("characters")) || { default:true };
+let owned = JSON.parse(localStorage.getItem("characters"));
+if(!owned){
+  owned = { default:true };
+  localStorage.setItem("characters", JSON.stringify(owned));
+}
+
 let active = localStorage.getItem("activeCharacter") || "default";
 
 const level = Math.floor(clicks / 100) + 1;
 
 /* ВАЖНО: порядок = индекс для index.html */
 const characters = [
-  { id:"default", name:"👦 Новичок", img:"./character_default.png", price:0, currency:"free", rarity:"common" },
-  { id:"clicker", name:"⚡ Кликер", img:"./character_clicker.png", price:5000, currency:"coins", rarity:"rare" },
-  { id:"business", name:"🏪 Бизнесмен", img:"./character_business.png", price:25000, currency:"coins", rarity:"epic" },
-  { id:"magnate", name:"🏦 Магнат", img:"./character_magnate.png", price:50, currency:"crystals", level:50, rarity:"legendary" },
-  { id:"legendary", name:"👑 Легенда", img:"./character_legendary.png", price:100, currency:"crystals", level:100, rarity:"legendary" }
+  { id:"default", name:"👦 Новичок", img:"assets/player.png", price:0, currency:"free", rarity:"common" },
+  { id:"clicker", name:"⚡ Кликер", img:"assets/character_clicker.png", price:5000, currency:"coins", rarity:"rare" },
+  { id:"business", name:"🏪 Бизнесмен", img:"assets/character_business.png", price:25000, currency:"coins", rarity:"epic" },
+  { id:"magnate", name:"🏦 Магнат", img:"assets/character_magnate.png", price:50, currency:"crystals", level:50, rarity:"legendary" },
+  { id:"legendary", name:"👑 Легенда", img:"assets/character_legendary.png", price:100, currency:"crystals", level:100, rarity:"legendary" }
 ];
 
 document.getElementById("coins").textContent = coins;
@@ -227,22 +227,24 @@ function buy(c, index){
   if(c.currency==="coins" && coins<c.price) return;
   if(c.currency==="crystals" && crystals<c.price) return;
 
-  c.currency==="coins" ? coins-=c.price : crystals-=c.price;
-  owned[c.id]=true;
+  if(c.currency==="coins") coins -= c.price;
+  else crystals -= c.price;
+
+  owned[c.id] = true;
   select(c.id, index);
 }
 
 function select(id, index){
-  active=id;
+  active = id;
   localStorage.setItem("activeCharacter", id);
-  localStorage.setItem("character", index); // 🔥 КЛЮЧЕВО
+  localStorage.setItem("character", index); // для index.html
   save();
 }
 
 function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
-  localStorage.setItem("characters",JSON.stringify(owned));
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("crystals", crystals);
+  localStorage.setItem("characters", JSON.stringify(owned));
   render();
 }
 
