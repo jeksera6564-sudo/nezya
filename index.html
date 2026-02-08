@@ -65,24 +65,19 @@ body{
   width:320px;max-width:85vw;
   cursor:pointer;
   transition:.15s;
-  animation:appear .35s ease;
-}
-
-@keyframes appear{
-  from{transform:scale(.6);opacity:0}
-  to{transform:scale(1);opacity:1}
 }
 
 .float{
-  position:absolute;
-  font-size:34px;
+  position:fixed;
+  font-size:28px;
   font-weight:900;
   pointer-events:none;
-  animation:fly 2s ease-out forwards;
+  animation:fly 1.8s ease-out forwards;
+  z-index:9999;
 }
 
 @keyframes fly{
-  to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.6)}
+  to{opacity:0;transform:translateY(-80px) scale(1.5)}
 }
 
 .bottom-menu{
@@ -127,100 +122,80 @@ body{
 </div>
 
 <script>
-/* ФОН */
 document.body.style.backgroundImage = "url('assets/bg.jpg')";
 
-/* ПЕРСОНАЖИ (ID СОВПАДАЮТ С characters.html) */
-const characters = {
-  default:{ img:"assets/player.png", power:1, crystal:0 },
-  clicker:{ img:"assets/character_clicker.png", power:2, crystal:0 },
-  business:{ img:"assets/character_business.png", power:4, crystal:1 },
-  magnate:{ img:"assets/character_magnate.png", power:7, crystal:2 },
-  legendary:{ img:"assets/character_legendary.png", power:15, crystal:5 }
+/* ПЕРСОНАЖИ */
+const characters={
+  default:{img:"assets/player.png",power:1,crystal:0},
+  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
+  business:{img:"assets/character_business.png",power:4,crystal:1},
+  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
+  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
 };
 
-let activeCharacter = localStorage.getItem("activeCharacter") || "default";
+let activeCharacter=localStorage.getItem("activeCharacter")||"default";
 
-/* ДАННЫЕ */
-let coins = +localStorage.getItem("coins") || 0;
-let crystals = +localStorage.getItem("crystals") || 0;
-let clicks = +localStorage.getItem("clicks") || 0;
-let combo = 1;
-let lastClick = Date.now();
+let coins=+localStorage.getItem("coins")||0;
+let crystals=+localStorage.getItem("crystals")||0;
+let clicks=+localStorage.getItem("clicks")||0;
+let combo=1,lastClick=Date.now();
 
-/* ЭЛЕМЕНТЫ */
-const coinsEl = document.getElementById("coins");
-const crystalsEl = document.getElementById("crystals");
-const levelEl = document.getElementById("level");
-const levelBar = document.getElementById("levelBar");
-const character = document.getElementById("character");
-const comboEl = document.getElementById("combo");
+const coinsEl=document.getElementById("coins");
+const crystalsEl=document.getElementById("crystals");
+const levelEl=document.getElementById("level");
+const levelBar=document.getElementById("levelBar");
+const comboEl=document.getElementById("combo");
+const character=document.getElementById("character");
 
-/* ЗАГРУЗКА ПЕРСОНАЖА */
-function loadCharacter(){
-  character.style.opacity = 0;
-  setTimeout(()=>{
-    character.src = characters[activeCharacter].img;
-    character.style.opacity = 1;
-  },120);
-}
-loadCharacter();
+character.src=characters[activeCharacter].img;
 
 /* UI */
 function updateUI(){
-  coinsEl.textContent = coins;
-  crystalsEl.textContent = crystals;
-  const lvl = Math.floor(clicks/100)+1;
-  levelEl.textContent = lvl;
-  levelBar.style.width = (clicks%100)+"%";
-  comboEl.textContent = "Комбо x"+combo;
+  coinsEl.textContent=coins;
+  crystalsEl.textContent=crystals;
+  const lvl=Math.floor(clicks/100)+1;
+  levelEl.textContent=lvl;
+  levelBar.style.width=(clicks%100)+"%";
+  comboEl.textContent="Комбо x"+combo;
 }
 
 /* КЛИК */
-character.onclick = ()=>{
-  const now = Date.now();
-  combo = (now-lastClick<800) ? Math.min(combo+1,20) : 1;
-  lastClick = now;
+character.onclick=()=>{
+  const now=Date.now();
+  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
+  lastClick=now;
 
-  const ch = characters[activeCharacter];
+  const ch=characters[activeCharacter];
+  let multi=1;
+  const r=Math.random();
+  if(r<0.01)multi=20;
+  else if(r<0.03)multi=10;
+  else if(r<0.07)multi=5;
+  else if(r<0.15)multi=2;
 
-  let multi = 1;
-  const r = Math.random();
-  if(r<0.01) multi=20;
-  else if(r<0.03) multi=10;
-  else if(r<0.07) multi=5;
-  else if(r<0.15) multi=2;
-
-  const gain = ch.power * combo * multi;
-  coins += gain;
-  crystals += ch.crystal;
-
-  spawn("+"+gain+(multi>1?" x"+multi:""), multi>=10?"#f43f5e":"gold");
-
-  character.style.transform="scale(.88)";
-  setTimeout(()=>character.style.transform="scale(1)",120);
+  const gain=ch.power*combo*multi;
+  coins+=gain;
+  crystals+=ch.crystal;
+  spawn("+"+gain,multi>=10?"#f43f5e":"gold");
 
   clicks++;
-  save(); updateUI();
+  save();updateUI();
 };
 
-/* ЭФФЕКТ */
+/* FLOAT */
 function spawn(text,color){
-  const r = character.getBoundingClientRect();
-  const el = document.createElement("div");
-  el.className="float";
-  el.textContent=text;
-  el.style.color=color;
-  el.style.left=r.left+r.width/2+"px";
-  el.style.top=r.top+r.height/2+"px";
-  el.style.setProperty("--x",(Math.random()*200-100)+"px");
-  el.style.setProperty("--y",(-Math.random()*160-60)+"px");
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),2000);
+  const e=document.createElement("div");
+  e.className="float";
+  e.textContent=text;
+  e.style.color=color;
+  e.style.left=Math.random()*80+10+"vw";
+  e.style.top=Math.random()*50+20+"vh";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),1800);
 }
 
-/* ГЛОБАЛЬНЫЙ ДОХОД */
-let lastTick = +localStorage.getItem("lastTick") || Date.now();
+/* ПАССИВНЫЙ ДОХОД */
+let lastTick=+localStorage.getItem("lastTick")||Date.now();
 
 function getIncomePerSecond(){
   const base={lemonade:3,shop:30,factory:300,bank:3000,corporation:9000,legendary:50000};
@@ -235,38 +210,39 @@ function getIncomePerSecond(){
 function applyGlobalIncome(){
   const now=Date.now();
   const diff=Math.floor((now-lastTick)/1000);
-  if(diff<=0) return;
+  if(diff<=0)return;
 
-  let coinsLS=+localStorage.getItem("coins")||0;
-  let crystalsLS=+localStorage.getItem("crystals")||0;
+  let earned=Math.floor(getIncomePerSecond()*diff/10); // ⬅ УМЕНЬШЕНО В 10 РАЗ
+  if(earned<=0)return;
+
+  coins+=earned;
+  spawn("+"+earned+" 🪙","gold");
+
   const upgrades=JSON.parse(localStorage.getItem("upgrades"))||{};
-
-  const earned=getIncomePerSecond()*diff;
-  coinsLS+=earned;
-
   if(upgrades.crystalIncome){
-    crystalsLS+=Math.floor(earned/5000);
+    const cry=Math.floor(earned/25000); // ⬅ УМЕНЬШЕНО В 5 РАЗ
+    if(cry>0){
+      crystals+=cry;
+      spawn("+"+cry+" 💎","cyan");
+    }
   }
 
-  localStorage.setItem("coins",coinsLS);
-  localStorage.setItem("crystals",crystalsLS);
-  localStorage.setItem("lastTick",now);
-
-  coins=coinsLS;
-  crystals=crystalsLS;
-  updateUI();
+  lastTick=now;
+  save();updateUI();
 }
 
 setInterval(applyGlobalIncome,1000);
 applyGlobalIncome();
 
-/* СОХРАНЕНИЕ */
+/* SAVE */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
   localStorage.setItem("activeCharacter",activeCharacter);
+  localStorage.setItem("lastTick",lastTick);
 }
+
 updateUI();
 </script>
 
