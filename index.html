@@ -14,22 +14,17 @@ body{
   overflow:hidden;
   user-select:none;
 }
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  pointer-events:none;
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
 .top-bar{
   position:absolute;
-  top:10px;
+  top:12px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
   flex-direction:column;
-  align-items:center;
   gap:6px;
+  align-items:center;
   z-index:5;
 }
 
@@ -38,19 +33,52 @@ body{
   background:rgba(0,0,0,.65);
   padding:8px 14px;
   border-radius:18px;
-  color:white;
   font-weight:900;
+  color:#fff;
   display:flex;
-  align-items:center;
   gap:6px;
+  align-items:center;
 }
 
-.coin{width:18px;height:18px;border-radius:50%;background:gold}
-.crystal{width:16px;height:16px;clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);background:#38bdf8}
+.coin{
+  width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
+}
+.crystal{
+  width:16px;height:16px;
+  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
+}
 
-.combo{color:#22c55e;font-weight:900;text-shadow:0 0 10px #22c55e}
+.level-wrap{
+  width:200px;
+  background:rgba(0,0,0,.6);
+  border-radius:12px;
+  padding:5px;
+}
+.level-bar{
+  height:10px;
+  background:gold;
+  border-radius:8px;
+  width:0%;
+}
+.level-text{
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  color:white;
+  margin-top:3px;
+}
+
+.combo{
+  font-weight:900;
+  color:#22c55e;
+  text-shadow:0 0 10px #22c55e;
+  font-size:13px;
+}
 
 .game{
+  position:relative;
   width:100%;
   height:100%;
   display:flex;
@@ -59,27 +87,27 @@ body{
 }
 
 .character-wrap{position:relative}
+
 .character{
-  width:260px;
+  width:280px;
   max-width:80vw;
-  transition:transform .1s ease;
+  cursor:pointer;
+  transition:transform .12s ease;
 }
 
 .aura{
   position:absolute;
-  inset:-35px;
+  inset:-30px;
   border-radius:50%;
   background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
-  animation:aura .5s ease-out forwards;
-}
-
-.ultra{
-  background:radial-gradient(circle,rgba(255,0,255,.8),transparent 70%);
+  opacity:0;
+  animation:aura .4s ease-out forwards;
+  pointer-events:none;
 }
 
 @keyframes aura{
-  from{transform:scale(.5);opacity:1}
-  to{transform:scale(1.6);opacity:0}
+  from{transform:scale(.6);opacity:.9}
+  to{transform:scale(1.4);opacity:0}
 }
 
 .float{
@@ -87,29 +115,30 @@ body{
   font-size:26px;
   font-weight:900;
   pointer-events:none;
-  animation:fly 1.5s ease-out forwards;
+  animation:fly 1.6s ease-out forwards;
+  z-index:9999;
 }
 
 @keyframes fly{
-  to{opacity:0;transform:translateY(-90px) scale(1.4)}
+  to{opacity:0;transform:translateY(-80px) scale(1.4)}
 }
 
 .bottom-menu{
   position:absolute;
-  bottom:14%;
+  bottom:22%;
   left:50%;
   transform:translateX(-50%);
   display:flex;
-  gap:12px;
+  gap:14px;
 }
 
 .menu-btn{
-  padding:12px 16px;
+  padding:12px 18px;
   border-radius:18px;
   background:rgba(0,0,0,.65);
   color:white;
   font-weight:900;
-  border:none;
+  text-decoration:none;
 }
 </style>
 </head>
@@ -117,6 +146,7 @@ body{
 <body>
 
 <script>
+/* 🔒 ПРОВЕРКА НИКА */
 if(!localStorage.getItem("nickname")){
   location.href="register.html";
 }
@@ -129,100 +159,113 @@ if(!localStorage.getItem("nickname")){
     <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
     <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
+
+  <div class="level-wrap">
+    <div class="level-bar" id="levelBar"></div>
+    <div class="level-text">Уровень <span id="level">1</span></div>
+  </div>
+
   <div class="combo" id="combo">Комбо x1</div>
 </div>
 
 <div class="game">
-  <div class="character-wrap" id="wrap">
-    <img id="character" class="character" alt="character">
+  <div class="character-wrap" id="charWrap">
+    <img id="character" class="character">
   </div>
 </div>
 
 <div class="bottom-menu">
-  <button class="menu-btn">🛒 Магазин</button>
-  <button class="menu-btn">🧍 Персонажи</button>
+  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
 </div>
-
-<audio id="clickSound" src="click.mp3"></audio>
 
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
+/* ПЕРСОНАЖИ */
 const characters={
   default:{img:"assets/player.png",power:1,crystal:0},
+  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
   business:{img:"assets/character_business.png",power:4,crystal:1},
+  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
   legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
 };
 
-let active="default";
+let active=localStorage.getItem("activeCharacter")||"default";
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
+let clicks=+localStorage.getItem("clicks")||0;
 let combo=1,lastClick=0;
 
 const character=document.getElementById("character");
-const wrap=document.getElementById("wrap");
+const wrap=document.getElementById("charWrap");
 character.src=characters[active].img;
 
 const coinsEl=document.getElementById("coins");
 const crystalsEl=document.getElementById("crystals");
+const levelEl=document.getElementById("level");
+const levelBar=document.getElementById("levelBar");
 const comboEl=document.getElementById("combo");
-const sound=document.getElementById("clickSound");
 
-function update(){
+function updateUI(){
   coinsEl.textContent=coins;
   crystalsEl.textContent=crystals;
+  const lvl=Math.floor(clicks/100)+1;
+  levelEl.textContent=lvl;
+  levelBar.style.width=(clicks%100)+"%";
   comboEl.textContent="Комбо x"+combo;
 }
 
-character.onclick=(e)=>{
+character.onclick=()=>{
   character.style.transform="scale(.9)";
-  setTimeout(()=>character.style.transform="scale(1)",100);
+  setTimeout(()=>character.style.transform="scale(1)",120);
 
-  sound.currentTime=0;
-  sound.play().catch(()=>{});
-
-  if(navigator.vibrate) navigator.vibrate(20);
+  const a=document.createElement("div");
+  a.className="aura";
+  wrap.appendChild(a);
+  setTimeout(()=>a.remove(),400);
 
   const now=Date.now();
   combo=(now-lastClick<800)?Math.min(combo+1,20):1;
   lastClick=now;
 
   let mult=1;
-  if(combo===20) mult=20;
+  const r=Math.random();
+  if(r<0.01) mult=20;
+  else if(r<0.03) mult=10;
+  else if(r<0.07) mult=5;
+  else if(r<0.15) mult=2;
 
   const ch=characters[active];
   const gain=ch.power*combo*mult;
 
   coins+=gain;
   crystals+=ch.crystal;
+  clicks++;
 
-  const aura=document.createElement("div");
-  aura.className="aura"+(combo===20?" ultra":"");
-  wrap.appendChild(aura);
-  setTimeout(()=>aura.remove(),500);
-
-  const f=document.createElement("div");
-  f.className="float";
-  f.textContent="+"+gain;
-  f.style.left=e.clientX+"px";
-  f.style.top=e.clientY+"px";
-  document.body.appendChild(f);
-  setTimeout(()=>f.remove(),1500);
-
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
-
-  update();
+  spawn("+"+gain,mult>=10?"#fb7185":"gold");
+  save();updateUI();
 };
 
-// пассивный доход
-setInterval(()=>{
-  coins+=1;
-  crystals+=0.2;
-  update();
-},1000);
+function spawn(text,color){
+  const e=document.createElement("div");
+  e.className="float";
+  e.textContent=text;
+  e.style.color=color;
+  e.style.left=Math.random()*80+10+"vw";
+  e.style.top=Math.random()*40+30+"vh";
+  document.body.appendChild(e);
+  setTimeout(()=>e.remove(),1600);
+}
 
-update();
+function save(){
+  localStorage.setItem("coins",coins);
+  localStorage.setItem("crystals",crystals);
+  localStorage.setItem("clicks",clicks);
+  localStorage.setItem("activeCharacter",active);
+}
+
+updateUI();
 </script>
 
 </body>
