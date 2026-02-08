@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Вход — Nezya</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(180deg,#000,#111);
+  font-family:Arial,sans-serif;
+  color:white;
+}
+.box{
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  width:90%;
+  max-width:320px;
+}
+input{
+  padding:14px 18px;
+  border-radius:20px;
+  border:none;
+  font-size:18px;
+}
+button{
+  padding:14px;
+  border-radius:22px;
+  border:none;
+  background:gold;
+  font-weight:900;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h1>Добро пожаловать 👋</h1>
+  <p>Введи свой ник</p>
+  <input id="name" placeholder="Никнейм">
+  <button onclick="start()">Начать</button>
+</div>
+
+<script>
+/* если ник уже есть — сразу в игру */
+if(localStorage.getItem("nickname")){
+  location.href="index.html";
+}
+
+function start(){
+  const name=document.getElementById("name").value.trim();
+  if(!name) return alert("Введи ник");
+  localStorage.setItem("nickname",name);
+  location.href="index.html";
+}
+</script>
+
+</body>
+</html>
