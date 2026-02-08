@@ -42,14 +42,13 @@ body{
 }
 .level-bar{height:10px;width:0%;background:gold;border-radius:6px}
 .level-text{text-align:center;font-size:13px;font-weight:bold;color:white;margin-top:4px}
-
 .game{
   position:relative;width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;z-index:2
 }
 .character{
   width:320px;max-width:85vw;
-  cursor:pointer;transition:transform .12s ease
+  cursor:pointer;transition:.12s
 }
 .float{
   position:absolute;font-size:34px;font-weight:900;
@@ -87,7 +86,7 @@ body{
 </div>
 
 <div class="game">
-  <img id="character" class="character" src="./player.png">
+  <img id="character" class="character">
 </div>
 
 <div class="bottom-menu">
@@ -96,20 +95,19 @@ body{
 </div>
 
 <script>
-/* ФОН ИГРЫ */
-document.body.style.backgroundImage = "url('./game-bg.jpg')";
+/* ФОН */
+document.body.style.backgroundImage = "url('./assets/bg.jpg')";
 
 /* ПЕРСОНАЖИ */
 const characters = [
-  { img:"./player.png", power:1, color:"gold" },
-  { img:"./character_clicker.png", power:2, color:"#ffeb3b" },
-  { img:"./character_business.png", power:4, color:"#4caf50" },
-  { img:"./character_magnate.png", power:7, color:"#03a9f4" },
-  { img:"./character_legendary.png", power:15, color:"#e040fb" }
+  { img:"./assets/player.png", power:1, color:"gold" },
+  { img:"./assets/character_clicker.png", power:2, color:"#ffeb3b" },
+  { img:"./assets/character_business.png", power:4, color:"#4caf50" },
+  { img:"./assets/character_magnate.png", power:7, color:"#03a9f4" },
+  { img:"./assets/character_legendary.png", power:15, color:"#e040fb" }
 ];
 
 let currentChar = +localStorage.getItem("character") || 0;
-
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
@@ -132,29 +130,11 @@ function updateUI(){
 
 character.onclick = ()=>{
   clicks++;
-  const gain = characters[currentChar].power;
-  coins += gain;
-
-  character.style.transform="scale(0.9)";
+  coins += characters[currentChar].power;
+  character.style.transform="scale(.9)";
   setTimeout(()=>character.style.transform="scale(1)",120);
-
-  spawn("+"+gain, characters[currentChar].color);
   save(); updateUI();
 };
-
-function spawn(text,color){
-  const r = character.getBoundingClientRect();
-  const el = document.createElement("div");
-  el.className="float";
-  el.textContent=text;
-  el.style.color=color;
-  el.style.left=r.left+r.width/2+"px";
-  el.style.top=r.top+r.height/2+"px";
-  el.style.setProperty("--x",(Math.random()*200-100)+"px");
-  el.style.setProperty("--y",(-Math.random()*150-50)+"px");
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),2000);
-}
 
 function save(){
   localStorage.setItem("coins",coins);
