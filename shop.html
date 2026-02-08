@@ -9,46 +9,68 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   color: white;
+  min-height: 100vh;
   background:
-    linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.9)),
-    url("shop-bg.jpg") center / cover no-repeat fixed;
+    linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)),
+    url("assets/shop-bg.jpg") center / cover no-repeat fixed;
 }
 
+/* верх */
 .top {
   display: flex;
   justify-content: center;
-  padding: 12px;
+  padding: 14px;
 }
 
 .coins {
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.65);
   padding: 8px 22px;
   border-radius: 20px;
   font-size: 20px;
 }
 
-h1 {
+/* кнопка назад — ЧУТЬ ВЫШЕ */
+.back-wrap {
   text-align: center;
+  margin: 6px 0 6px;
 }
 
+.back {
+  background: gold;
+  padding: 8px 22px;
+  border-radius: 22px;
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* заголовки */
+h1, h2 {
+  text-align: center;
+  margin: 8px 0;
+}
+
+/* магазин */
 .shop {
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 16px;
-  padding-bottom: 90px;
+  padding-bottom: 80px;
 }
 
 .item {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.14);
   border-radius: 18px;
   padding: 16px;
   text-align: center;
+  backdrop-filter: blur(4px);
 }
 
 .item button {
-  margin-top: 8px;
-  padding: 8px 16px;
+  margin-top: 10px;
+  padding: 8px 18px;
   border-radius: 20px;
   border: none;
   background: gold;
@@ -63,26 +85,9 @@ h1 {
 }
 
 .lock {
-  color: #ff6b6b;
+  color: #ff7b7b;
   font-size: 13px;
-}
-
-.bottom {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  padding: 12px;
-  background: rgba(0,0,0,0.65);
-  text-align: center;
-}
-
-.back {
-  background: gold;
-  padding: 10px 24px;
-  border-radius: 22px;
-  color: black;
-  font-weight: bold;
-  text-decoration: none;
+  margin-top: 6px;
 }
 </style>
 </head>
@@ -93,25 +98,30 @@ h1 {
   <div class="coins">🪙 <span id="coins">0</span></div>
 </div>
 
-<h1>🏦 Источники дохода</h1>
-
-<div class="shop" id="shop"></div>
-
-<div class="bottom">
+<div class="back-wrap">
   <a href="index.html" class="back">⬅ Назад</a>
 </div>
 
+<h1>🏦 Источники дохода</h1>
+<div class="shop" id="incomeShop"></div>
+
+<h2>✨ Улучшения</h2>
+<div class="shop" id="upgradeShop"></div>
+
 <script>
-let coins = parseInt(localStorage.getItem("coins")) || 0;
-let clicks = parseInt(localStorage.getItem("clicks")) || 0;
+let coins = Number(localStorage.getItem("coins")) || 0;
+let clicks = Number(localStorage.getItem("clicks")) || 0;
 
 let incomes = JSON.parse(localStorage.getItem("incomes")) || {
-  lemonade: 0,
-  shop: 0,
-  factory: 0,
-  bank: 0,
-  corporation: 0,
-  legendary: 0
+  lemonade: 0, shop: 0, factory: 0, bank: 0, corporation: 0, legendary: 0
+};
+
+let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
+  clickPower: 0,
+  autoIncome: 0,
+  critChance: 0,
+  magnet: 0,
+  incomeBoost: 0
 };
 
 const incomeList = {
@@ -128,55 +138,89 @@ const incomeList = {
   }
 };
 
-const coinsEl = document.getElementById("coins");
-const shopEl = document.getElementById("shop");
+const upgradeList = {
+  clickPower: { name: "⚡ Усиление клика", price: 5000, desc: "+1 к клику" },
+  autoIncome: { name: "⏱ Автодоход", price: 15000, desc: "+5 🪙 / сек" },
+  critChance: { name: "💥 Крит-клик", price: 25000, desc: "Шанс ×2" },
+  magnet: { name: "🧲 Магнит монет", price: 40000, desc: "Красивый эффект" },
+  incomeBoost: { name: "🏆 Буст дохода", price: 75000, desc: "+10% дохода" }
+};
 
+const coinsEl = document.getElementById("coins");
 coinsEl.textContent = coins;
 
-function getPrice(base, level) {
-  return Math.floor(base * (1 + level * 0.6));
+const incomeShop = document.getElementById("incomeShop");
+const upgradeShop = document.getElementById("upgradeShop");
+
+function price(base, lvl) {
+  return Math.floor(base * (1 + lvl * 0.6));
 }
 
 function render() {
-  shopEl.innerHTML = "";
+  incomeShop.innerHTML = "";
+  upgradeShop.innerHTML = "";
 
   for (let key in incomeList) {
-    const lvl = incomes[key];
     const data = incomeList[key];
-    const price = getPrice(data.basePrice, lvl);
+    const lvl = incomes[key];
+    const cost = price(data.basePrice, lvl);
+    const locked = data.legendary && (coins < 1_000_000 || clicks < 1000);
 
-    let locked = false;
-    if (data.legendary && (coins < 1000000 || clicks < 1000)) {
-      locked = true;
-    }
-
-    const item = document.createElement("div");
-    item.className = "item";
-
-    item.innerHTML = `
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
       <h3>${data.name}</h3>
       <p>Уровень: ${lvl}</p>
-      <p>Доход: +${data.income * lvl} 🪙 / сек</p>
-      <p><b>${price.toLocaleString()} 🪙</b></p>
-      ${locked ? `<div class="lock">Нужно:<br>1000 кликов<br>1 000 000 монет</div>` : ""}
-      <button ${locked || coins < price ? "disabled" : ""}>Купить</button>
+      <p>+${data.income * lvl} 🪙 / сек</p>
+      <p><b>${cost.toLocaleString()} 🪙</b></p>
+      ${locked ? `<div class="lock">1000 кликов<br>1 000 000 🪙</div>` : ""}
+      <button ${locked || coins < cost ? "disabled" : ""}>Купить</button>
     `;
 
-    if (!locked && coins >= price) {
-      item.querySelector("button").onclick = () => buy(key, price);
+    if (!locked && coins >= cost) {
+      el.querySelector("button").onclick = () => buyIncome(key, cost);
     }
+    incomeShop.appendChild(el);
+  }
 
-    shopEl.appendChild(item);
+  for (let key in upgradeList) {
+    const up = upgradeList[key];
+    const bought = upgrades[key];
+
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <h3>${up.name}</h3>
+      <p>${up.desc}</p>
+      <p><b>${up.price.toLocaleString()} 🪙</b></p>
+      <button ${bought || coins < up.price ? "disabled" : ""}>
+        ${bought ? "Куплено" : "Купить"}
+      </button>
+    `;
+
+    if (!bought && coins >= up.price) {
+      el.querySelector("button").onclick = () => buyUpgrade(key, up.price);
+    }
+    upgradeShop.appendChild(el);
   }
 }
 
-function buy(key, price) {
-  coins -= price;
+function buyIncome(key, cost) {
+  coins -= cost;
   incomes[key]++;
+  save();
+}
 
+function buyUpgrade(key, cost) {
+  coins -= cost;
+  upgrades[key] = 1;
+  save();
+}
+
+function save() {
   localStorage.setItem("coins", coins);
   localStorage.setItem("incomes", JSON.stringify(incomes));
-
+  localStorage.setItem("upgrades", JSON.stringify(upgrades));
   coinsEl.textContent = coins;
   render();
 }
