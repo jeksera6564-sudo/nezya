@@ -2,271 +2,242 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Nezya</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Nezya Game</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{margin:0;padding:0;box-sizing:border-box;touch-action:manipulation}
 body{
-  width:100vw;height:100vh;
-  background:center/cover no-repeat;
-  font-family:Arial,sans-serif;
+  height:100vh;
+  background:#020617;
+  color:white;
+  font-family:Arial;
   overflow:hidden;
-  user-select:none;
 }
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+.hidden{display:none}
 
-.top-bar{
+/* UI */
+.top{
   position:absolute;
-  top:12px;
+  top:10px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
-  flex-direction:column;
-  gap:6px;
-  align-items:center;
+  gap:14px;
   z-index:5;
 }
-
-.balances{display:flex;gap:12px}
-.balance{
-  background:rgba(0,0,0,.65);
-  padding:8px 14px;
-  border-radius:18px;
+.stat{
+  background:#000a;
+  padding:10px 16px;
+  border-radius:20px;
   font-weight:900;
-  color:#fff;
-  display:flex;
-  gap:6px;
-  align-items:center;
 }
 
-.coin{
-  width:18px;height:18px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
-}
-.crystal{
-  width:16px;height:16px;
-  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
-  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
-}
-
-.level-wrap{
-  width:200px;
-  background:rgba(0,0,0,.6);
-  border-radius:12px;
-  padding:5px;
-}
-.level-bar{
-  height:10px;
-  background:gold;
-  border-radius:8px;
-  width:0%;
-}
-.level-text{
-  text-align:center;
-  font-size:12px;
-  font-weight:bold;
-  color:white;
-  margin-top:3px;
-}
-
-.combo{
-  font-weight:900;
-  color:#22c55e;
-  text-shadow:0 0 10px #22c55e;
-  font-size:13px;
-}
-
-.game{
-  position:relative;
-  width:100%;
+/* Game */
+.center{
   height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
 }
-
-.character-wrap{position:relative}
-
-.character{
-  width:280px;
+#char{
+  width:260px;
   max-width:80vw;
-  cursor:pointer;
-  transition:transform .12s ease;
+  transition:transform .08s;
 }
 
-.aura{
+/* Bottom */
+.bottom{
   position:absolute;
-  inset:-30px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
-  opacity:0;
-  animation:aura .4s ease-out forwards;
-  pointer-events:none;
-}
-
-@keyframes aura{
-  from{transform:scale(.6);opacity:.9}
-  to{transform:scale(1.4);opacity:0}
-}
-
-.float{
-  position:fixed;
-  font-size:26px;
-  font-weight:900;
-  pointer-events:none;
-  animation:fly 1.6s ease-out forwards;
-  z-index:9999;
-}
-
-@keyframes fly{
-  to{opacity:0;transform:translateY(-80px) scale(1.4)}
-}
-
-.bottom-menu{
-  position:absolute;
-  bottom:22%;
-  left:50%;
-  transform:translateX(-50%);
+  bottom:15%;
+  width:100%;
   display:flex;
-  gap:14px;
+  justify-content:center;
+  gap:12px;
 }
-
-.menu-btn{
-  padding:12px 18px;
-  border-radius:18px;
-  background:rgba(0,0,0,.65);
+button{
+  background:#000a;
+  border:none;
+  border-radius:16px;
+  padding:12px 16px;
   color:white;
   font-weight:900;
-  text-decoration:none;
+}
+
+/* Modal */
+.modal{
+  position:fixed;
+  inset:0;
+  background:#000c;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.modal-box{
+  background:#020617;
+  padding:18px;
+  border-radius:16px;
+  width:90%;
+  max-width:360px;
+}
+.modal-box h3{text-align:center;margin-bottom:10px}
+
+/* Register */
+#register{
+  position:fixed;
+  inset:0;
+  background:#020617;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+.reg-box{
+  background:#000;
+  padding:24px;
+  border-radius:18px;
+  width:90%;
+  max-width:320px;
+  text-align:center;
+}
+.reg-box input{
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  margin:12px 0;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<script>
-/* 🔒 ПРОВЕРКА НИКА */
-if(!localStorage.getItem("nickname")){
-  location.href="register.html";
-}
-</script>
-
-<div class="overlay"></div>
-
-<div class="top-bar">
-  <div class="balances">
-    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
-  </div>
-
-  <div class="level-wrap">
-    <div class="level-bar" id="levelBar"></div>
-    <div class="level-text">Уровень <span id="level">1</span></div>
-  </div>
-
-  <div class="combo" id="combo">Комбо x1</div>
-</div>
-
-<div class="game">
-  <div class="character-wrap" id="charWrap">
-    <img id="character" class="character">
+<!-- REGISTER -->
+<div id="register" class="hidden">
+  <div class="reg-box">
+    <h2>Введите ник</h2>
+    <input id="nickInput" placeholder="Ваш ник">
+    <button onclick="saveNick()">Начать</button>
   </div>
 </div>
 
-<div class="bottom-menu">
-  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
+<!-- GAME -->
+<div class="top">
+  <div class="stat">💰 <span id="coins">0</span></div>
+  <div class="stat">💎 <span id="crystals">0</span></div>
 </div>
 
-<script>
-document.body.style.backgroundImage="url('assets/bg.jpg')";
+<div class="center">
+  <img src="assets/player.png" id="char">
+</div>
 
-/* ПЕРСОНАЖИ */
-const characters={
-  default:{img:"assets/player.png",power:1,crystal:0},
-  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
-  business:{img:"assets/character_business.png",power:4,crystal:1},
-  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
-  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+<div class="bottom">
+  <button onclick="openLB()">🏆 Таблица лидеров</button>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="modal" id="lb">
+  <div class="modal-box">
+    <h3>🏆 TOP-20</h3>
+    <ol id="lbList"></ol>
+    <button onclick="closeLB()">Закрыть</button>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDocs, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
+  authDomain: "nezya-game.firebaseapp.com",
+  projectId: "nezya-game",
+  storageBucket: "nezya-game.firebasestorage.app",
+  messagingSenderId: "866470790249",
+  appId: "1:866470790249:web:8c7bfa8b351e8e5d354ef8"
 };
 
-let active=localStorage.getItem("activeCharacter")||"default";
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
-let clicks=+localStorage.getItem("clicks")||0;
-let combo=1,lastClick=0;
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-const character=document.getElementById("character");
-const wrap=document.getElementById("charWrap");
-character.src=characters[active].img;
+// GAME STATE
+let coins = 0;
+let crystals = 0;
+let nickname = localStorage.getItem("nickname");
 
-const coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
-const levelEl=document.getElementById("level");
-const levelBar=document.getElementById("levelBar");
-const comboEl=document.getElementById("combo");
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const char = document.getElementById("char");
 
-function updateUI(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
-  const lvl=Math.floor(clicks/100)+1;
-  levelEl.textContent=lvl;
-  levelBar.style.width=(clicks%100)+"%";
-  comboEl.textContent="Комбо x"+combo;
+// REGISTER
+if(!nickname){
+  document.getElementById("register").classList.remove("hidden");
 }
 
-character.onclick=()=>{
-  character.style.transform="scale(.9)";
-  setTimeout(()=>character.style.transform="scale(1)",120);
-
-  const a=document.createElement("div");
-  a.className="aura";
-  wrap.appendChild(a);
-  setTimeout(()=>a.remove(),400);
-
-  const now=Date.now();
-  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
-  lastClick=now;
-
-  let mult=1;
-  const r=Math.random();
-  if(r<0.01) mult=20;
-  else if(r<0.03) mult=10;
-  else if(r<0.07) mult=5;
-  else if(r<0.15) mult=2;
-
-  const ch=characters[active];
-  const gain=ch.power*combo*mult;
-
-  coins+=gain;
-  crystals+=ch.crystal;
-  clicks++;
-
-  spawn("+"+gain,mult>=10?"#fb7185":"gold");
-  save();updateUI();
+window.saveNick = ()=>{
+  const n = document.getElementById("nickInput").value.trim();
+  if(n.length<2) return alert("Слишком короткий ник");
+  nickname = n;
+  localStorage.setItem("nickname",n);
+  document.getElementById("register").classList.add("hidden");
 };
 
-function spawn(text,color){
-  const e=document.createElement("div");
-  e.className="float";
-  e.textContent=text;
-  e.style.color=color;
-  e.style.left=Math.random()*80+10+"vw";
-  e.style.top=Math.random()*40+30+"vh";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),1600);
+// CLICK
+char.addEventListener("pointerdown",()=>{
+  coins += 1;
+  crystals += 0.1;
+  char.style.transform="scale(.92)";
+  setTimeout(()=>char.style.transform="scale(1)",80);
+  update();
+});
+
+// PASSIVE
+setInterval(()=>{
+  coins += 1;
+  crystals += 0.1;
+  update();
+},1000);
+
+// UPDATE
+function update(){
+  coinsEl.textContent = Math.floor(coins);
+  crystalsEl.textContent = crystals.toFixed(1);
+  saveOnline();
 }
 
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
-  localStorage.setItem("clicks",clicks);
-  localStorage.setItem("activeCharacter",active);
+// SAVE ONLINE
+async function saveOnline(){
+  if(!nickname) return;
+  await setDoc(doc(db,"players",nickname),{
+    nick:nickname,
+    coins:Math.floor(coins),
+    crystals:Math.floor(crystals),
+    time:Date.now()
+  });
 }
 
-updateUI();
+// LEADERBOARD
+window.openLB = async ()=>{
+  const q = query(collection(db,"players"),orderBy("coins","desc"),limit(20));
+  const snap = await getDocs(q);
+  const list = document.getElementById("lbList");
+  list.innerHTML="";
+  snap.forEach(d=>{
+    const p=d.data();
+    const li=document.createElement("li");
+    li.textContent = `${p.nick} — ${p.coins}`;
+    list.appendChild(li);
+  });
+  document.getElementById("lb").style.display="flex";
+};
+
+window.closeLB = ()=>{
+  document.getElementById("lb").style.display="none";
+};
+
 </script>
-
 </body>
 </html>
