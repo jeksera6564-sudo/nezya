@@ -16,7 +16,6 @@ body{
 }
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
-/* ВЕРХ */
 .top-bar{
   padding-top:12px;
   display:flex;
@@ -50,7 +49,6 @@ body{
   background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
 
-/* КНОПКИ НАСТРОЕК */
 .sound-toggle,.vibe-toggle{
   position:fixed;
   right:12px;
@@ -65,15 +63,13 @@ body{
 .sound-toggle{top:12px}
 .vibe-toggle{top:54px}
 
-/* ИГРА */
 .game{
   flex:1;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:flex-start;
-  padding-top:14px;
   gap:14px;
+  padding-top:10px;
 }
 
 .character{
@@ -83,7 +79,6 @@ body{
   transition:.12s;
 }
 
-/* НИЖНИЕ КНОПКИ — ПРИВЯЗАНЫ К ПЕРСОНАЖУ */
 .bottom-menu{
   display:flex;
   gap:14px;
@@ -126,22 +121,19 @@ body{
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
+/* ЭЛЕМЕНТЫ */
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const incomeInfo = document.getElementById("incomeInfo");
+const character = document.getElementById("character");
+const soundBtn = document.getElementById("soundBtn");
+const vibeBtn = document.getElementById("vibeBtn");
+
 /* НАСТРОЙКИ */
 let soundEnabled = localStorage.getItem("sound") !== "off";
 let vibeEnabled  = localStorage.getItem("vibe")  !== "off";
 soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
 vibeBtn.textContent  = vibeEnabled  ? "📳 ON" : "📴 OFF";
-
-soundBtn.onclick=()=>{
-  soundEnabled=!soundEnabled;
-  localStorage.setItem("sound",soundEnabled?"on":"off");
-  soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
-};
-vibeBtn.onclick=()=>{
-  vibeEnabled=!vibeEnabled;
-  localStorage.setItem("vibe",vibeEnabled?"on":"off");
-  vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
-};
 
 /* ДАННЫЕ */
 let coins = +localStorage.getItem("coins") || 0;
@@ -159,7 +151,19 @@ const characters={
 let active = localStorage.getItem("activeCharacter") || "default";
 character.src = characters[active].img;
 
-/* ПАССИВ */
+/* КНОПКИ */
+soundBtn.onclick=()=>{
+  soundEnabled=!soundEnabled;
+  localStorage.setItem("sound",soundEnabled?"on":"off");
+  soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
+};
+vibeBtn.onclick=()=>{
+  vibeEnabled=!vibeEnabled;
+  localStorage.setItem("vibe",vibeEnabled?"on":"off");
+  vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
+};
+
+/* ПАССИВНЫЙ ДОХОД */
 function getPassive(){
   const base={lemonade:3,shop:30,factory:300,bank:3000,corp:9000};
   const data=JSON.parse(localStorage.getItem("incomes"))||{};
@@ -179,7 +183,8 @@ function passiveTick(){
   coins+=p.c*diff;
   crystals+=p.d*diff;
   lastTick=now;
-  save();updateUI();
+  save();
+  updateUI();
 }
 setInterval(passiveTick,1000);
 passiveTick();
@@ -190,7 +195,8 @@ character.onclick=()=>{
   coins+=ch.power;
   crystals+=ch.crystal;
   if(vibeEnabled && navigator.vibrate) navigator.vibrate(30);
-  save();updateUI();
+  save();
+  updateUI();
 };
 
 function save(){
@@ -198,12 +204,14 @@ function save(){
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("lastTick",lastTick);
 }
+
 function updateUI(){
-  coins.textContent=coins;
-  crystals.textContent=crystals;
+  coinsEl.textContent = coins;
+  crystalsEl.textContent = crystals;
   const p=getPassive();
   incomeInfo.textContent=`+${p.c}/сек • +${p.c*60}/мин`;
 }
+
 updateUI();
 </script>
 
