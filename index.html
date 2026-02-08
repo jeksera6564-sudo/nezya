@@ -10,47 +10,95 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* ==== ТВОИ СТИЛИ (СОХРАНЕНЫ) ==== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
   width:100vw;height:100vh;
-  background:center/cover no-repeat;
+  background:url("bg.jpg") center/cover no-repeat;
   font-family:Arial,sans-serif;
   overflow:hidden;
   user-select:none;
   color:white;
 }
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
-.top-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;align-items:center;z-index:5}
+
+.top-bar{
+  position:absolute;top:12px;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;
+  gap:6px;align-items:center;z-index:5
+}
+
 .balances{display:flex;gap:12px}
-.balance{background:rgba(0,0,0,.65);padding:8px 14px;border-radius:18px;font-weight:900;display:flex;gap:6px;align-items:center}
-.coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle,#fff9c4,#fbc02d)}
-.crystal{width:16px;height:16px;clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);background:linear-gradient(135deg,#7dd3fc,#38bdf8)}
-.level-wrap{width:200px;background:rgba(0,0,0,.6);border-radius:12px;padding:5px}
+.balance{
+  background:rgba(0,0,0,.65);
+  padding:8px 14px;border-radius:18px;
+  font-weight:900;display:flex;gap:6px;align-items:center
+}
+.coin{width:18px;height:18px;border-radius:50%;background:gold}
+.crystal{width:16px;height:16px;clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);background:#38bdf8}
+
+.level-wrap{
+  width:200px;background:rgba(0,0,0,.6);
+  border-radius:12px;padding:5px
+}
 .level-bar{height:10px;background:gold;border-radius:8px;width:0%}
 .level-text{text-align:center;font-size:12px;font-weight:bold}
-.combo{font-weight:900;color:#22c55e;text-shadow:0 0 10px #22c55e;font-size:13px}
-.game{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.character{width:280px;cursor:pointer;transition:.12s}
-.bottom-menu{position:absolute;bottom:22%;left:50%;transform:translateX(-50%);display:flex;gap:14px}
-.menu-btn{padding:12px 18px;border-radius:18px;background:rgba(0,0,0,.65);color:white;font-weight:900;text-decoration:none}
 
-/* ==== ЛИДЕРБОРД ==== */
+.combo{font-weight:900;color:#22c55e;text-shadow:0 0 10px #22c55e}
+
+.game{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center
+}
+.character{
+  width:280px;max-width:80vw;
+  cursor:pointer;transition:.12s
+}
+
+.bottom-menu{
+  position:absolute;bottom:22%;
+  left:50%;transform:translateX(-50%);
+  display:flex;gap:14px
+}
+.menu-btn{
+  padding:12px 18px;border-radius:18px;
+  background:rgba(0,0,0,.65);
+  color:white;font-weight:900;border:none
+}
+
+/* РЕГИСТРАЦИЯ */
+#register{
+  position:fixed;inset:0;
+  background:#000c;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  z-index:100
+}
+#register input{
+  padding:12px;border-radius:12px;
+  border:none;font-size:18px
+}
+#register button{
+  margin-top:10px;
+  padding:12px 20px;
+  border:none;border-radius:12px;
+  font-size:18px;font-weight:bold
+}
+
+/* ЛИДЕРБОРД */
 #leaderboard{
   position:fixed;inset:0;
   background:rgba(0,0,0,.9);
   display:none;justify-content:center;align-items:center;
-  z-index:40;
+  z-index:50
 }
 .lb-box{
-  background:#111;
-  border-radius:16px;
-  padding:16px;
-  width:90%;max-width:420px;
+  background:#111;border-radius:16px;
+  padding:16px;width:90%;max-width:420px
 }
 .lb-row{
   display:flex;justify-content:space-between;
-  padding:6px 0;border-bottom:1px solid #fff2;
+  padding:6px 0;border-bottom:1px solid #fff2
 }
 .lb-row.me{color:gold;font-weight:bold}
 </style>
@@ -58,13 +106,14 @@ body{
 
 <body>
 
-<script>
-if(!localStorage.getItem("nickname")){
-  location.href="register.html";
-}
-</script>
-
 <div class="overlay"></div>
+
+<!-- РЕГИСТРАЦИЯ -->
+<div id="register">
+  <h2>Введите ник</h2>
+  <input id="nickInput" placeholder="nickname">
+  <button onclick="register()">Играть</button>
+</div>
 
 <div class="top-bar">
   <div class="balances">
@@ -85,8 +134,6 @@ if(!localStorage.getItem("nickname")){
 </div>
 
 <div class="bottom-menu">
-  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
   <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
 </div>
 
@@ -100,9 +147,7 @@ if(!localStorage.getItem("nickname")){
 </div>
 
 <script>
-document.body.style.backgroundImage="url('assets/bg.jpg')";
-
-/* ===== FIREBASE ===== */
+/* FIREBASE */
 firebase.initializeApp({
   apiKey:"AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
   authDomain:"nezya-game.firebaseapp.com",
@@ -110,75 +155,103 @@ firebase.initializeApp({
 });
 const db=firebase.firestore();
 
-/* ===== DATA ===== */
-const nickname=localStorage.getItem("nickname");
+/* ПЕРСОНАЖИ */
+const characters={
+  default:{img:"character_default.png",power:1},
+  clicker:{img:"character_clicker.png",power:2},
+  business:{img:"character_business.png",power:4},
+  magnate:{img:"character_magnate.png",power:7},
+  legendary:{img:"character_legendary.png",power:15}
+};
+
+/* ИГРОК */
+let nickname=localStorage.getItem("nickname");
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
 let combo=1,lastClick=0;
+let activeCharacter=localStorage.getItem("activeCharacter")||"default";
 let unsubLB=null;
 
-/* ===== UI ===== */
-const coinsEl=coinsEl=document.getElementById("coins");
+/* UI */
+const coinsEl=document.getElementById("coins");
 const crystalsEl=document.getElementById("crystals");
 const levelEl=document.getElementById("level");
 const levelBar=document.getElementById("levelBar");
 const comboEl=document.getElementById("combo");
 const lbList=document.getElementById("lbList");
-
-/* ===== CHARACTER ===== */
 const character=document.getElementById("character");
-character.src="assets/player.png";
 
-/* ===== CLICK ===== */
+/* РЕГИСТРАЦИЯ */
+if(nickname){
+  document.getElementById("register").style.display="none";
+  loadPlayer();
+}
+
+function register(){
+  const nick=document.getElementById("nickInput").value.trim();
+  if(nick.length<3)return alert("Минимум 3 символа");
+  nickname=nick;
+  localStorage.setItem("nickname",nick);
+  document.getElementById("register").style.display="none";
+  db.collection("players").doc(nick).set({coins:0,clicks:0},{merge:true});
+}
+
+/* ЗАГРУЗКА */
+function loadPlayer(){
+  db.collection("players").doc(nickname).get().then(d=>{
+    if(d.exists){
+      coins=d.data().coins||0;
+      clicks=d.data().clicks||0;
+      updateUI();
+    }
+  });
+}
+
+/* ПЕРСОНАЖ */
+character.src=characters[activeCharacter].img;
+character.onerror=()=>character.src="player.png";
+
+/* КЛИК */
 character.onclick=()=>{
   const now=Date.now();
-  combo=(now-lastClick<700)?Math.min(combo+1,15):1;
+  combo=(now-lastClick<700)?Math.min(combo+1,20):1;
   lastClick=now;
 
-  const gain=combo;
+  const gain=characters[activeCharacter].power*combo;
   coins+=gain;
   clicks++;
-
   updateUI();
 };
 
-/* ===== UI UPDATE ===== */
+/* UI */
 function updateUI(){
   coinsEl.textContent=coins;
   crystalsEl.textContent=crystals;
-  const lvl=Math.floor(clicks/100)+1;
-  levelEl.textContent=lvl;
+  levelEl.textContent=Math.floor(clicks/100)+1;
   levelBar.style.width=(clicks%100)+"%";
   comboEl.textContent="Комбо x"+combo;
 }
 
-/* ===== SAVE (каждые 3 сек) ===== */
+/* SAVE */
 setInterval(()=>{
+  if(!nickname)return;
   localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
-
-  db.collection("players").doc(nickname).set({
-    coins,crystals,clicks
-  },{merge:true});
+  db.collection("players").doc(nickname).set({coins,clicks},{merge:true});
 },3000);
 
-/* ===== LEADERBOARD ===== */
+/* ЛИДЕРБОРД */
 function openLB(){
   document.getElementById("leaderboard").style.display="flex";
   if(unsubLB)unsubLB();
-
-  unsubLB=db.collection("players")
-    .orderBy("coins","desc")
-    .limit(10)
+  unsubLB=db.collection("players").orderBy("coins","desc").limit(10)
     .onSnapshot(s=>{
       lbList.innerHTML="";
       let i=1;
       s.forEach(d=>{
-        const me=d.id===nickname?"me":"";
         lbList.innerHTML+=`
-          <div class="lb-row ${me}">
+          <div class="lb-row ${d.id===nickname?"me":""}">
             <span>${i++}. ${d.id}</span>
             <span>${d.data().coins}</span>
           </div>`;
