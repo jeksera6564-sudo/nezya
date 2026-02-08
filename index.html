@@ -14,17 +14,22 @@ body{
   overflow:hidden;
   user-select:none;
 }
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  pointer-events:none;
+}
 
 .top-bar{
   position:absolute;
-  top:12px;
+  top:10px;
   left:50%;
   transform:translateX(-50%);
   display:flex;
   flex-direction:column;
-  gap:6px;
   align-items:center;
+  gap:6px;
   z-index:5;
 }
 
@@ -33,35 +38,71 @@ body{
   background:rgba(0,0,0,.65);
   padding:8px 14px;
   border-radius:18px;
+  color:white;
   font-weight:900;
-  color:#fff;
   display:flex;
-  gap:6px;
   align-items:center;
+  gap:6px;
 }
 
 .coin{width:18px;height:18px;border-radius:50%;background:gold}
-.crystal{width:16px;height:16px;background:#38bdf8}
+.crystal{width:16px;height:16px;clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);background:#38bdf8}
 
-.level-wrap{
-  width:200px;background:rgba(0,0,0,.6);
-  border-radius:12px;padding:5px;
+.combo{color:#22c55e;font-weight:900;text-shadow:0 0 10px #22c55e}
+
+.game{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.level-bar{height:10px;background:gold;border-radius:8px;width:0%}
-.level-text{text-align:center;font-size:12px;font-weight:bold;color:white;margin-top:3px}
 
-.game{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
-.character{width:260px;max-width:80vw}
+.character-wrap{position:relative}
+.character{
+  width:260px;
+  max-width:80vw;
+  transition:transform .1s ease;
+}
+
+.aura{
+  position:absolute;
+  inset:-35px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
+  animation:aura .5s ease-out forwards;
+}
+
+.ultra{
+  background:radial-gradient(circle,rgba(255,0,255,.8),transparent 70%);
+}
+
+@keyframes aura{
+  from{transform:scale(.5);opacity:1}
+  to{transform:scale(1.6);opacity:0}
+}
+
+.float{
+  position:fixed;
+  font-size:26px;
+  font-weight:900;
+  pointer-events:none;
+  animation:fly 1.5s ease-out forwards;
+}
+
+@keyframes fly{
+  to{opacity:0;transform:translateY(-90px) scale(1.4)}
+}
 
 .bottom-menu{
   position:absolute;
-  bottom:18%;
+  bottom:14%;
   left:50%;
   transform:translateX(-50%);
   display:flex;
   gap:12px;
-  z-index:6;
 }
+
 .menu-btn{
   padding:12px 16px;
   border-radius:18px;
@@ -69,28 +110,6 @@ body{
   color:white;
   font-weight:900;
   border:none;
-}
-
-/* 🏆 ЛИДЕРЫ */
-.leaderboard{
-  position:fixed;inset:0;
-  background:url("assets/kubok.jpg") center/cover no-repeat;
-  display:none;flex-direction:column;
-  padding:20px;z-index:20;color:white;
-}
-.lb-box{
-  background:rgba(0,0,0,.75);
-  border-radius:16px;padding:16px;
-  max-height:80vh;overflow:auto;
-}
-.lb-row{
-  display:flex;justify-content:space-between;
-  padding:6px 0;border-bottom:1px solid rgba(255,255,255,.15);
-}
-.lb-close{
-  margin-top:12px;text-align:center;
-  padding:10px;border-radius:14px;
-  background:#ef4444;font-weight:900;
 }
 </style>
 </head>
@@ -107,106 +126,103 @@ if(!localStorage.getItem("nickname")){
 
 <div class="top-bar">
   <div class="balances">
-    <div class="balance">💰 <span id="coins">0</span></div>
-    <div class="balance">💎 <span id="crystals">0</span></div>
+    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
+    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
-  <div class="level-wrap">
-    <div class="level-bar" id="levelBar"></div>
-    <div class="level-text">Уровень <span id="level">1</span></div>
-  </div>
+  <div class="combo" id="combo">Комбо x1</div>
 </div>
 
 <div class="game">
-  <img id="character" class="character" src="assets/player.png">
-</div>
-
-<div class="bottom-menu">
-  <button class="menu-btn" onclick="openLB()">🏆 Топ</button>
-</div>
-
-<div class="leaderboard" id="lb">
-  <div class="lb-box">
-    <h2 style="text-align:center">🏆 TOP-20</h2>
-    <div id="lbList"></div>
-    <div class="lb-close" onclick="closeLB()">Закрыть</div>
+  <div class="character-wrap" id="wrap">
+    <img id="character" class="character" alt="character">
   </div>
 </div>
 
-<!-- 🔥 FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<div class="bottom-menu">
+  <button class="menu-btn">🛒 Магазин</button>
+  <button class="menu-btn">🧍 Персонажи</button>
+</div>
+
+<audio id="clickSound" src="click.mp3"></audio>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDDs8s4EfQIt3nJlB1ctrLlU2h_Rkgaxcg",
-  authDomain: "nezya-game.firebaseapp.com",
-  projectId: "nezya-game"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-let coins = +localStorage.getItem("coins") || 0;
-let crystals = +localStorage.getItem("crystals") || 0;
-let clicks = +localStorage.getItem("clicks") || 0;
-const nickname = localStorage.getItem("nickname");
+const characters={
+  default:{img:"assets/player.png",power:1,crystal:0},
+  business:{img:"assets/character_business.png",power:4,crystal:1},
+  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+};
+
+let active="default";
+let coins=+localStorage.getItem("coins")||0;
+let crystals=+localStorage.getItem("crystals")||0;
+let combo=1,lastClick=0;
+
+const character=document.getElementById("character");
+const wrap=document.getElementById("wrap");
+character.src=characters[active].img;
 
 const coinsEl=document.getElementById("coins");
 const crystalsEl=document.getElementById("crystals");
-const levelEl=document.getElementById("level");
-const levelBar=document.getElementById("levelBar");
+const comboEl=document.getElementById("combo");
+const sound=document.getElementById("clickSound");
 
-function updateUI(){
+function update(){
   coinsEl.textContent=coins;
   crystalsEl.textContent=crystals;
-  const lvl=Math.floor(clicks/100)+1;
-  levelEl.textContent=lvl;
-  levelBar.style.width=(clicks%100)+"%";
+  comboEl.textContent="Комбо x"+combo;
 }
 
-document.getElementById("character").onclick=()=>{
-  coins++;
-  clicks++;
-  save();
-  saveScore();
-  updateUI();
-};
+character.onclick=(e)=>{
+  character.style.transform="scale(.9)";
+  setTimeout(()=>character.style.transform="scale(1)",100);
 
-function save(){
+  sound.currentTime=0;
+  sound.play().catch(()=>{});
+
+  if(navigator.vibrate) navigator.vibrate(20);
+
+  const now=Date.now();
+  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
+  lastClick=now;
+
+  let mult=1;
+  if(combo===20) mult=20;
+
+  const ch=characters[active];
+  const gain=ch.power*combo*mult;
+
+  coins+=gain;
+  crystals+=ch.crystal;
+
+  const aura=document.createElement("div");
+  aura.className="aura"+(combo===20?" ultra":"");
+  wrap.appendChild(aura);
+  setTimeout(()=>aura.remove(),500);
+
+  const f=document.createElement("div");
+  f.className="float";
+  f.textContent="+"+gain;
+  f.style.left=e.clientX+"px";
+  f.style.top=e.clientY+"px";
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),1500);
+
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
-  localStorage.setItem("clicks",clicks);
-}
 
-function saveScore(){
-  db.collection("leaderboard").doc(nickname).set({
-    nick:nickname,
-    coins:coins
-  });
-}
+  update();
+};
 
-function openLB(){
-  const list=document.getElementById("lbList");
-  list.innerHTML="Загрузка...";
-  db.collection("leaderboard")
-    .orderBy("coins","desc")
-    .limit(20)
-    .get()
-    .then(snap=>{
-      list.innerHTML="";
-      let i=1;
-      snap.forEach(d=>{
-        const p=d.data();
-        list.innerHTML+=`<div class="lb-row"><span>${i}. ${p.nick}</span><span>${p.coins}</span></div>`;
-        i++;
-      });
-    });
-  document.getElementById("lb").style.display="flex";
-}
-function closeLB(){
-  document.getElementById("lb").style.display="none";
-}
+// пассивный доход
+setInterval(()=>{
+  coins+=1;
+  crystals+=0.2;
+  update();
+},1000);
 
-updateUI();
+update();
 </script>
 
 </body>
