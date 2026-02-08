@@ -239,3 +239,64 @@ updateUI();
 
 </body>
 </html>
+
+
+
+/* ===== ГЛОБАЛЬНЫЙ ДОХОД ===== */
+let lastTick = +localStorage.getItem("lastTick") || Date.now();
+
+function getIncomePerSecond(){
+  const incomeList = {
+    lemonade:3,
+    shop:30,
+    factory:300,
+    bank:3000,
+    corporation:9000,
+    legendary:50000
+  };
+
+  const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
+
+  let sum = 0;
+  for(let k in incomeList){
+    sum += (incomes[k] || 0) * incomeList[k];
+  }
+
+  if(upgrades.ultraBoost) sum *= 2;
+  return sum;
+}
+
+function applyGlobalIncome(){
+  const now = Date.now();
+  const diff = Math.floor((now - lastTick) / 1000);
+  if(diff <= 0) return;
+
+  let coins = +localStorage.getItem("coins") || 0;
+  let crystals = +localStorage.getItem("crystals") || 0;
+  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
+
+  const incomePerSec = getIncomePerSecond();
+  const earnedCoins = incomePerSec * diff;
+
+  coins += earnedCoins;
+
+  // кристаллы с дохода
+  if(upgrades.crystalIncome){
+    crystals += Math.floor(earnedCoins / 5000);
+  }
+
+  localStorage.setItem("coins", coins);
+  localStorage.setItem("crystals", crystals);
+  localStorage.setItem("lastTick", now);
+}
+
+/* тик каждую секунду */
+setInterval(applyGlobalIncome, 1000);
+
+/* начислять при любом клике */
+document.addEventListener("click", applyGlobalIncome);
+
+/* начислить сразу при загрузке страницы */
+applyGlobalIncome();
+
