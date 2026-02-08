@@ -22,35 +22,34 @@ body {
   user-select: none;
 }
 
+/* затемнение */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.45);
 }
 
-/* ВЕРХ */
-.top-ui {
+/* верх */
+.top-bar {
   position: absolute;
   top: 14px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   z-index: 3;
-  width: 90%;
-  max-width: 420px;
+  align-items: center;
 }
 
-.top-bar {
+.balances {
   display: flex;
   gap: 12px;
-  justify-content: center;
 }
 
 .balance {
   background: rgba(0,0,0,0.65);
-  padding: 8px 14px;
+  padding: 10px 16px;
   border-radius: 20px;
   font-weight: 900;
   color: #fff;
@@ -60,50 +59,43 @@ body {
 }
 
 .coin {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d);
 }
 
 .crystal {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   clip-path: polygon(50% 0%, 90% 25%, 70% 100%, 30% 100%, 10% 25%);
   background: linear-gradient(135deg, #7dd3fc, #38bdf8);
 }
 
-/* УРОВЕНЬ */
-.level-box {
-  background: rgba(0,0,0,0.55);
-  border-radius: 14px;
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.lvl {
-  font-weight: 900;
-  font-size: 14px;
-}
-
-.xp-bar {
-  flex: 1;
-  height: 8px;
-  background: rgba(255,255,255,0.2);
+/* уровень */
+.level-wrap {
+  width: 200px;
+  background: rgba(0,0,0,0.6);
   border-radius: 10px;
-  overflow: hidden;
+  padding: 4px;
 }
 
-.xp-fill {
-  height: 100%;
+.level-bar {
+  height: 10px;
   width: 0%;
-  background: linear-gradient(90deg, #fde047, #f59e0b);
-  transition: width 0.3s ease;
+  background: gold;
+  border-radius: 6px;
 }
 
-/* ИГРА */
+.level-text {
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  margin-top: 4px;
+}
+
+/* игра */
 .game {
   position: relative;
   width: 100%;
@@ -117,14 +109,14 @@ body {
 .character {
   width: 320px;
   max-width: 85vw;
-  transition: transform .12s ease;
+  transition: transform 0.12s ease;
   cursor: pointer;
 }
 
-/* ЧИСЛА */
+/* цифры */
 .float {
   position: absolute;
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 900;
   color: gold;
   pointer-events: none;
@@ -134,11 +126,11 @@ body {
 @keyframes fly {
   to {
     opacity: 0;
-    transform: translate(var(--x), var(--y)) scale(1.4);
+    transform: translate(var(--x), var(--y)) scale(1.5);
   }
 }
 
-/* НИЗ */
+/* низ */
 .bottom-menu {
   position: absolute;
   bottom: 16px;
@@ -164,106 +156,66 @@ body {
 
 <div class="overlay"></div>
 
-<div class="top-ui">
-  <div class="top-bar">
+<div class="top-bar">
+  <div class="balances">
     <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
     <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
 
-  <div class="level-box">
-    <div class="lvl">LVL <span id="level">1</span></div>
-    <div class="xp-bar">
-      <div class="xp-fill" id="xpFill"></div>
-    </div>
+  <div class="level-wrap">
+    <div class="level-bar" id="levelBar"></div>
+    <div class="level-text">Уровень <span id="level">1</span></div>
   </div>
 </div>
 
 <div class="game">
-  <img src="assets/character.png" class="character" id="character">
+  <img src="character.png" class="character" id="character">
 </div>
 
 <div class="bottom-menu">
   <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+  <a href="#" class="menu-btn">🧍 Персонажи</a>
 </div>
 
 <script>
-/* ===== ДАННЫЕ ===== */
+/* фон */
+const bg = localStorage.getItem("background") || "bg.jpg";
+document.body.style.backgroundImage = `url(${bg})`;
+
+/* данные */
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
 
-let level = +localStorage.getItem("level") || 1;
-let xp = +localStorage.getItem("xp") || 0;
-
-let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
-let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
-
-let lastOnline = +localStorage.getItem("lastOnline") || Date.now();
-
-/* ===== UI ===== */
 const coinsEl = document.getElementById("coins");
 const crystalsEl = document.getElementById("crystals");
 const levelEl = document.getElementById("level");
-const xpFill = document.getElementById("xpFill");
+const levelBar = document.getElementById("levelBar");
 const character = document.getElementById("character");
-
-function xpNeed() {
-  return level * 100;
-}
 
 function updateUI() {
   coinsEl.textContent = coins;
   crystalsEl.textContent = crystals;
+
+  const level = Math.floor(clicks / 100) + 1;
+  const progress = (clicks % 100);
+
   levelEl.textContent = level;
-  xpFill.style.width = Math.min(100, xp / xpNeed() * 100) + "%";
+  levelBar.style.width = progress + "%";
 }
 
-/* ===== КЛИК ===== */
 character.onclick = () => {
   clicks++;
+  coins++;
 
-  let power = 1 + (upgrades.clickPower || 0);
-  coins += power;
-  xp += 1;
+  character.style.transform = "scale(0.9)";
+  setTimeout(() => character.style.transform = "scale(1)", 120);
 
-  checkLevel();
-  spawn("+" + power);
-
+  spawn("+1");
   save();
   updateUI();
 };
 
-/* ===== АВТОДОХОД ===== */
-const incomeList = {
-  lemonade: 3, shop: 30, factory: 300, bank: 3000,
-  corporation: 9000, residential: 15000, business: 30000
-};
-
-function incomePerSecond() {
-  let sum = 0;
-  for (let k in incomes) sum += (incomeList[k] || 0) * incomes[k];
-  return sum;
-}
-
-setInterval(() => {
-  let inc = incomePerSecond();
-  coins += inc;
-  xp += inc * 0.05;
-  checkLevel();
-  updateUI();
-  save();
-}, 1000);
-
-/* ===== УРОВЕНЬ ===== */
-function checkLevel() {
-  while (xp >= xpNeed()) {
-    xp -= xpNeed();
-    level++;
-    spawn("LVL UP!");
-  }
-}
-
-/* ===== ЭФФЕКТ ===== */
 function spawn(text) {
   const r = character.getBoundingClientRect();
   const el = document.createElement("div");
@@ -277,18 +229,13 @@ function spawn(text) {
   setTimeout(()=>el.remove(),2000);
 }
 
-/* ===== СОХРАНЕНИЕ ===== */
 function save() {
   localStorage.setItem("coins", coins);
   localStorage.setItem("crystals", crystals);
   localStorage.setItem("clicks", clicks);
-  localStorage.setItem("level", level);
-  localStorage.setItem("xp", xp);
-  localStorage.setItem("lastOnline", Date.now());
 }
 
 updateUI();
-save();
 </script>
 
 </body>
