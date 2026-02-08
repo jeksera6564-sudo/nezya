@@ -16,20 +16,29 @@ body{
 }
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
+/* ВЕРХ */
 .top-bar{
-  position:absolute;top:14px;left:50%;
-  transform:translateX(-50%);
-  display:flex;flex-direction:column;gap:8px;
-  align-items:center;z-index:5;
+  padding-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+  z-index:5;
 }
 
 .balances{display:flex;gap:12px}
 .balance{
   background:rgba(0,0,0,.65);
-  padding:10px 16px;border-radius:20px;
-  font-weight:900;color:#fff;
-  display:flex;gap:8px;align-items:center;
+  padding:10px 16px;
+  border-radius:20px;
+  font-weight:900;
+  color:#fff;
+  display:flex;
+  gap:8px;
+  align-items:center;
 }
+
+.income{font-size:13px;opacity:.85}
 
 .coin{
   width:20px;height:20px;border-radius:50%;
@@ -41,50 +50,44 @@ body{
   background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
 
-.sound-toggle, .vibe-toggle{
+/* КНОПКИ НАСТРОЕК */
+.sound-toggle,.vibe-toggle{
   position:fixed;
+  right:12px;
   background:rgba(0,0,0,.65);
   color:white;
-  padding:10px 14px;
-  border-radius:16px;
+  padding:8px 12px;
+  border-radius:14px;
   font-weight:900;
   cursor:pointer;
   z-index:10;
 }
-.sound-toggle{top:16px;right:16px}
-.vibe-toggle{top:60px;right:16px}
+.sound-toggle{top:12px}
+.vibe-toggle{top:54px}
 
+/* ИГРА */
 .game{
-  position:relative;width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-  z-index:2;
-}
-
-/* ПЕРСОНАЖ */
-.character-wrapper{
-  position:relative;
+  flex:1;
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:flex-start;
+  padding-top:14px;
+  gap:14px;
 }
 
 .character{
-  width:320px;
-  max-width:85vw;
+  width:300px;
+  max-width:80vw;
   cursor:pointer;
   transition:.12s;
 }
 
-/* КНОПКИ ПОД ПЕРСОНАЖЕМ */
+/* НИЖНИЕ КНОПКИ — ПРИВЯЗАНЫ К ПЕРСОНАЖУ */
 .bottom-menu{
-  position:absolute;
-  top:100%;
-  margin-top:20px;
   display:flex;
   gap:14px;
-  z-index:5;
 }
-
 .menu-btn{
   padding:12px 18px;
   border-radius:18px;
@@ -92,64 +95,6 @@ body{
   color:white;
   font-weight:900;
   text-decoration:none;
-  white-space:nowrap;
-}
-
-/* ЭФФЕКТЫ */
-.aura{
-  position:absolute;
-  inset:-40px;
-  border-radius:50%;
-  opacity:0;
-  filter:blur(18px);
-  animation:aura .45s ease-out forwards;
-  z-index:-1;
-}
-@keyframes aura{
-  0%{opacity:0;transform:scale(.6)}
-  50%{opacity:.9}
-  100%{opacity:0;transform:scale(1.4)}
-}
-
-.ultra-aura{
-  position:absolute;
-  inset:-120px;
-  border-radius:50%;
-  background:conic-gradient(red,orange,yellow,lime,cyan,blue,violet,red);
-  filter:blur(40px);
-  animation:ultra 1s ease-out forwards;
-  opacity:0;
-  z-index:-2;
-}
-@keyframes ultra{
-  0%{transform:scale(.3);opacity:0}
-  40%{opacity:1}
-  100%{transform:scale(1.6);opacity:0}
-}
-
-.shockwave{
-  position:fixed;
-  left:50%;top:50%;
-  width:20px;height:20px;
-  border-radius:50%;
-  border:4px solid rgba(255,255,255,.8);
-  transform:translate(-50%,-50%);
-  animation:wave .6s ease-out forwards;
-  z-index:20;
-}
-@keyframes wave{
-  to{width:220vw;height:220vw;opacity:0}
-}
-
-.float{
-  position:absolute;
-  font-size:26px;
-  font-weight:900;
-  pointer-events:none;
-  animation:fly 1.6s ease-out forwards;
-}
-@keyframes fly{
-  to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.4)}
 }
 </style>
 </head>
@@ -157,42 +102,35 @@ body{
 <body>
 
 <div class="overlay"></div>
-<div class="sound-toggle" id="soundBtn">🔊 ON</div>
-<div class="vibe-toggle" id="vibeBtn">📳 ON</div>
+
+<div class="sound-toggle" id="soundBtn"></div>
+<div class="vibe-toggle" id="vibeBtn"></div>
 
 <div class="top-bar">
   <div class="balances">
     <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
     <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
+  <div class="income" id="incomeInfo">+0/сек • +0/мин</div>
 </div>
 
 <div class="game">
-  <div class="character-wrapper" id="charWrap">
-    <img id="character" class="character">
+  <img id="character" class="character">
 
-    <!-- КНОПКИ СЛЕДУЮТ ЗА ПЕРСОНАЖЕМ -->
-    <div class="bottom-menu">
-      <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-      <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
-    </div>
+  <div class="bottom-menu">
+    <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+    <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
   </div>
 </div>
 
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
+/* НАСТРОЙКИ */
 let soundEnabled = localStorage.getItem("sound") !== "off";
 let vibeEnabled  = localStorage.getItem("vibe")  !== "off";
-
-const soundBtn=document.getElementById("soundBtn");
-const vibeBtn=document.getElementById("vibeBtn");
-soundBtn.textContent=soundEnabled?"🔊 ON":"🔇 OFF";
-vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
-
-const clickSound=new Audio("click.mp3");
-clickSound.preload="auto";
-let soundUnlocked=false;
+soundBtn.textContent = soundEnabled ? "🔊 ON" : "🔇 OFF";
+vibeBtn.textContent  = vibeEnabled  ? "📳 ON" : "📴 OFF";
 
 soundBtn.onclick=()=>{
   soundEnabled=!soundEnabled;
@@ -205,41 +143,68 @@ vibeBtn.onclick=()=>{
   vibeBtn.textContent=vibeEnabled?"📳 ON":"📴 OFF";
 };
 
+/* ДАННЫЕ */
+let coins = +localStorage.getItem("coins") || 0;
+let crystals = +localStorage.getItem("crystals") || 0;
+let lastTick = +localStorage.getItem("lastTick") || Date.now();
+
+/* ПЕРСОНАЖ */
 const characters={
-  default:{img:"assets/player.png",power:1,crystal:0,aura:"#ffd54f"}
+  default:{img:"assets/player.png",power:1,crystal:0},
+  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
+  business:{img:"assets/character_business.png",power:4,crystal:1},
+  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
+  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+};
+let active = localStorage.getItem("activeCharacter") || "default";
+character.src = characters[active].img;
+
+/* ПАССИВ */
+function getPassive(){
+  const base={lemonade:3,shop:30,factory:300,bank:3000,corp:9000};
+  const data=JSON.parse(localStorage.getItem("incomes"))||{};
+  let c=0,d=0;
+  for(let k in base){
+    c+=(data[k]||0)*base[k];
+    d+=Math.floor((data[k]||0)/5);
+  }
+  return {c,d};
+}
+
+function passiveTick(){
+  const now=Date.now();
+  const diff=Math.floor((now-lastTick)/1000);
+  if(diff<=0) return;
+  const p=getPassive();
+  coins+=p.c*diff;
+  crystals+=p.d*diff;
+  lastTick=now;
+  save();updateUI();
+}
+setInterval(passiveTick,1000);
+passiveTick();
+
+/* КЛИК */
+character.onclick=()=>{
+  const ch=characters[active];
+  coins+=ch.power;
+  crystals+=ch.crystal;
+  if(vibeEnabled && navigator.vibrate) navigator.vibrate(30);
+  save();updateUI();
 };
 
-let active="default";
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
-
-const character=document.getElementById("character");
-const charWrap=document.getElementById("charWrap");
-character.src=characters[active].img;
-
-const coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
-
+function save(){
+  localStorage.setItem("coins",coins);
+  localStorage.setItem("crystals",crystals);
+  localStorage.setItem("lastTick",lastTick);
+}
 function updateUI(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
+  coins.textContent=coins;
+  crystals.textContent=crystals;
+  const p=getPassive();
+  incomeInfo.textContent=`+${p.c}/сек • +${p.c*60}/мин`;
 }
 updateUI();
-
-character.onclick=()=>{
-  if(!soundUnlocked){
-    clickSound.play().catch(()=>{});
-    clickSound.pause();clickSound.currentTime=0;
-    soundUnlocked=true;
-  }
-  if(soundEnabled){
-    clickSound.currentTime=0;
-    clickSound.play();
-  }
-  coins++;
-  localStorage.setItem("coins",coins);
-  updateUI();
-};
 </script>
 
 </body>
