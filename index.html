@@ -6,168 +6,67 @@
 <title>Nezya</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  width:100vw;height:100vh;
+  background:center/cover no-repeat;
+  font-family:Arial,sans-serif;
+  overflow:hidden;user-select:none
 }
-
-body {
-  width: 100vw;
-  height: 100vh;
-  background: center / cover no-repeat;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-  user-select: none;
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+.top-bar{
+  position:absolute;top:14px;left:50%;
+  transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:8px;
+  align-items:center;z-index:3
 }
-
-/* затемнение */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
+.balances{display:flex;gap:12px}
+.balance{
+  background:rgba(0,0,0,.65);
+  padding:10px 16px;border-radius:20px;
+  font-weight:900;color:#fff;
+  display:flex;gap:8px;align-items:center
 }
-
-/* верх */
-.top-bar {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 3;
-  align-items: center;
+.coin{
+  width:20px;height:20px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
 }
-
-.balances {
-  display: flex;
-  gap: 12px;
+.crystal{
+  width:18px;height:18px;
+  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
+  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
 }
-
-.balance {
-  background: rgba(0,0,0,0.65);
-  padding: 10px 16px;
-  border-radius: 20px;
-  font-weight: 900;
-  color: #fff;
-  display: flex;
-  gap: 8px;
-  align-items: center;
+.level-wrap{
+  width:200px;background:rgba(0,0,0,.6);
+  border-radius:10px;padding:4px
 }
+.level-bar{height:10px;width:0%;background:gold;border-radius:6px}
+.level-text{text-align:center;font-size:13px;font-weight:bold;color:white;margin-top:4px}
 
-.coin {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d);
+.game{
+  position:relative;width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;z-index:2
 }
-
-.crystal {
-  width: 18px;
-  height: 18px;
-  clip-path: polygon(50% 0%, 90% 25%, 70% 100%, 30% 100%, 10% 25%);
-  background: linear-gradient(135deg, #7dd3fc, #38bdf8);
+.character{
+  width:320px;max-width:85vw;
+  cursor:pointer;transition:transform .12s ease
 }
-
-/* уровень */
-.level-wrap {
-  width: 200px;
-  background: rgba(0,0,0,0.6);
-  border-radius: 10px;
-  padding: 4px;
+.float{
+  position:absolute;font-size:34px;font-weight:900;
+  pointer-events:none;animation:fly 2s ease-out forwards
 }
-
-.level-bar {
-  height: 10px;
-  width: 0%;
-  background: gold;
-  border-radius: 6px;
+@keyframes fly{
+  to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.5)}
 }
-
-.level-text {
-  text-align: center;
-  font-size: 13px;
-  font-weight: bold;
-  color: white;
-  margin-top: 4px;
+.bottom-menu{
+  position:absolute;bottom:16px;left:50%;
+  transform:translateX(-50%);
+  display:flex;gap:14px;z-index:3
 }
-
-/* игра */
-.game {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.character {
-  width: 320px;
-  max-width: 85vw;
-  transition: transform 0.12s ease;
-  cursor: pointer;
-}
-
-/* цифры */
-.float {
-  position: absolute;
-  font-size: 36px;
-  font-weight: 900;
-  color: gold;
-  pointer-events: none;
-  animation: fly 2s ease-out forwards;
-}
-
-@keyframes fly {
-  to {
-    opacity: 0;
-    transform: translate(var(--x), var(--y)) scale(1.5);
-  }
-}
-
-/* меню */
-.bottom-menu {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 14px;
-  z-index: 3;
-}
-
-.menu-btn {
-  padding: 12px 16px;
-  border-radius: 18px;
-  background: rgba(0,0,0,0.65);
-  color: white;
-  font-weight: 900;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* персонажи */
-.characters {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  display: none;
-  z-index: 5;
-  padding: 20px;
-}
-
-.char {
-  background: rgba(255,255,255,0.15);
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 12px;
-  color: white;
-  cursor: pointer;
+.menu-btn{
+  padding:12px 16px;border-radius:18px;
+  background:rgba(0,0,0,.65);
+  color:white;font-weight:900;text-decoration:none
 }
 </style>
 </head>
@@ -181,7 +80,6 @@ body {
     <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
     <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
   </div>
-
   <div class="level-wrap">
     <div class="level-bar" id="levelBar"></div>
     <div class="level-text">Уровень <span id="level">1</span></div>
@@ -189,85 +87,87 @@ body {
 </div>
 
 <div class="game">
-  <img src="character.png" class="character" id="character">
+  <img id="character" class="character">
 </div>
 
 <div class="bottom-menu">
-  <div class="menu-btn" onclick="openShop()">🛒 Магазин</div>
-  <div class="menu-btn" onclick="openCharacters()">🧍 Персонажи</div>
-</div>
-
-<div class="characters" id="characters">
-  <div class="char" onclick="selectChar(0)">🙂 Обычный — +1</div>
-  <div class="char" onclick="selectChar(1)">🔥 Огненный — +2</div>
-  <div class="char" onclick="selectChar(2)">⚡ Электро — +3</div>
-  <div class="char" onclick="selectChar(3)">💎 Кристалл — +5</div>
-  <div class="char" onclick="selectChar(4)">🌟 Легенда — +10</div>
-  <div class="menu-btn" onclick="closeCharacters()">Закрыть</div>
+  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
 </div>
 
 <script>
-/* фон */
+/* ФОН */
 document.body.style.backgroundImage = "url(bg.jpg)";
 
-/* данные */
+/* ПЕРСОНАЖИ */
+const characters = [
+  { img:"character_default.png", power:1, color:"gold" },
+  { img:"character_clicker.png", power:2, color:"#ffeb3b" },
+  { img:"character_business.png", power:4, color:"#4caf50" },
+  { img:"character_magnate.png", power:7, color:"#03a9f4" },
+  { img:"character_legendary.png", power:15, color:"#e040fb" }
+];
+
+let currentChar = +localStorage.getItem("character") || 0;
+
+/* ДАННЫЕ */
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
-let currentChar = +localStorage.getItem("char") || 0;
 
-const effects = [1,2,3,5,10];
-
+/* ЭЛЕМЕНТЫ */
 const coinsEl = document.getElementById("coins");
 const crystalsEl = document.getElementById("crystals");
 const levelEl = document.getElementById("level");
 const levelBar = document.getElementById("levelBar");
 const character = document.getElementById("character");
 
-function updateUI() {
+/* ЗАГРУЗКА ПЕРСОНАЖА */
+character.src = characters[currentChar].img;
+
+/* UI */
+function updateUI(){
   coinsEl.textContent = coins;
   crystalsEl.textContent = crystals;
-  const level = Math.floor(clicks / 100) + 1;
-  levelEl.textContent = level;
-  levelBar.style.width = (clicks % 100) + "%";
+  const lvl = Math.floor(clicks/100)+1;
+  levelEl.textContent = lvl;
+  levelBar.style.width = (clicks%100)+"%";
 }
 
-character.onclick = () => {
+/* КЛИК */
+character.onclick = ()=>{
   clicks++;
-  const gain = effects[currentChar];
+  const gain = characters[currentChar].power;
   coins += gain;
 
-  character.style.transform = "scale(0.9)";
+  character.style.transform="scale(0.9)";
   setTimeout(()=>character.style.transform="scale(1)",120);
 
-  spawn("+" + gain);
-  save();
-  updateUI();
+  spawn("+"+gain, characters[currentChar].color);
+  save(); updateUI();
 };
 
-function spawn(text) {
+/* ЭФФЕКТ */
+function spawn(text,color){
   const r = character.getBoundingClientRect();
   const el = document.createElement("div");
-  el.className = "float";
-  el.textContent = text;
-  el.style.left = r.left + r.width/2 + "px";
-  el.style.top = r.top + r.height/2 + "px";
+  el.className="float";
+  el.textContent=text;
+  el.style.color=color;
+  el.style.left=r.left+r.width/2+"px";
+  el.style.top=r.top+r.height/2+"px";
   el.style.setProperty("--x",(Math.random()*200-100)+"px");
   el.style.setProperty("--y",(-Math.random()*150-50)+"px");
   document.body.appendChild(el);
   setTimeout(()=>el.remove(),2000);
 }
 
-function openCharacters(){ document.getElementById("characters").style.display="block"; }
-function closeCharacters(){ document.getElementById("characters").style.display="none"; }
-function selectChar(i){ currentChar=i; localStorage.setItem("char",i); closeCharacters(); }
-
-function openShop(){ alert("Магазин подключим следующим шагом 😉"); }
-
+/* СОХРАНЕНИЕ */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
+  localStorage.setItem("character",currentChar);
 }
 
 updateUI();
