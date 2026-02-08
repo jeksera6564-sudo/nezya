@@ -87,7 +87,7 @@ body{
 </div>
 
 <div class="game">
-  <img id="character" class="character">
+  <img id="character" class="character" src="./player.png">
 </div>
 
 <div class="bottom-menu">
@@ -97,35 +97,31 @@ body{
 
 <script>
 /* ФОН ИГРЫ */
-document.body.style.backgroundImage = "url(game-bg.jpg)";
+document.body.style.backgroundImage = "url('./game-bg.jpg')";
 
 /* ПЕРСОНАЖИ */
 const characters = [
-  { img:"player.png", power:1, color:"gold" },
-  { img:"character_clicker.png", power:2, color:"#ffeb3b" },
-  { img:"character_business.png", power:4, color:"#4caf50" },
-  { img:"character_magnate.png", power:7, color:"#03a9f4" },
-  { img:"character_legendary.png", power:15, color:"#e040fb" }
+  { img:"./player.png", power:1, color:"gold" },
+  { img:"./character_clicker.png", power:2, color:"#ffeb3b" },
+  { img:"./character_business.png", power:4, color:"#4caf50" },
+  { img:"./character_magnate.png", power:7, color:"#03a9f4" },
+  { img:"./character_legendary.png", power:15, color:"#e040fb" }
 ];
 
 let currentChar = +localStorage.getItem("character") || 0;
 
-/* ДАННЫЕ */
 let coins = +localStorage.getItem("coins") || 0;
 let crystals = +localStorage.getItem("crystals") || 0;
 let clicks = +localStorage.getItem("clicks") || 0;
 
-/* ЭЛЕМЕНТЫ */
 const coinsEl = document.getElementById("coins");
 const crystalsEl = document.getElementById("crystals");
 const levelEl = document.getElementById("level");
 const levelBar = document.getElementById("levelBar");
 const character = document.getElementById("character");
 
-/* ЗАГРУЗКА ПЕРСОНАЖА */
 character.src = characters[currentChar].img;
 
-/* UI */
 function updateUI(){
   coinsEl.textContent = coins;
   crystalsEl.textContent = crystals;
@@ -134,7 +130,6 @@ function updateUI(){
   levelBar.style.width = (clicks%100)+"%";
 }
 
-/* КЛИК */
 character.onclick = ()=>{
   clicks++;
   const gain = characters[currentChar].power;
@@ -147,7 +142,6 @@ character.onclick = ()=>{
   save(); updateUI();
 };
 
-/* ЭФФЕКТ */
 function spawn(text,color){
   const r = character.getBoundingClientRect();
   const el = document.createElement("div");
@@ -162,7 +156,6 @@ function spawn(text,color){
   setTimeout(()=>el.remove(),2000);
 }
 
-/* СОХРАНЕНИЕ */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
