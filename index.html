@@ -130,16 +130,16 @@ body{
 /* ФОН */
 document.body.style.backgroundImage = "url('assets/bg.jpg')";
 
-/* ПЕРСОНАЖИ */
-const characters = [
-  { img:"assets/player.png", power:1, crystal:0 },
-  { img:"assets/character_clicker.png", power:2, crystal:0 },
-  { img:"assets/character_business.png", power:4, crystal:1 },
-  { img:"assets/character_magnate.png", power:7, crystal:2 },
-  { img:"assets/character_legendary.png", power:15, crystal:5 }
-];
+/* ПЕРСОНАЖИ (ID СОВПАДАЮТ С characters.html) */
+const characters = {
+  default:{ img:"assets/player.png", power:1, crystal:0 },
+  clicker:{ img:"assets/character_clicker.png", power:2, crystal:0 },
+  business:{ img:"assets/character_business.png", power:4, crystal:1 },
+  magnate:{ img:"assets/character_magnate.png", power:7, crystal:2 },
+  legendary:{ img:"assets/character_legendary.png", power:15, crystal:5 }
+};
 
-let currentChar = +localStorage.getItem("activeCharacter") || 0;
+let activeCharacter = localStorage.getItem("activeCharacter") || "default";
 
 /* ДАННЫЕ */
 let coins = +localStorage.getItem("coins") || 0;
@@ -160,7 +160,7 @@ const comboEl = document.getElementById("combo");
 function loadCharacter(){
   character.style.opacity = 0;
   setTimeout(()=>{
-    character.src = characters[currentChar].img;
+    character.src = characters[activeCharacter].img;
     character.style.opacity = 1;
   },120);
 }
@@ -176,19 +176,13 @@ function updateUI(){
   comboEl.textContent = "Комбо x"+combo;
 }
 
-/* ОФФЛАЙН ДОХОД */
-const lastTime = +localStorage.getItem("lastTime") || Date.now();
-const diff = Math.floor((Date.now()-lastTime)/1000);
-if(diff>10){
-  coins += diff * 0.5;
-  crystals += Math.floor(diff/600);
-}
-
 /* КЛИК */
 character.onclick = ()=>{
   const now = Date.now();
   combo = (now-lastClick<800) ? Math.min(combo+1,20) : 1;
   lastClick = now;
+
+  const ch = characters[activeCharacter];
 
   let multi = 1;
   const r = Math.random();
@@ -197,9 +191,9 @@ character.onclick = ()=>{
   else if(r<0.07) multi=5;
   else if(r<0.15) multi=2;
 
-  const gain = characters[currentChar].power * combo * multi;
+  const gain = ch.power * combo * multi;
   coins += gain;
-  crystals += characters[currentChar].crystal;
+  crystals += ch.crystal;
 
   spawn("+"+gain+(multi>1?" x"+multi:""), multi>=10?"#f43f5e":"gold");
 
@@ -225,138 +219,56 @@ function spawn(text,color){
   setTimeout(()=>el.remove(),2000);
 }
 
+/* ГЛОБАЛЬНЫЙ ДОХОД */
+let lastTick = +localStorage.getItem("lastTick") || Date.now();
+
+function getIncomePerSecond(){
+  const base={lemonade:3,shop:30,factory:300,bank:3000,corporation:9000,legendary:50000};
+  const incomes=JSON.parse(localStorage.getItem("incomes"))||{};
+  const upgrades=JSON.parse(localStorage.getItem("upgrades"))||{};
+  let sum=0;
+  for(let k in base) sum+=(incomes[k]||0)*base[k];
+  if(upgrades.ultraBoost) sum*=2;
+  return sum;
+}
+
+function applyGlobalIncome(){
+  const now=Date.now();
+  const diff=Math.floor((now-lastTick)/1000);
+  if(diff<=0) return;
+
+  let coinsLS=+localStorage.getItem("coins")||0;
+  let crystalsLS=+localStorage.getItem("crystals")||0;
+  const upgrades=JSON.parse(localStorage.getItem("upgrades"))||{};
+
+  const earned=getIncomePerSecond()*diff;
+  coinsLS+=earned;
+
+  if(upgrades.crystalIncome){
+    crystalsLS+=Math.floor(earned/5000);
+  }
+
+  localStorage.setItem("coins",coinsLS);
+  localStorage.setItem("crystals",crystalsLS);
+  localStorage.setItem("lastTick",now);
+
+  coins=coinsLS;
+  crystals=crystalsLS;
+  updateUI();
+}
+
+setInterval(applyGlobalIncome,1000);
+applyGlobalIncome();
+
 /* СОХРАНЕНИЕ */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
-  localStorage.setItem("activeCharacter",currentChar);
-  localStorage.setItem("lastTime",Date.now());
+  localStorage.setItem("activeCharacter",activeCharacter);
 }
-
 updateUI();
 </script>
 
 </body>
 </html>
-
-
-
-/* ===== ГЛОБАЛЬНЫЙ ДОХОД ===== */
-let lastTick = +localStorage.getItem("lastTick") || Date.now();
-
-function getIncomePerSecond(){
-  const incomeList = {
-    lemonade:3,
-    shop:30,
-    factory:300,
-    bank:3000,
-    corporation:9000,
-    legendary:50000
-  };
-
-  const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
-  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
-
-  let sum = 0;
-  for(let k in incomeList){
-    sum += (incomes[k] || 0) * incomeList[k];
-  }
-
-  if(upgrades.ultraBoost) sum *= 2;
-  return sum;
-}
-
-function applyGlobalIncome(){
-  const now = Date.now();
-  const diff = Math.floor((now - lastTick) / 1000);
-  if(diff <= 0) return;
-
-  let coins = +localStorage.getItem("coins") || 0;
-  let crystals = +localStorage.getItem("crystals") || 0;
-  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
-
-  const incomePerSec = getIncomePerSecond();
-  const earnedCoins = incomePerSec * diff;
-
-  coins += earnedCoins;
-
-  // кристаллы с дохода
-  if(upgrades.crystalIncome){
-    crystals += Math.floor(earnedCoins / 5000);
-  }
-
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("crystals", crystals);
-  localStorage.setItem("lastTick", now);
-}
-
-/* тик каждую секунду */
-setInterval(applyGlobalIncome, 1000);
-
-/* начислять при любом клике */
-document.addEventListener("click", applyGlobalIncome);
-
-/* начислить сразу при загрузке страницы */
-applyGlobalIncome();
-
-
-
-    /* ===== ГЛОБАЛЬНЫЙ ДОХОД ===== */
-let lastTick = +localStorage.getItem("lastTick") || Date.now();
-
-function getIncomePerSecond(){
-  const incomeList = {
-    lemonade:3,
-    shop:30,
-    factory:300,
-    bank:3000,
-    corporation:9000,
-    legendary:50000
-  };
-
-  const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
-  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
-
-  let sum = 0;
-  for(let k in incomeList){
-    sum += (incomes[k] || 0) * incomeList[k];
-  }
-
-  if(upgrades.ultraBoost) sum *= 2;
-  return sum;
-}
-
-function applyGlobalIncome(){
-  const now = Date.now();
-  const diff = Math.floor((now - lastTick) / 1000);
-  if(diff <= 0) return;
-
-  let coins = +localStorage.getItem("coins") || 0;
-  let crystals = +localStorage.getItem("crystals") || 0;
-  const upgrades = JSON.parse(localStorage.getItem("upgrades")) || {};
-
-  const incomePerSec = getIncomePerSecond();
-  const earnedCoins = incomePerSec * diff;
-
-  coins += earnedCoins;
-
-  // кристаллы с дохода
-  if(upgrades.crystalIncome){
-    crystals += Math.floor(earnedCoins / 5000);
-  }
-
-  localStorage.setItem("coins", coins);
-  localStorage.setItem("crystals", crystals);
-  localStorage.setItem("lastTick", now);
-}
-
-/* тик каждую секунду */
-setInterval(applyGlobalIncome, 1000);
-
-/* начислять при любом клике */
-document.addEventListener("click", applyGlobalIncome);
-
-/* начислить сразу при загрузке страницы */
-applyGlobalIncome();
-
