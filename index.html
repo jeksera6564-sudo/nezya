@@ -139,11 +139,11 @@ let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
 let combo=1,lastClick=0;
 
-/* АПГРЕЙДЫ ИЗ МАГАЗИНА */
+/* АПГРЕЙДЫ */
 let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
-  crystalClick:0,
-  crystalIncome:0,
-  ultraBoost:0
+  crystalClick:0,     // шанс кристалла с клика
+  crystalIncome:0,   // пассивный доход монет
+  ultraBoost:0       // открывает x2–x5
 };
 
 const character=document.getElementById("character");
@@ -156,6 +156,17 @@ const levelEl=document.getElementById("level");
 const levelBar=document.getElementById("levelBar");
 const comboEl=document.getElementById("combo");
 
+/* МУЛЬТИПЛИКАТОР x2–x5 */
+function getClickMultiplier(){
+  if(!upgrades.ultraBoost) return 1;
+
+  const r=Math.random();
+  if(r<0.05) return 5;   // 5%
+  if(r<0.15) return 3;   // 10%
+  if(r<0.35) return 2;   // 20%
+  return 1;
+}
+
 function updateUI(){
   coinsEl.textContent=coins;
   crystalsEl.textContent=crystals;
@@ -165,6 +176,7 @@ function updateUI(){
   comboEl.textContent="Комбо x"+combo;
 }
 
+/* КЛИК */
 character.onclick=()=>{
   character.style.transform="scale(.9)";
   setTimeout(()=>character.style.transform="scale(1)",120);
@@ -179,20 +191,29 @@ character.onclick=()=>{
   lastClick=now;
 
   const ch=characters[active];
+  const multi=getClickMultiplier();
 
-  let gain = ch.power * combo;
-  if(upgrades.ultraBoost) gain *= 2;
-
+  let gain = ch.power * combo * multi;
   coins += gain;
   crystals += ch.crystal;
   clicks++;
 
-  if(upgrades.crystalClick && Math.random()<0.1){
-    crystals++;
+  /* шанс кристалла с клика */
+  if(upgrades.crystalClick){
+    const chance = 0.05 * upgrades.crystalClick;
+    if(Math.random()<chance) crystals++;
   }
 
   save();updateUI();
 };
+
+/* ПАССИВНЫЙ ДОХОД */
+setInterval(()=>{
+  if(upgrades.crystalIncome){
+    coins += upgrades.crystalIncome;
+    save();updateUI();
+  }
+},1000);
 
 function save(){
   localStorage.setItem("coins",coins);
