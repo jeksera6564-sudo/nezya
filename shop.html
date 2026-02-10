@@ -1,201 +1,128 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Магазин — Nezi</title>
-
-<style>
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  color:white;
-  min-height:100vh;
-  background:
-    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.85)),
-    url("assets/shop-bg.jpg") center/cover no-repeat fixed;
-}
-
-.top{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  padding:14px;
-  flex-wrap:wrap;
-}
-.balance{
-  background:rgba(0,0,0,.65);
-  padding:8px 18px;
-  border-radius:20px;
-  font-size:18px;
-}
-
-.back-wrap{text-align:center;margin:6px 0}
-.back{
-  background:gold;
-  padding:8px 22px;
-  border-radius:22px;
-  color:black;
-  font-weight:bold;
-  text-decoration:none;
-}
-
-.shop{
-  padding:20px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-  gap:16px;
-  padding-bottom:80px;
-}
-.item{
-  background:rgba(255,255,255,.14);
-  border-radius:18px;
-  padding:16px;
-  text-align:center;
-}
-.item button{
-  margin-top:10px;
-  padding:8px 18px;
-  border-radius:20px;
-  border:none;
-  background:gold;
-  font-weight:bold;
-  cursor:pointer;
-}
-.item button:disabled{
-  background:#666;
-  color:#aaa;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Магазин — Nezi</title>
+    <style>
+        body {
+            margin: 0; font-family: sans-serif; color: white; min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), #1a1a1a;
+        }
+        .top {
+            position: sticky; top: 0; z-index: 100; display: flex; justify-content: center; gap: 10px;
+            padding: 15px; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+        }
+        .balance { background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .back-wrap { text-align: center; margin: 20px 0; }
+        .back { background: #fbbf24; padding: 12px 30px; border-radius: 25px; color: black; font-weight: 900; text-decoration: none; }
+        h2 { text-align: center; color: #fbbf24; margin: 20px 0; }
+        .shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; max-width: 900px; margin: 0 auto; }
+        .item { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .item b { color: #fbbf24; display: block; margin: 10px 0; }
+        .item button { width: 100%; padding: 10px; border-radius: 12px; border: none; background: #fbbf24; font-weight: bold; cursor: pointer; }
+        .item button:disabled { background: #444; color: #888; }
+    </style>
 </head>
-
 <body>
-
 <div class="top">
-  <div class="balance">🪙 <span id="coins">0</span></div>
-  <div class="balance">💎 <span id="crystals">0</span></div>
-  <div class="balance">⏱ <span id="incomePerSec">0</span>/сек</div>
+    <div class="balance">🪙 <span id="coins">0</span></div>
+    <div class="balance">💎 <span id="crystals">0</span></div>
 </div>
-
-<div class="back-wrap">
-  <a href="index.html" class="back">⬅ Назад</a>
-</div>
-
-<h1 style="text-align:center">🏦 Источники дохода</h1>
+<div class="back-wrap"><a href="index.html" class="back">⬅ НАЗАД</a></div>
+<h2>🏦 БИЗНЕС</h2>
 <div class="shop" id="incomeShop"></div>
-
-<h2 style="text-align:center">✨ Улучшения</h2>
+<h2>✨ АПГРЕЙДЫ</h2>
 <div class="shop" id="upgradeShop"></div>
 
 <script>
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
-
-let incomes=JSON.parse(localStorage.getItem("incomes"))||{
-  lemonade:0,shop:0,factory:0,bank:0,corporation:0,legendary:0
+let state = {
+    coins: +localStorage.getItem("coins") || 0,
+    crystals: +localStorage.getItem("crystals") || 0,
+    incomes: JSON.parse(localStorage.getItem("incomes")) || {},
+    upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
 };
 
-let upgrades=JSON.parse(localStorage.getItem("upgrades"))||{
-  crystalClick:0,
-  crystalIncome:0,
-  ultraBoost:0
+const incomeList = {
+    lemonade: { name: "🍋 Лимонад", base: 300, inc: 3 },
+    shop: { name: "🏪 Магазин", base: 3000, inc: 30 },
+    factory: { name: "🏭 Фабрика", base: 30000, inc: 300 },
+    bank: { name: "🏦 Банк", base: 300000, inc: 3000 },
+    corporation: { name: "🏢 Корп", base: 900000, inc: 9000 },
+    legendary: { name: "👑 Легенда", base: 3000000, inc: 50000 }
 };
 
-const incomeList={
-  lemonade:{name:"🍋 Лимонад",basePrice:300,income:3},
-  shop:{name:"🏪 Магазин",basePrice:3000,income:30},
-  factory:{name:"🏭 Фабрика",basePrice:30000,income:300},
-  bank:{name:"🏦 Банк",basePrice:300000,income:3000},
-  corporation:{name:"🏢 Корпорация",basePrice:900000,income:9000},
-  legendary:{name:"👑 Легендарная корпорация",basePrice:3000000,income:50000}
+const crystalList = {
+    crystalClick: { name: "💎 Шанс кристалла", price: 30 },
+    crystalIncome: { name: "💠 Авто-кристалл", price: 40 },
+    ultraBoost: { name: "🚀 Доход x2", price: 50 }
 };
 
-const crystalUpgrades={
-  crystalClick:{name:"💎 Кристаллы с клика",price:30},
-  crystalIncome:{name:"💠 Кристаллы с дохода",price:40},
-  ultraBoost:{name:"🚀 Ультра x2",price:50}
-};
+const getPrice = (base, lvl) => Math.floor(base * Math.pow(1.5, lvl || 0));
 
-const price=(base,lvl)=>Math.floor(base*(1+lvl*0.6));
+function render() {
+    document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+    document.getElementById("crystals").textContent = state.crystals;
 
-function getIncomePerSecond(){
-  let sum=0;
-  for(let k in incomeList) sum+=incomeList[k].income*incomes[k];
-  if(upgrades.ultraBoost) sum*=2;
-  return sum;
+    const iShop = document.getElementById("incomeShop");
+    iShop.innerHTML = "";
+    for (let k in incomeList) {
+        let cost = getPrice(incomeList[k].base, state.incomes[k]);
+        iShop.innerHTML += `<div class="item">
+            <h3>${incomeList[k].name}</h3>
+            <p>Уровень: ${state.incomes[k] || 0}</p>
+            <b>${cost.toLocaleString()} 🪙</b>
+            <button ${state.coins < cost ? 'disabled' : ''} onclick="buyI('${k}')">Купить</button>
+        </div>`;
+    }
+
+    const uShop = document.getElementById("upgradeShop");
+    uShop.innerHTML = "";
+    for (let k in crystalList) {
+        let bought = state.upgrades[k];
+        uShop.innerHTML += `<div class="item">
+            <h3>${crystalList[k].name}</h3>
+            <b>${crystalList[k].price} 💎</b>
+            <button ${bought || state.crystals < crystalList[k].price ? 'disabled' : ''} onclick="buyU('${k}')">
+                ${bought ? 'Куплено' : 'Купить'}
+            </button>
+        </div>`;
+    }
 }
 
-const coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
-const incomeEl=document.getElementById("incomePerSec");
-const incomeShop=document.getElementById("incomeShop");
-const upgradeShop=document.getElementById("upgradeShop");
+window.buyI = (k) => {
+    let cost = getPrice(incomeList[k].base, state.incomes[k]);
+    if(state.coins >= cost) {
+        state.coins -= cost;
+        state.incomes[k] = (state.incomes[k] || 0) + 1;
+        save();
+    }
+};
 
-function render(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
-  incomeEl.textContent=getIncomePerSecond();
+window.buyU = (k) => {
+    let p = crystalList[k].price;
+    if(state.crystals >= p && !state.upgrades[k]) {
+        state.crystals -= p;
+        state.upgrades[k] = 1;
+        save();
+    }
+};
 
-  incomeShop.innerHTML="";
-  for(let k in incomeList){
-    const d=incomeList[k];
-    const lvl=incomes[k];
-    const cost=price(d.basePrice,lvl);
-
-    const el=document.createElement("div");
-    el.className="item";
-    el.innerHTML=`
-      <h3>${d.name}</h3>
-      <p>Куплено: ${lvl}</p>
-      <p><b>${cost} 🪙</b></p>
-      <button ${coins<cost?"disabled":""}>Купить</button>
-    `;
-    el.querySelector("button").onclick=()=>{
-      if(coins<cost) return;
-      coins-=cost;
-      incomes[k]++;
-      save();
-    };
-    incomeShop.appendChild(el);
-  }
-
-  upgradeShop.innerHTML="";
-  for(let k in crystalUpgrades){
-    const u=crystalUpgrades[k];
-    const bought=upgrades[k];
-    const el=document.createElement("div");
-    el.className="item";
-    el.innerHTML=`
-      <h3>${u.name}</h3>
-      <p><b>${u.price} 💎</b></p>
-      <button ${bought||crystals<u.price?"disabled":""}>
-        ${bought?"Куплено":"Купить"}
-      </button>
-    `;
-    el.querySelector("button").onclick=()=>{
-      if(crystals<u.price) return;
-      crystals-=u.price;
-      upgrades[k]=1;
-      save();
-    };
-    upgradeShop.appendChild(el);
-  }
+function save() {
+    localStorage.setItem("coins", state.coins);
+    localStorage.setItem("crystals", state.crystals);
+    localStorage.setItem("incomes", JSON.stringify(state.incomes));
+    localStorage.setItem("upgrades", JSON.stringify(state.upgrades));
+    render();
 }
 
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
-  localStorage.setItem("incomes",JSON.stringify(incomes));
-  localStorage.setItem("upgrades",JSON.stringify(upgrades));
-  render();
-}
-
-setInterval(()=>{
-  const inc=getIncomePerSecond();
-  if(inc>0){
-    coins+=inc;
-    save();
-  }
-},1000);
+setInterval(() => {
+    let sum = 0;
+    for (let k in state.incomes) sum += (incomeList[k].inc * state.incomes[k]);
+    if (state.upgrades.ultraBoost) sum *= 2;
+    state.coins += sum;
+    document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+}, 1000);
 
 render();
 </script>
