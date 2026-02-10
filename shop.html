@@ -2,103 +2,68 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Nezi — Кристаллы</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Магазин — Nezi</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
+  margin:0;
   font-family:Arial,sans-serif;
   color:white;
-  background:
-    linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.85)),
-    url("assets/game-bg.jpg") center/cover no-repeat fixed;
   min-height:100vh;
-  overflow:hidden;
+  background:
+    linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.85)),
+    url("assets/shop-bg.jpg") center/cover no-repeat fixed;
 }
 
-/* ===== TOP ===== */
 .top{
   display:flex;
   justify-content:center;
   gap:12px;
-  padding:12px;
+  padding:14px;
   flex-wrap:wrap;
 }
 .balance{
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.65);
   padding:8px 18px;
   border-radius:20px;
   font-size:18px;
 }
 
-/* ===== GRID ===== */
-.grid{
-  width:320px;
-  height:320px;
-  margin:20px auto;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-}
-
-.cell{
-  background:rgba(255,255,255,.1);
-  border-radius:14px;
-  position:relative;
-}
-
-/* ===== CRYSTALS ===== */
-.crystal{
-  width:100%;
-  height:100%;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:26px;
-  font-weight:bold;
-  cursor:pointer;
-  animation:spawn .25s ease-out;
-}
-
-@keyframes spawn{
-  from{transform:scale(0);opacity:0}
-  to{transform:scale(1);opacity:1}
-}
-
-.c1{background:#6cf}
-.c2{background:#3cf}
-.c3{background:#93f}
-.c4{background:#f9c}
-.c5{background:gold;color:black}
-
-/* ===== UI ===== */
-.actions{
-  text-align:center;
-  margin-top:10px;
-}
-button{
-  padding:10px 24px;
-  border-radius:22px;
-  border:none;
-  font-weight:bold;
-  cursor:pointer;
+.back-wrap{text-align:center;margin:6px 0}
+.back{
   background:gold;
+  padding:8px 22px;
+  border-radius:22px;
   color:black;
+  font-weight:bold;
+  text-decoration:none;
 }
 
-.float{
-  position:fixed;
-  font-size:22px;
-  font-weight:900;
-  pointer-events:none;
-  animation:fly 1s ease-out forwards;
-  z-index:9999;
+.shop{
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:16px;
+  padding-bottom:80px;
 }
-@keyframes fly{
-  from{opacity:1;transform:translateY(0)}
-  to{opacity:0;transform:translateY(-60px)}
+.item{
+  background:rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+}
+.item button{
+  margin-top:10px;
+  padding:8px 18px;
+  border-radius:20px;
+  border:none;
+  background:gold;
+  font-weight:bold;
+  cursor:pointer;
+}
+.item button:disabled{
+  background:#666;
+  color:#aaa;
 }
 </style>
 </head>
@@ -108,123 +73,131 @@ button{
 <div class="top">
   <div class="balance">🪙 <span id="coins">0</span></div>
   <div class="balance">💎 <span id="crystals">0</span></div>
+  <div class="balance">⏱ <span id="incomePerSec">0</span>/сек</div>
 </div>
 
-<div class="grid" id="grid"></div>
-
-<div class="actions">
-  <button onclick="spawnCrystal()">➕ Создать кристалл</button>
-  <br><br>
-  <a href="shop.html"><button>🏦 Магазин</button></a>
+<div class="back-wrap">
+  <a href="index.html" class="back">⬅ Назад</a>
 </div>
+
+<h1 style="text-align:center">🏦 Источники дохода</h1>
+<div class="shop" id="incomeShop"></div>
+
+<h2 style="text-align:center">✨ Улучшения</h2>
+<div class="shop" id="upgradeShop"></div>
 
 <script>
-/* ===== СИНХРОНИЗАЦИЯ ===== */
-let coins = +localStorage.getItem("coins") || 0;
-let crystals = +localStorage.getItem("crystals") || 0;
+let coins=+localStorage.getItem("coins")||0;
+let crystals=+localStorage.getItem("crystals")||0;
 
-/* ===== GRID ===== */
-const gridEl = document.getElementById("grid");
-let grid = JSON.parse(localStorage.getItem("mergeGrid")) || Array(16).fill(0);
-let selected = null;
-
-/* ===== ДАННЫЕ КРИСТАЛЛОВ ===== */
-const crystalData = {
-  1:{icon:"💎",reward:1},
-  2:{icon:"💠",reward:3},
-  3:{icon:"🔷",reward:8},
-  4:{icon:"✨",reward:20},
-  5:{icon:"👑",reward:60} // легендарный
+let incomes=JSON.parse(localStorage.getItem("incomes"))||{
+  lemonade:0,shop:0,factory:0,bank:0,corporation:0,legendary:0
 };
 
-/* ===== UI ===== */
-const coinsEl = document.getElementById("coins");
-const crystalsEl = document.getElementById("crystals");
+let upgrades=JSON.parse(localStorage.getItem("upgrades"))||{
+  crystalClick:0,
+  crystalIncome:0,
+  ultraBoost:0
+};
+
+const incomeList={
+  lemonade:{name:"🍋 Лимонад",basePrice:300,income:3},
+  shop:{name:"🏪 Магазин",basePrice:3000,income:30},
+  factory:{name:"🏭 Фабрика",basePrice:30000,income:300},
+  bank:{name:"🏦 Банк",basePrice:300000,income:3000},
+  corporation:{name:"🏢 Корпорация",basePrice:900000,income:9000},
+  legendary:{name:"👑 Легендарная корпорация",basePrice:3000000,income:50000}
+};
+
+const crystalUpgrades={
+  crystalClick:{name:"💎 Кристаллы с клика",price:30},
+  crystalIncome:{name:"💠 Кристаллы с дохода",price:40},
+  ultraBoost:{name:"🚀 Ультра x2",price:50}
+};
+
+const price=(base,lvl)=>Math.floor(base*(1+lvl*0.6));
+
+function getIncomePerSecond(){
+  let sum=0;
+  for(let k in incomeList) sum+=incomeList[k].income*incomes[k];
+  if(upgrades.ultraBoost) sum*=2;
+  return sum;
+}
+
+const coinsEl=document.getElementById("coins");
+const crystalsEl=document.getElementById("crystals");
+const incomeEl=document.getElementById("incomePerSec");
+const incomeShop=document.getElementById("incomeShop");
+const upgradeShop=document.getElementById("upgradeShop");
 
 function render(){
-  coinsEl.textContent = coins;
-  crystalsEl.textContent = crystals;
-  gridEl.innerHTML="";
+  coinsEl.textContent=coins;
+  crystalsEl.textContent=crystals;
+  incomeEl.textContent=getIncomePerSecond();
 
-  grid.forEach((lvl,i)=>{
-    const cell=document.createElement("div");
-    cell.className="cell";
+  incomeShop.innerHTML="";
+  for(let k in incomeList){
+    const d=incomeList[k];
+    const lvl=incomes[k];
+    const cost=price(d.basePrice,lvl);
 
-    if(lvl){
-      const c=document.createElement("div");
-      c.className=`crystal c${lvl}`;
-      c.textContent=crystalData[lvl].icon;
-      c.onclick=()=>clickCrystal(i);
-      cell.appendChild(c);
-    }
-    gridEl.appendChild(cell);
-  });
-}
-
-/* ===== LOGIC ===== */
-function spawnCrystal(){
-  const empty = grid.map((v,i)=>v?null:i).filter(v=>v!==null);
-  if(!empty.length) return;
-  const i = empty[Math.floor(Math.random()*empty.length)];
-  grid[i]=1;
-  save();
-}
-
-function clickCrystal(i){
-  if(selected===null){
-    selected=i;
-    return;
-  }
-  if(selected===i){
-    selected=null;
-    return;
+    const el=document.createElement("div");
+    el.className="item";
+    el.innerHTML=`
+      <h3>${d.name}</h3>
+      <p>Куплено: ${lvl}</p>
+      <p><b>${cost} 🪙</b></p>
+      <button ${coins<cost?"disabled":""}>Купить</button>
+    `;
+    el.querySelector("button").onclick=()=>{
+      if(coins<cost) return;
+      coins-=cost;
+      incomes[k]++;
+      save();
+    };
+    incomeShop.appendChild(el);
   }
 
-  if(grid[selected]===grid[i]){
-    const lvl=grid[i];
-    grid[selected]=0;
-    grid[i]=Math.min(lvl+1,5);
-
-    const reward = crystalData[lvl].reward;
-    coins += reward*10;
-    crystals += reward;
-
-    float(`+${reward*10} 🪙`,window.innerWidth/2,80,"gold");
-    float(`+${reward} 💎`,window.innerWidth/2,120,"cyan");
+  upgradeShop.innerHTML="";
+  for(let k in crystalUpgrades){
+    const u=crystalUpgrades[k];
+    const bought=upgrades[k];
+    const el=document.createElement("div");
+    el.className="item";
+    el.innerHTML=`
+      <h3>${u.name}</h3>
+      <p><b>${u.price} 💎</b></p>
+      <button ${bought||crystals<u.price?"disabled":""}>
+        ${bought?"Куплено":"Купить"}
+      </button>
+    `;
+    el.querySelector("button").onclick=()=>{
+      if(crystals<u.price) return;
+      crystals-=u.price;
+      upgrades[k]=1;
+      save();
+    };
+    upgradeShop.appendChild(el);
   }
-  selected=null;
-  save();
 }
 
-/* ===== FX ===== */
-function float(text,x,y,color){
-  const e=document.createElement("div");
-  e.className="float";
-  e.textContent=text;
-  e.style.left=x+"px";
-  e.style.top=y+"px";
-  e.style.color=color;
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),1000);
-}
-
-/* ===== SAVE ===== */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
-  localStorage.setItem("mergeGrid",JSON.stringify(grid));
+  localStorage.setItem("incomes",JSON.stringify(incomes));
+  localStorage.setItem("upgrades",JSON.stringify(upgrades));
   render();
 }
 
-/* ===== INIT ===== */
+setInterval(()=>{
+  const inc=getIncomePerSecond();
+  if(inc>0){
+    coins+=inc;
+    save();
+  }
+},1000);
+
 render();
-
-/* ===== YANDEX ADS (ЗАГЛУШКА) ===== */
-// В будущем:
-// YaGames.init().then(ysdk=>{
-//   ysdk.adv.showFullscreenAdv();
-// });
 </script>
-
 </body>
 </html>
