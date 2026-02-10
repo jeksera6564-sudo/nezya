@@ -3,135 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIP Wheel — Nezya Edition</title>
+    <title>Mega Wheels — Nezya Edition</title>
     <style>
         :root {
             --gold: #ffd700;
             --neon-blue: #00d2ff;
             --neon-purple: #9d00ff;
-            --neon-pink: #ff007f;
+            --neon-red: #ff4d4d;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
             width: 100vw; height: 100vh; 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            background: #020205;
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: background 0.5s;
+            transition: background 0.8s ease;
         }
 
-        .balance-top { position: absolute; top: 20px; display: flex; gap: 15px; z-index: 20; }
+        /* Сияние фона в зависимости от колеса */
+        .bg-glow {
+            position: absolute; width: 100%; height: 100%;
+            z-index: 1; opacity: 0.3; transition: 0.8s;
+        }
+
+        .balance-top { position: absolute; top: 20px; display: flex; gap: 10px; z-index: 20; }
         .bal { 
-            background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; 
-            border: 2px solid var(--gold); font-weight: 900; min-width: 110px; 
-            text-align: center; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 15px; 
+            border: 2px solid var(--gold); font-weight: 900; min-width: 100px; 
+            text-align: center; backdrop-filter: blur(10px); font-size: 14px;
         }
 
-        /* Переключатель колес */
+        /* Переключатель из 3 кнопок */
         .mode-switch {
-            margin-bottom: 20px;
-            background: rgba(255,255,255,0.05);
-            padding: 5px; border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 25px; background: rgba(255,255,255,0.05);
+            padding: 5px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1);
             display: flex; gap: 5px; z-index: 30;
         }
         .mode-btn {
-            padding: 10px 20px; border-radius: 25px; border: none;
-            cursor: pointer; font-weight: 900; font-size: 12px;
-            transition: 0.3s; background: transparent; color: #777;
+            padding: 10px 15px; border-radius: 30px; border: none;
+            cursor: pointer; font-weight: 900; font-size: 10px;
+            transition: 0.3s; background: transparent; color: #555; text-transform: uppercase;
         }
-        .mode-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        .mode-btn.active.coin { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
         .mode-btn.active.vip { background: var(--neon-purple); color: #fff; box-shadow: 0 0 15px var(--neon-purple); }
+        .mode-btn.active.ultra { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px var(--neon-red); }
 
         .wheel-container { 
-            position: relative; width: 340px; height: 340px; margin-bottom: 20px; 
-            transition: 0.5s;
+            position: relative; width: 330px; height: 330px; margin-bottom: 20px; z-index: 10;
         }
 
         .wheel {
-            width: 100%; height: 100%; border-radius: 50%; 
-            border: 8px solid var(--gold);
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1), border 0.5s;
-            position: relative; overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+            width: 100%; height: 100%; border-radius: 50%; border: 8px solid var(--gold);
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1), border-color 0.5s;
+            position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
         }
 
         .segment {
-            position: absolute; width: 50%; height: 50%;
-            left: 50%; top: 50%; transform-origin: 0% 0%;
+            position: absolute; width: 50%; height: 50%; left: 50%; top: 50%; transform-origin: 0% 0%;
             display: flex; align-items: center; justify-content: flex-start;
-            padding-left: 50px; font-weight: 900; font-size: 13px;
-            text-shadow: 0 0 10px rgba(0,0,0,1); pointer-events: none;
+            padding-left: 45px; font-weight: 900; font-size: 12px;
+            text-shadow: 0 0 8px rgba(0,0,0,1); pointer-events: none;
         }
 
         .pointer {
             position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
-            border-top: 45px solid var(--gold); z-index: 50; filter: drop-shadow(0 0 10px var(--gold));
-            transition: border-top-color 0.5s;
+            width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent;
+            border-top: 40px solid var(--gold); z-index: 50; filter: drop-shadow(0 0 10px var(--gold));
+            transition: 0.5s;
         }
 
         .center-cap {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: var(--gold); border: 4px solid #fff;
-            border-radius: 50%; z-index: 60; box-shadow: 0 0 30px var(--gold);
-            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            width: 55px; height: 55px; background: var(--gold); border: 3px solid #fff;
+            border-radius: 50%; z-index: 60; box-shadow: 0 0 25px var(--gold);
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
             transition: 0.5s;
         }
 
         .spin-btn {
             background: linear-gradient(45deg, var(--gold), #ff7f50);
-            color: #000; border: none; padding: 18px 60px;
+            color: #000; border: none; padding: 18px 60px; z-index: 10;
             border-radius: 50px; font-weight: 900; font-size: 22px; cursor: pointer;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-            transition: 0.3s; text-transform: uppercase;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); transition: 0.3s;
         }
-
-        .spin-btn:disabled { opacity: 0.5; transform: scale(0.95); }
+        .spin-btn:active { transform: scale(0.95); }
+        .spin-btn:disabled { opacity: 0.4; pointer-events: none; }
 
         .jackpot-alert {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95); border: 3px solid var(--gold);
-            padding: 40px; border-radius: 30px; text-align: center;
-            z-index: 100; display: none;
+            background: rgba(0,0,0,0.95); border: 3px solid var(--neon-red);
+            padding: 40px; border-radius: 30px; text-align: center; z-index: 100; display: none;
         }
     </style>
 </head>
-<body>
+<body id="mainBody">
+
+    <div class="bg-glow" id="bgGlow"></div>
 
     <div class="jackpot-alert" id="jackpotBox">
-        <h1 style="color: var(--gold); margin-bottom: 10px;">🏆 JACKPOT!</h1>
-        <p style="font-size: 20px;">Вы разблокировали героя:<br><b style="color: #ff4d4d;">МАГНАТ</b></p>
-        <button class="spin-btn" style="margin-top: 20px;" onclick="closeJackpot()">УРА!</button>
+        <h1 style="color: var(--gold); margin-bottom: 10px;">🔥 MEGA JACKPOT!</h1>
+        <p style="font-size: 20px;">Вы получили секретного персонажа:<br><b style="color: #ff4d4d; font-size: 30px;">МАГНАТ</b></p>
+        <button class="spin-btn" style="margin-top: 20px;" onclick="closeJackpot()">ЗАБРАТЬ</button>
     </div>
 
     <div class="balance-top">
-        <div class="bal">🪙 <span id="coins">0</span></div>
-        <div class="bal">💎 <span id="crystals">0</span></div>
+        <div class="bal" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
+        <div class="bal" style="border-color: var(--neon-blue);">💎 <span id="crystals">0</span></div>
     </div>
 
     <div class="mode-switch">
-        <button id="btnCoinMode" class="mode-btn active" onclick="setMode('coin')">ЗОЛОТОЕ КОЛЕСО</button>
-        <button id="btnVipMode" class="mode-btn vip" onclick="setMode('vip')">АЛМАЗНОЕ КОЛЕСО</button>
+        <button id="btn-coin" class="mode-btn active coin" onclick="setMode('coin')">Обычное</button>
+        <button id="btn-vip" class="mode-btn vip" onclick="setMode('vip')">VIP</button>
+        <button id="btn-ultra" class="mode-btn ultra" onclick="setMode('ultra')">Ultra 5k</button>
     </div>
 
-    <div class="wheel-container" id="wCont">
+    <div class="wheel-container">
         <div class="pointer" id="pointer"></div>
         <div class="center-cap" id="cap">🪙</div>
         <div class="wheel" id="wheel"></div>
     </div>
 
-    <div class="controls">
+    <div class="controls" style="text-align: center;">
         <button id="spinBtn" class="spin-btn" onclick="spin()">КРУТИТЬ</button>
-        <div id="timer" style="margin-top: 15px; color: var(--gold); font-weight: bold; text-align: center;">...</div>
-        <a href="index.html" style="margin-top: 20px; color: #666; display: block; text-decoration: none; font-size: 13px; text-align: center;">НАЗАД</a>
+        <div id="timer" style="margin-top: 15px; color: #fff; font-weight: bold; font-size: 14px;">Удачи!</div>
+        <a href="index.html" style="margin-top: 20px; color: #555; display: block; text-decoration: none; font-size: 12px;">НАЗАД В ИГРУ</a>
     </div>
 
 <script>
-    let currentMode = 'coin'; // 'coin' или 'vip'
+    let currentMode = 'coin';
+    let isSpinning = false;
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
@@ -141,28 +143,16 @@
 
     const wheelData = {
         coin: {
-            cost: 50000,
-            currency: 'coin',
-            color1: '#ffa502', color2: '#121212',
-            cap: '🪙',
-            prizes: [
-                { n: "🪙 100k", t: "coin", v: 100000 }, { n: "💎 5", t: "cry", v: 5 },
-                { n: "🪙 50k", t: "coin", v: 50000 },  { n: "💎 1", t: "cry", v: 1 },
-                { n: "🪙 200k", t: "coin", v: 200000 }, { n: "🪙 10k", t: "coin", v: 10000 },
-                { n: "💎 10", t: "cry", v: 10 },    { n: "🪙 5k", t: "coin", v: 5000 }
-            ]
+            cost: 50000, curr: 'coin', color: '#ffa502', glow: 'radial-gradient(circle, rgba(255,165,0,0.2) 0%, transparent 70%)', cap: '🪙',
+            prizes: [{n:"100k 🪙",v:100000,t:'c'}, {n:"5 💎",v:5,t:'d'}, {n:"50k 🪙",v:50000,t:'c'}, {n:"1 💎",v:1,t:'d'}, {n:"200k 🪙",v:200000,t:'c'}, {n:"10k 🪙",v:10000,t:'c'}, {n:"10 💎",v:10,t:'d'}, {n:"5k 🪙",v:5000,t:'c'}]
         },
         vip: {
-            cost: 100,
-            currency: 'cry',
-            color1: '#9d00ff', color2: '#121212',
-            cap: '💎',
-            prizes: [
-                { n: "💎 500", t: "cry", v: 500 }, { n: "🪙 10k", t: "coin", v: 10000 },
-                { n: "💎 10", t: "cry", v: 10 },   { n: "🪙 5k", t: "coin", v: 5000 },
-                { n: "💎 200", t: "cry", v: 200 }, { n: "🪙 1k", t: "coin", v: 1000 },
-                { n: "💎 50", t: "cry", v: 50 },   { n: "🪙 500", t: "coin", v: 500 }
-            ]
+            cost: 100, curr: 'cry', color: '#9d00ff', glow: 'radial-gradient(circle, rgba(157,0,255,0.2) 0%, transparent 70%)', cap: '💎',
+            prizes: [{n:"500 💎",v:500,t:'d'}, {n:"10k 🪙",v:10000,t:'c'}, {n:"10 💎",v:10,t:'d'}, {n:"5k 🪙",v:5000,t:'c'}, {n:"200 💎",v:200,t:'d'}, {n:"1k 🪙",v:1000,t:'c'}, {n:"50 💎",v:50,t:'d'}, {n:"500 🪙",v:500,t:'c'}]
+        },
+        ultra: {
+            cost: 5000, curr: 'cry', color: '#ff4d4d', glow: 'radial-gradient(circle, rgba(255,77,77,0.2) 0%, transparent 70%)', cap: '🔥',
+            prizes: [{n:"10k 💎",v:10000,t:'d'}, {n:"1M 🪙",v:1000000,t:'c'}, {n:"5k 💎",v:5000,t:'d'}, {n:"2M 🪙",v:2000000,t:'c'}, {n:"7k 💎",v:7000,t:'d'}, {n:"500k 🪙",v:500000,t:'c'}, {n:"3k 💎",v:3000,t:'d'}, {n:"100 💎",v:100,t:'d'}]
         }
     };
 
@@ -171,23 +161,20 @@
         currentMode = mode;
         const data = wheelData[mode];
         
-        // Визуальное переключение
-        document.getElementById("btnCoinMode").classList.toggle("active", mode === 'coin');
-        document.getElementById("btnVipMode").classList.toggle("active", mode === 'vip');
+        // UI кнопки
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`btn-${mode}`).classList.add('active');
+        
+        // Цвета темы
+        document.getElementById("bgGlow").style.background = data.glow;
+        document.getElementById("wheel").style.borderColor = data.color;
+        document.getElementById("pointer").style.borderTopColor = data.color;
+        document.getElementById("cap").style.background = data.color;
+        document.getElementById("cap").textContent = data.cap;
         
         const wheel = document.getElementById("wheel");
         wheel.innerHTML = "";
-        wheel.style.borderColor = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
-        document.getElementById("pointer").style.borderTopColor = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
-        document.getElementById("cap").style.background = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
-        document.getElementById("cap").textContent = data.cap;
-        
-        wheel.style.background = `conic-gradient(
-            ${data.color1} 0deg 45deg, ${data.color2} 45deg 90deg, 
-            ${data.color1} 90deg 135deg, ${data.color2} 135deg 180deg,
-            ${data.color1} 180deg 225deg, ${data.color2} 225deg 270deg, 
-            ${data.color1} 270deg 315deg, ${data.color2} 315deg 360deg
-        )`;
+        wheel.style.background = `conic-gradient(${data.color} 0deg 45deg, #121212 45deg 90deg, ${data.color} 90deg 135deg, #121212 135deg 180deg, ${data.color} 180deg 225deg, #121212 225deg 270deg, ${data.color} 270deg 315deg, #121212 315deg 360deg)`;
 
         data.prizes.forEach((p, i) => {
             const div = document.createElement("div");
@@ -196,61 +183,55 @@
             div.innerHTML = p.n;
             wheel.appendChild(div);
         });
-
         updateUI();
     }
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-        document.getElementById("crystals").textContent = state.crystals;
-        
+        document.getElementById("crystals").textContent = state.crystals.toLocaleString();
         const data = wheelData[currentMode];
-        const spinBtn = document.getElementById("spinBtn");
+        const btn = document.getElementById("spinBtn");
         
         if (currentMode === 'vip') {
             const diff = Date.now() - state.lastSpin;
-            const day = 86400000;
-            if (diff < day) {
-                spinBtn.textContent = `ЗА ${data.cost} 💎`;
-                const timeLeft = day - diff;
-                document.getElementById("timer").textContent = `Бесплатно через: ${Math.floor(timeLeft/3600000)}ч`;
+            if (diff < 86400000) {
+                btn.textContent = `ЗА ${data.cost} 💎`;
+                document.getElementById("timer").textContent = `Бесплатно через: ${Math.floor((86400000-diff)/3600000)}ч`;
             } else {
-                spinBtn.textContent = "БЕСПЛАТНО";
-                document.getElementById("timer").textContent = "VIP Бонус готов!";
+                btn.textContent = "БЕСПЛАТНО";
+                document.getElementById("timer").textContent = "VIP бонус готов!";
             }
         } else {
-            spinBtn.textContent = `ЗА ${data.cost.toLocaleString()} 🪙`;
-            document.getElementById("timer").textContent = "Испытай удачу!";
+            btn.textContent = `ЗА ${data.cost.toLocaleString()} ${data.curr === 'coin' ? '🪙' : '💎'}`;
+            document.getElementById("timer").textContent = currentMode === 'ultra' ? "РИСКНИ ВСЕМ!" : "Попробуй удачу!";
         }
     }
 
-    let isSpinning = false;
     function spin() {
         if (isSpinning) return;
         const data = wheelData[currentMode];
         
-        // Проверка цены
+        if (currentMode === 'coin' && state.coins < data.cost) return alert("Мало монет!");
+        if (currentMode === 'ultra' && state.crystals < data.cost) return alert("Мало кристаллов!");
         if (currentMode === 'vip') {
             const isFree = (Date.now() - state.lastSpin) >= 86400000;
-            if (!isFree) {
-                if (state.crystals < data.cost) return alert("Нужно больше кристаллов!");
-                state.crystals -= data.cost;
-            } else {
-                state.lastSpin = Date.now();
-                localStorage.setItem("lastSpinTime", state.lastSpin);
-            }
+            if (!isFree && state.crystals < data.cost) return alert("Мало кристаллов!");
+            if (isFree) { state.lastSpin = Date.now(); localStorage.setItem("lastSpinTime", state.lastSpin); }
+            else state.crystals -= data.cost;
         } else {
-            if (state.coins < data.cost) return alert("Нужно больше монет!");
-            state.coins -= data.cost;
+            if (data.curr === 'coin') state.coins -= data.cost;
+            else state.crystals -= data.cost;
         }
 
         isSpinning = true;
         document.getElementById("spinBtn").disabled = true;
 
         const targetSector = Math.floor(Math.random() * 8);
-        const magnatChance = Math.random() < 0.0004;
+        // Шанс на магната 0.04%. В Ультра колесе шанс выше в 5 раз (0.2%)
+        const chance = currentMode === 'ultra' ? 0.002 : 0.0004;
+        const gotMagnat = Math.random() < chance;
+
         const totalRot = 3600 + (360 - (targetSector * 45));
-        
         const wheel = document.getElementById("wheel");
         wheel.style.transform = `rotate(${totalRot}deg)`;
 
@@ -258,15 +239,14 @@
             isSpinning = false;
             document.getElementById("spinBtn").disabled = false;
             
-            if (magnatChance && !state.ownedHeroes["magnate"]) {
+            if (gotMagnat && !state.ownedHeroes["magnate"]) {
                 state.ownedHeroes["magnate"] = true;
                 localStorage.setItem("characters", JSON.stringify(state.ownedHeroes));
                 document.getElementById("jackpotBox").style.display = "block";
             }
 
             const prize = data.prizes[targetSector];
-            if (prize.t === "coin") state.coins += prize.v;
-            else state.crystals += prize.v;
+            if (prize.t === 'c') state.coins += prize.v; else state.crystals += prize.v;
 
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("crystals", state.crystals);
@@ -279,7 +259,7 @@
     }
 
     function closeJackpot() { document.getElementById("jackpotBox").style.display = "none"; }
-    setMode('coin'); // Начинаем с обычного
+    setMode('coin');
 </script>
 </body>
 </html>
