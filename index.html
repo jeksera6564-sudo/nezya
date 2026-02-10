@@ -89,7 +89,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Всплывающие цифры */
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 45px; color: var(--gold); text-shadow: 0 0 10px #000; animation: floatUp 0.7s ease-out forwards; z-index: 500; }
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 45px; text-shadow: 0 0 10px #000; animation: floatUp 0.7s ease-out forwards; z-index: 500; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-200px); } }
 
         /* Ауры */
@@ -177,6 +177,8 @@
         boughtEffs: JSON.parse(localStorage.getItem("activeEffects")) || {}
     };
 
+    const CRYSTAL_CHANCE = 0.05; // 5% шанс на кристалл
+
     function renderEffects() {
         const container = document.getElementById('effList');
         container.innerHTML = '';
@@ -212,25 +214,44 @@
         charImg.classList.add("char-active");
         
         const hero = heroes[state.activeHero] || heroes.default;
+        
+        // Монеты
         state.coins += hero.pwr;
         state.earned += hero.pwr;
         state.clicks++;
 
-        // Вибрация
-        if (navigator.vibrate) navigator.vibrate(10);
+        // Кристаллы (Шанс)
+        let gotCrystal = false;
+        if (Math.random() < CRYSTAL_CHANCE) {
+            state.crystals += 1;
+            gotCrystal = true;
+        }
 
-        // Всплывающее число
-        const t = document.createElement("div");
-        t.className = "float-text";
-        t.style.left = e.clientX + "px";
-        t.style.top = e.clientY + "px";
-        t.textContent = `+${hero.pwr}`;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 600);
+        // Вибрация
+        if (navigator.vibrate) navigator.vibrate(gotCrystal ? 35 : 10);
+
+        // Всплывающие тексты
+        createFloatText(e.clientX, e.clientY, `+${hero.pwr}`, "var(--gold)");
+        if (gotCrystal) {
+            setTimeout(() => {
+                createFloatText(e.clientX + 35, e.clientY - 35, "+1 💎", "var(--neon-blue)");
+            }, 60);
+        }
 
         updateUI();
         save();
     });
+
+    function createFloatText(x, y, text, color) {
+        const t = document.createElement("div");
+        t.className = "float-text";
+        t.style.left = x + "px";
+        t.style.top = y + "px";
+        t.style.color = color;
+        t.textContent = text;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 600);
+    }
 
     window.addEventListener("pointerup", () => charImg.classList.remove("char-active"));
 
@@ -257,7 +278,6 @@
     }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
 
-    // Инициализация
     updateUI();
 </script>
 </body>
