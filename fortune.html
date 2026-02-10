@@ -19,9 +19,9 @@
             background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: background 0.5s;
         }
 
-        /* Баланс с неоном */
         .balance-top { position: absolute; top: 20px; display: flex; gap: 15px; z-index: 20; }
         .bal { 
             background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; 
@@ -30,32 +30,40 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Контейнер колеса */
+        /* Переключатель колес */
+        .mode-switch {
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; gap: 5px; z-index: 30;
+        }
+        .mode-btn {
+            padding: 10px 20px; border-radius: 25px; border: none;
+            cursor: pointer; font-weight: 900; font-size: 12px;
+            transition: 0.3s; background: transparent; color: #777;
+        }
+        .mode-btn.active { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        .mode-btn.active.vip { background: var(--neon-purple); color: #fff; box-shadow: 0 0 15px var(--neon-purple); }
+
         .wheel-container { 
-            position: relative; width: 360px; height: 360px; margin-bottom: 30px; 
-            filter: drop-shadow(0 0 30px rgba(157, 0, 255, 0.2));
+            position: relative; width: 340px; height: 340px; margin-bottom: 20px; 
+            transition: 0.5s;
         }
 
         .wheel {
             width: 100%; height: 100%; border-radius: 50%; 
             border: 8px solid var(--gold);
-            background: conic-gradient(
-                #ff4757 0deg 45deg, #121212 45deg 90deg, 
-                #ffa502 90deg 135deg, #121212 135deg 180deg,
-                #1e90ff 180deg 225deg, #121212 225deg 270deg, 
-                #9d00ff 270deg 315deg, #121212 315deg 360deg
-            );
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1), border 0.5s;
             position: relative; overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 1), inset 0 0 50px rgba(255,215,0,0.2);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1);
         }
 
-        /* Мерцающие сегменты */
         .segment {
             position: absolute; width: 50%; height: 50%;
             left: 50%; top: 50%; transform-origin: 0% 0%;
             display: flex; align-items: center; justify-content: flex-start;
-            padding-left: 60px; font-weight: 900; font-size: 14px;
+            padding-left: 50px; font-weight: 900; font-size: 13px;
             text-shadow: 0 0 10px rgba(0,0,0,1); pointer-events: none;
         }
 
@@ -63,6 +71,7 @@
             position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
             border-top: 45px solid var(--gold); z-index: 50; filter: drop-shadow(0 0 10px var(--gold));
+            transition: border-top-color 0.5s;
         }
 
         .center-cap {
@@ -70,33 +79,25 @@
             width: 60px; height: 60px; background: var(--gold); border: 4px solid #fff;
             border-radius: 50%; z-index: 60; box-shadow: 0 0 30px var(--gold);
             display: flex; align-items: center; justify-content: center; font-size: 24px;
+            transition: 0.5s;
         }
 
-        /* Кнопка с анимацией */
         .spin-btn {
             background: linear-gradient(45deg, var(--gold), #ff7f50);
-            color: #000; border: none; padding: 20px 70px;
-            border-radius: 50px; font-weight: 900; font-size: 24px; cursor: pointer;
+            color: #000; border: none; padding: 18px 60px;
+            border-radius: 50px; font-weight: 900; font-size: 22px; cursor: pointer;
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
             transition: 0.3s; text-transform: uppercase;
-            animation: buttonGlow 2s infinite ease-in-out;
         }
 
-        @keyframes buttonGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); transform: scale(1); }
-            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7); transform: scale(1.05); }
-        }
-
-        .spin-btn:disabled { background: #333; color: #666; animation: none; }
+        .spin-btn:disabled { opacity: 0.5; transform: scale(0.95); }
 
         .jackpot-alert {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.9); border: 3px solid var(--gold);
+            background: rgba(0,0,0,0.95); border: 3px solid var(--gold);
             padding: 40px; border-radius: 30px; text-align: center;
-            z-index: 100; display: none; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100; display: none;
         }
-
-        @keyframes pop { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
     </style>
 </head>
 <body>
@@ -104,7 +105,7 @@
     <div class="jackpot-alert" id="jackpotBox">
         <h1 style="color: var(--gold); margin-bottom: 10px;">🏆 JACKPOT!</h1>
         <p style="font-size: 20px;">Вы разблокировали героя:<br><b style="color: #ff4d4d;">МАГНАТ</b></p>
-        <button class="spin-btn" style="margin-top: 20px; padding: 10px 30px; font-size: 14px;" onclick="closeJackpot()">ЗАБРАТЬ</button>
+        <button class="spin-btn" style="margin-top: 20px;" onclick="closeJackpot()">УРА!</button>
     </div>
 
     <div class="balance-top">
@@ -112,20 +113,25 @@
         <div class="bal">💎 <span id="crystals">0</span></div>
     </div>
 
-    <div class="wheel-container">
-        <div class="pointer"></div>
-        <div class="center-cap">💎</div>
-        <div class="wheel" id="wheel">
-            </div>
+    <div class="mode-switch">
+        <button id="btnCoinMode" class="mode-btn active" onclick="setMode('coin')">ЗОЛОТОЕ КОЛЕСО</button>
+        <button id="btnVipMode" class="mode-btn vip" onclick="setMode('vip')">АЛМАЗНОЕ КОЛЕСО</button>
+    </div>
+
+    <div class="wheel-container" id="wCont">
+        <div class="pointer" id="pointer"></div>
+        <div class="center-cap" id="cap">🪙</div>
+        <div class="wheel" id="wheel"></div>
     </div>
 
     <div class="controls">
         <button id="spinBtn" class="spin-btn" onclick="spin()">КРУТИТЬ</button>
-        <div id="timer" style="margin-top: 15px; color: var(--gold); font-weight: bold; opacity: 0.8;">...</div>
-        <a href="index.html" style="margin-top: 20px; color: #666; display: block; text-decoration: none; font-size: 13px;">ВЕРНУТЬСЯ К КЛИКАМ</a>
+        <div id="timer" style="margin-top: 15px; color: var(--gold); font-weight: bold; text-align: center;">...</div>
+        <a href="index.html" style="margin-top: 20px; color: #666; display: block; text-decoration: none; font-size: 13px; text-align: center;">НАЗАД</a>
     </div>
 
 <script>
+    let currentMode = 'coin'; // 'coin' или 'vip'
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
@@ -133,79 +139,132 @@
         ownedHeroes: JSON.parse(localStorage.getItem("characters")) || { default: true }
     };
 
-    const prizes = [
-        { n: "💎 500", t: "cry", v: 500 }, { n: "🪙 10k", t: "coin", v: 10000 },
-        { n: "💎 10", t: "cry", v: 10 },   { n: "🪙 5k", t: "coin", v: 5000 },
-        { n: "💎 200", t: "cry", v: 200 }, { n: "🪙 1k", t: "coin", v: 1000 },
-        { n: "💎 50", t: "cry", v: 50 },   { n: "🪙 500", t: "coin", v: 500 }
-    ];
+    const wheelData = {
+        coin: {
+            cost: 50000,
+            currency: 'coin',
+            color1: '#ffa502', color2: '#121212',
+            cap: '🪙',
+            prizes: [
+                { n: "🪙 100k", t: "coin", v: 100000 }, { n: "💎 5", t: "cry", v: 5 },
+                { n: "🪙 50k", t: "coin", v: 50000 },  { n: "💎 1", t: "cry", v: 1 },
+                { n: "🪙 200k", t: "coin", v: 200000 }, { n: "🪙 10k", t: "coin", v: 10000 },
+                { n: "💎 10", t: "cry", v: 10 },    { n: "🪙 5k", t: "coin", v: 5000 }
+            ]
+        },
+        vip: {
+            cost: 100,
+            currency: 'cry',
+            color1: '#9d00ff', color2: '#121212',
+            cap: '💎',
+            prizes: [
+                { n: "💎 500", t: "cry", v: 500 }, { n: "🪙 10k", t: "coin", v: 10000 },
+                { n: "💎 10", t: "cry", v: 10 },   { n: "🪙 5k", t: "coin", v: 5000 },
+                { n: "💎 200", t: "cry", v: 200 }, { n: "🪙 1k", t: "coin", v: 1000 },
+                { n: "💎 50", t: "cry", v: 50 },   { n: "🪙 500", t: "coin", v: 500 }
+            ]
+        }
+    };
 
-    // Отрисовка текста на колесе
-    const wheel = document.getElementById("wheel");
-    prizes.forEach((p, i) => {
-        const div = document.createElement("div");
-        div.className = "segment";
-        div.style.transform = `rotate(${i * 45 + 22.5}deg) rotate(-90deg)`;
-        div.innerHTML = p.n;
-        wheel.appendChild(div);
-    });
+    function setMode(mode) {
+        if (isSpinning) return;
+        currentMode = mode;
+        const data = wheelData[mode];
+        
+        // Визуальное переключение
+        document.getElementById("btnCoinMode").classList.toggle("active", mode === 'coin');
+        document.getElementById("btnVipMode").classList.toggle("active", mode === 'vip');
+        
+        const wheel = document.getElementById("wheel");
+        wheel.innerHTML = "";
+        wheel.style.borderColor = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
+        document.getElementById("pointer").style.borderTopColor = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
+        document.getElementById("cap").style.background = mode === 'coin' ? 'var(--gold)' : 'var(--neon-purple)';
+        document.getElementById("cap").textContent = data.cap;
+        
+        wheel.style.background = `conic-gradient(
+            ${data.color1} 0deg 45deg, ${data.color2} 45deg 90deg, 
+            ${data.color1} 90deg 135deg, ${data.color2} 135deg 180deg,
+            ${data.color1} 180deg 225deg, ${data.color2} 225deg 270deg, 
+            ${data.color1} 270deg 315deg, ${data.color2} 315deg 360deg
+        )`;
+
+        data.prizes.forEach((p, i) => {
+            const div = document.createElement("div");
+            div.className = "segment";
+            div.style.transform = `rotate(${i * 45 + 22.5}deg) rotate(-90deg)`;
+            div.innerHTML = p.n;
+            wheel.appendChild(div);
+        });
+
+        updateUI();
+    }
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals;
-        const diff = Date.now() - state.lastSpin;
-        const day = 86400000;
-        if (diff < day) {
-            document.getElementById("spinBtn").textContent = `ЗА 100 💎`;
-            const timeLeft = day - diff;
-            const h = Math.floor(timeLeft / 3600000);
-            const m = Math.floor((timeLeft % 3600000) / 60000);
-            document.getElementById("timer").textContent = `Бесплатно через: ${h}ч ${m}м`;
+        
+        const data = wheelData[currentMode];
+        const spinBtn = document.getElementById("spinBtn");
+        
+        if (currentMode === 'vip') {
+            const diff = Date.now() - state.lastSpin;
+            const day = 86400000;
+            if (diff < day) {
+                spinBtn.textContent = `ЗА ${data.cost} 💎`;
+                const timeLeft = day - diff;
+                document.getElementById("timer").textContent = `Бесплатно через: ${Math.floor(timeLeft/3600000)}ч`;
+            } else {
+                spinBtn.textContent = "БЕСПЛАТНО";
+                document.getElementById("timer").textContent = "VIP Бонус готов!";
+            }
         } else {
-            document.getElementById("spinBtn").textContent = "БЕСПЛАТНО";
-            document.getElementById("timer").textContent = "Удача ждет тебя!";
+            spinBtn.textContent = `ЗА ${data.cost.toLocaleString()} 🪙`;
+            document.getElementById("timer").textContent = "Испытай удачу!";
         }
     }
 
     let isSpinning = false;
     function spin() {
         if (isSpinning) return;
-        const now = Date.now();
-        const isFree = (now - state.lastSpin) >= 86400000;
-
-        if (!isFree) {
-            if (state.crystals < 100) return alert("Мало 💎!");
-            state.crystals -= 100;
+        const data = wheelData[currentMode];
+        
+        // Проверка цены
+        if (currentMode === 'vip') {
+            const isFree = (Date.now() - state.lastSpin) >= 86400000;
+            if (!isFree) {
+                if (state.crystals < data.cost) return alert("Нужно больше кристаллов!");
+                state.crystals -= data.cost;
+            } else {
+                state.lastSpin = Date.now();
+                localStorage.setItem("lastSpinTime", state.lastSpin);
+            }
         } else {
-            state.lastSpin = now;
-            localStorage.setItem("lastSpinTime", state.lastSpin);
+            if (state.coins < data.cost) return alert("Нужно больше монет!");
+            state.coins -= data.cost;
         }
 
         isSpinning = true;
         document.getElementById("spinBtn").disabled = true;
 
-        // ШАНС 0.04% НА МАГНАТА (1 из 2500)
+        const targetSector = Math.floor(Math.random() * 8);
         const magnatChance = Math.random() < 0.0004;
-        
-        // Обычный выбор сектора
-        let targetSector = Math.floor(Math.random() * 8);
-        const roll = Math.random();
-        if (roll < 0.05) targetSector = 0; // 5% на джекпот 500💎
-
         const totalRot = 3600 + (360 - (targetSector * 45));
+        
+        const wheel = document.getElementById("wheel");
         wheel.style.transform = `rotate(${totalRot}deg)`;
 
         setTimeout(() => {
             isSpinning = false;
             document.getElementById("spinBtn").disabled = false;
             
-            if (magnatChance) {
+            if (magnatChance && !state.ownedHeroes["magnate"]) {
                 state.ownedHeroes["magnate"] = true;
                 localStorage.setItem("characters", JSON.stringify(state.ownedHeroes));
                 document.getElementById("jackpotBox").style.display = "block";
             }
 
-            const prize = prizes[targetSector];
+            const prize = data.prizes[targetSector];
             if (prize.t === "coin") state.coins += prize.v;
             else state.crystals += prize.v;
 
@@ -213,7 +272,6 @@
             localStorage.setItem("crystals", state.crystals);
             updateUI();
             
-            // Сброс позиции без анимации
             wheel.style.transition = "none";
             wheel.style.transform = `rotate(${totalRot % 360}deg)`;
             setTimeout(() => wheel.style.transition = "transform 5s cubic-bezier(0.15, 0, 0.15, 1)", 50);
@@ -221,7 +279,7 @@
     }
 
     function closeJackpot() { document.getElementById("jackpotBox").style.display = "none"; }
-    updateUI();
+    setMode('coin'); // Начинаем с обычного
 </script>
 </body>
 </html>
