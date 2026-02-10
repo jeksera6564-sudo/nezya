@@ -40,11 +40,12 @@
         /* Игровая зона */
         .game { height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        
         .character { 
             width: 280px; max-width: 80vw; cursor: pointer; 
             z-index: 50; position: relative; pointer-events: auto;
             filter: drop-shadow(0 0 25px rgba(0,0,0,0.8));
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.05s;
             animation: idleBreath 3s ease-in-out infinite;
         }
 
@@ -52,7 +53,12 @@
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-15px) scale(1.03); }
         }
-        .char-active { transform: scale(0.82) translateY(10px) !important; }
+
+        /* ЭФФЕКТ НАЖАТИЯ (Всплеск и сжатие) */
+        .char-active { 
+            transform: scale(0.9) rotate(2deg) !important; 
+            filter: drop-shadow(0 0 40px var(--gold)) brightness(1.2) !important;
+        }
 
         #displayNickname { margin-top: 20px; font-weight: 900; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
 
@@ -90,7 +96,6 @@
         .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 40px; animation: floatUp 0.7s ease-out forwards; z-index: 500; }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-200px); } }
 
-        /* Стили для Онлайн окна */
         .online-status { text-align: center; }
         .online-title { font-size: 32px; color: var(--purple); margin-bottom: 10px; letter-spacing: 4px; }
         .loader { width: 50px; height: 50px; border: 5px solid #333; border-top-color: var(--purple); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -152,10 +157,9 @@
         <div class="online-status">
             <center><div class="loader"></div></center>
             <h2 class="online-title">ONLINE</h2>
-            <p style="color: #aaa; margin-bottom: 20px;">Режим сетевой игры находится в разработке.</p>
-            <p style="font-size: 12px; color: var(--purple);">СКОРО: БИТВЫ КЛАНОВ И ТУРНИРЫ</p>
+            <p style="color: #aaa; margin-bottom: 20px;">Режим сетевой игры в разработке.</p>
+            <div class="close-btn" onclick="closeModal()">НАЗАД</div>
         </div>
-        <div class="close-btn" onclick="closeModal()">НАЗАД</div>
     </div>
 
     <div id="statModal" class="modal">
@@ -175,7 +179,6 @@
         earned: +localStorage.getItem("stat_earned") || 0,
         activeHero: localStorage.getItem("activeCharacter") || "default",
         name: localStorage.getItem("userName") || "Nezya Player",
-        // Эффекты
         unlockedEffects: JSON.parse(localStorage.getItem("unlockedEffects")) || {},
         activeEffect: localStorage.getItem("currentEffect") || "none"
     };
@@ -187,18 +190,15 @@
         document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
         document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
         
-        // Картинка персонажа
         const activeHero = localStorage.getItem("activeCharacter") || "default";
         document.getElementById("charImg").src = `assets/character_${activeHero}.png`;
 
-        // Визуализация ауры
         document.querySelectorAll('.aura').forEach(a => a.style.opacity = "0");
         if(state.activeEffect !== "none") {
             const auraId = "aura" + state.activeEffect.charAt(0).toUpperCase() + state.activeEffect.slice(1);
             if(document.getElementById(auraId)) document.getElementById(auraId).style.opacity = "0.7";
         }
 
-        // Обновление кнопок в модалке эффектов
         ['gold', 'blue', 'red'].forEach(eff => {
             const btn = document.getElementById(`btn-eff-${eff}`);
             if(state.unlockedEffects[eff]) {
@@ -208,26 +208,10 @@
         });
     }
 
-    // ЛОГИКА ЭФФЕКТОВ
-    window.toggleEffect = (id, price) => {
-        if(state.unlockedEffects[id]) {
-            state.activeEffect = (state.activeEffect === id) ? "none" : id;
-        } else {
-            if(state.crystals >= price) {
-                state.crystals -= price;
-                state.unlockedEffects[id] = true;
-                state.activeEffect = id;
-            } else {
-                alert("Недостаточно кристаллов! 💎");
-            }
-        }
-        save();
-        updateUI();
-    };
-
-    // КЛИК
+    // КЛИК С ЭФФЕКТОМ
     const charImg = document.getElementById("charImg");
     charImg.addEventListener("pointerdown", (e) => {
+        // Добавляем класс эффекта нажатия
         charImg.classList.add("char-active");
         
         const pwr = +localStorage.getItem("clickPower") || 1;
@@ -250,18 +234,32 @@
 
         updateUI();
         save();
+        
+        // Убираем класс через 100мс для возможности повторного клика
+        setTimeout(() => charImg.classList.remove("char-active"), 100);
     });
-
-    window.addEventListener("pointerup", () => charImg.classList.remove("char-active"));
 
     function createFloatText(x, y, text, color) {
         const t = document.createElement("div");
         t.className = "float-text";
-        t.style.left = x + "px"; t.style.top = y + "px";
+        t.style.left = (x - 20) + "px"; t.style.top = y + "px";
         t.style.color = color; t.textContent = text;
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 600);
     }
+
+    window.toggleEffect = (id, price) => {
+        if(state.unlockedEffects[id]) {
+            state.activeEffect = (state.activeEffect === id) ? "none" : id;
+        } else {
+            if(state.crystals >= price) {
+                state.crystals -= price;
+                state.unlockedEffects[id] = true;
+                state.activeEffect = id;
+            } else { alert("Недостаточно кристаллов! 💎"); }
+        }
+        save(); updateUI();
+    };
 
     function save() {
         localStorage.setItem("coins", state.coins);
@@ -275,7 +273,6 @@
     window.openModal = (id) => { document.getElementById(id).style.display = "flex"; };
     window.closeModal = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); };
 
-    // Пассивный доход
     setInterval(() => {
         let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
         let totalIncome = 0;
@@ -284,12 +281,7 @@
         if(incomes.factory) totalIncome += incomes.factory * 120;
         if(incomes.oil) totalIncome += incomes.oil * 1000;
         if(incomes.bank) totalIncome += incomes.bank * 15000;
-
-        if (totalIncome > 0) {
-            state.coins += totalIncome;
-            save();
-            updateUI();
-        }
+        if (totalIncome > 0) { state.coins += totalIncome; save(); updateUI(); }
     }, 1000);
 
     updateUI();
