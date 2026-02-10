@@ -3,229 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker — Статистика</title>
+    <title>Nezya Clicker Mobile</title>
     <style>
+        :root {
+            --gold: #ffd700;
+            --neon-blue: #00d2ff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body { 
             width: 100vw; height: 100vh; 
-            background: radial-gradient(circle, #1a1a2e, #020205); 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
 
-        /* Верхняя панель */
-        .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .balances { display: flex; gap: 12px; }
-        .balance { 
-            background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; 
-            display: flex; align-items: center; gap: 8px; font-weight: 900; 
-            border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        /* Баланс сверху */
+        .top-bar { position: absolute; top: 20px; width: 100%; display: flex; justify-content: center; z-index: 10; }
+        .balance-container { 
+            display: flex; gap: 10px; background: rgba(0,0,0,0.6); 
+            padding: 8px 15px; border-radius: 20px; border: 1px solid var(--gold);
         }
+        .bal-item { font-weight: 900; font-size: 14px; }
 
         /* Игровая зона */
-        .game { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        .char-container { position: relative; display: flex; align-items: center; justify-content: center; }
+        .game { 
+            height: 100%; display: flex; align-items: center; 
+            justify-content: center; padding-left: 60px; /* Отступ под левые кнопки */
+        }
         
-        /* Ауры */
-        .aura { position: absolute; width: 380px; height: 380px; border-radius: 50%; z-index: 1; opacity: 0; transition: 0.8s; filter: blur(50px); pointer-events: none; }
-        .aura-gold { background: radial-gradient(circle, #ffd700 0%, transparent 70%); }
-        .aura-fire { background: radial-gradient(circle, #ff4500 0%, transparent 70%); animation: pulse 1s infinite alternate; }
-        .aura-rgb { background: conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red); animation: rotateRGB 2s infinite linear; filter: blur(60px); }
-
-        @keyframes pulse { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.2); opacity: 0.8; } }
-        @keyframes rotateRGB { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
+        .char-container { position: relative; }
         .character { 
-            width: 280px; max-width: 80vw; cursor: pointer; 
-            transition: transform 0.05s; z-index: 5; 
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
-            user-select: none;
+            width: 250px; max-width: 65vw; cursor: pointer; z-index: 5;
+            transition: transform 0.1s; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            animation: idle 3s ease-in-out infinite;
         }
-        .character:active { transform: scale(0.9); }
+        @keyframes idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .character:active { transform: scale(0.92); }
 
-        /* Нижнее меню */
-        .bottom-menu { position: absolute; bottom: 25px; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 0 10px; z-index: 20; }
-        .menu-btn { 
-            background: rgba(0,0,0,0.9); border: 1px solid #ffd700; color: white; text-decoration: none; 
-            border-radius: 12px; font-weight: 900; font-size: 8px; text-align: center; padding: 12px 2px; text-transform: uppercase;
+        /* Ауры */
+        .aura { position: absolute; width: 300px; height: 300px; border-radius: 50%; z-index: 1; opacity: 0; transition: 1s; filter: blur(50px); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
+        .aura-fire { background: radial-gradient(circle, #ff4500 0%, transparent 70%); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.3); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.3; } }
+
+        /* ЛЕВОЕ МЕНЮ (Вертикальное) */
+        .side-menu { 
+            position: absolute; left: 15px; top: 50%; 
+            transform: translateY(-50%); display: flex; 
+            flex-direction: column; gap: 20px; z-index: 30;
         }
+        .side-btn {
+            width: 55px; height: 55px; background: rgba(0,0,0,0.8);
+            border: 2px solid var(--neon-blue); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+            cursor: pointer; transition: 0.3s;
+        }
+        .side-btn:active { transform: scale(1.1); background: var(--neon-blue); }
+
+        /* НИЖНЕЕ МЕНЮ (Горизонтальное) */
+        .bottom-menu { 
+            position: absolute; bottom: 25px; width: 100%; 
+            display: flex; justify-content: center; gap: 12px; padding: 0 15px; z-index: 30;
+        }
+        .bottom-btn {
+            flex: 1; max-width: 100px; height: 65px;
+            background: linear-gradient(145deg, #111, #000);
+            border: 2px solid var(--gold); border-radius: 15px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-decoration: none; font-size: 10px; font-weight: 900;
+            text-transform: uppercase; transition: 0.2s;
+        }
+        .bottom-btn:active { transform: translateY(5px); background: var(--gold); color: black; }
+        .bottom-btn span { font-size: 20px; margin-bottom: 4px; }
 
         /* Модальные окна */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
-            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 40px 20px;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 50px 20px;
             backdrop-filter: blur(15px);
         }
-        .modal h2 { color: #ffd700; margin-bottom: 25px; letter-spacing: 2px; text-shadow: 0 0 10px #ffd700; }
-        
-        /* Карточки статы */
-        .stats-container { width: 100%; max-width: 350px; }
-        .stat-item { 
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; 
-            margin-bottom: 10px; display: flex; justify-content: space-between; border: 1px solid rgba(255,215,0,0.2);
+        .card {
+            width: 100%; max-width: 350px; background: var(--glass); 
+            padding: 15px; border-radius: 15px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,215,0,0.2);
         }
-        .stat-label { color: #aaa; font-size: 14px; }
-        .stat-value { color: #fff; font-weight: 900; font-size: 16px; }
+        .close-btn { margin-top: 30px; padding: 12px 50px; background: #fff; color: #000; border-radius: 25px; font-weight: 900; }
 
-        .close-btn { margin-top: 20px; padding: 12px 40px; background: #ffd700; color: #000; border-radius: 20px; font-weight: 900; cursor: pointer; }
-
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 35px; color: #ffd700; text-shadow: 0 0 10px #000; animation: float 0.6s forwards; z-index: 100; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px); } }
+        /* Всплывающий урон */
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 32px; color: var(--gold); animation: float 0.6s ease-out forwards; z-index: 100; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div class="balances">
-            <div class="balance">🪙 <span id="coins">0</span></div>
-            <div class="balance">💎 <span id="crystals">0</span></div>
+        <div class="balance-container">
+            <div class="bal-item">🪙 <span id="coins">0</span></div>
+            <div class="bal-item">💎 <span id="crystals">0</span></div>
         </div>
+    </div>
+
+    <div class="side-menu">
+        <div class="side-btn" onclick="openModal('statModal')">📊</div>
+        <div class="side-btn" onclick="openModal('effModal')">✨</div>
+        <div class="side-btn" onclick="alert('Настройки в разработке')">⚙️</div>
     </div>
 
     <div class="game">
         <div class="char-container">
             <div id="auraGold" class="aura aura-gold"></div>
             <div id="auraFire" class="aura aura-fire"></div>
-            <div id="auraRGB" class="aura aura-rgb"></div>
             <img id="charImg" class="character" src="">
         </div>
-        <h3 id="heroNameDisplay" style="color:#ffd700; margin-top:15px; letter-spacing:2px">ГЕРОЙ</h3>
     </div>
 
     <div class="bottom-menu">
-        <a href="shop.html" class="menu-btn">🛒 Рынок</a>
-        <a href="fortune.html" class="menu-btn">🎡 Удача</a>
-        <a href="#" class="menu-btn" onclick="openModal('effectsModal')">✨ Эфф</a>
-        <a href="#" class="menu-btn" onclick="openModal('statsModal')">📊 Стата</a>
-        <a href="characters.html" class="menu-btn">🧍 Герои</a>
+        <a href="shop.html" class="bottom-btn"><span>🛒</span>Рынок</a>
+        <a href="fortune.html" class="bottom-btn"><span>🎡</span>Удача</a>
+        <a href="characters.html" class="bottom-btn"><span>🧍</span>Герои</a>
     </div>
 
-    <div id="statsModal" class="modal">
-        <h2>ВАША СТАТИСТИКА</h2>
-        <div class="stats-container">
-            <div class="stat-item"><span class="stat-label">Всего кликов:</span><span class="stat-value" id="stat-clicks">0</span></div>
-            <div class="stat-item"><span class="stat-label">Заработано монет:</span><span class="stat-value" id="stat-total-coins">0</span></div>
-            <div class="stat-item"><span class="stat-label">Сила клика:</span><span class="stat-value" id="stat-pwr">0</span></div>
-            <div class="stat-item"><span class="stat-label">Пассивный доход:</span><span class="stat-value" id="stat-passive">0/сек</span></div>
-        </div>
+    <div id="statModal" class="modal">
+        <h2 style="color:var(--gold); margin-bottom:20px">СТАТИСТИКА</h2>
+        <div class="card"><span>Клики</span><b id="s-clicks">0</b></div>
+        <div class="card"><span>Всего монет</span><b id="s-total">0</b></div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
-    <div id="effectsModal" class="modal">
-        <h2>МАГАЗИН ЭФФЕКТОВ</h2>
-        <div id="eff-list" style="width: 100%; max-width: 350px;">
-            <div class="stat-item"><span>Золото (150💎)</span><button onclick="buyEffect('gold', 150)" style="padding:5px 10px; background:#ffd700; border:none; border-radius:5px; font-weight:900">КУПИТЬ</button></div>
-            <div class="stat-item"><span>Огонь (500💎)</span><button onclick="buyEffect('fire', 500)" style="padding:5px 10px; background:#ffd700; border:none; border-radius:5px; font-weight:900">КУПИТЬ</button></div>
-            <div class="stat-item"><span>RGB (5000💎)</span><button onclick="buyEffect('rgb', 5000)" style="padding:5px 10px; background:#ffd700; border:none; border-radius:5px; font-weight:900">КУПИТЬ</button></div>
+    <div id="effModal" class="modal">
+        <h2 style="color:var(--neon-blue); margin-bottom:20px">ЭФФЕКТЫ</h2>
+        <div class="card">
+            <div><h4>Золотое Сияние</h4><small>150 💎</small></div>
+            <button onclick="buyEff('gold', 150)" id="btn-gold" style="padding:8px; border-radius:8px; background:var(--gold); border:none; font-weight:900">КУПИТЬ</button>
+        </div>
+        <div class="card">
+            <div><h4>Огненный Шторм</h4><small>500 💎</small></div>
+            <button onclick="buyEff('fire', 500)" id="btn-fire" style="padding:8px; border-radius:8px; background:var(--gold); border:none; font-weight:900">КУПИТЬ</button>
         </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
 <script>
-    const heroData = {
+    const heroes = {
         default: { name: "Новичок", pwr: 1, img: "assets/character_default.png" },
         clicker: { name: "Про-Кликер", pwr: 5, img: "assets/character_clicker.png" },
-        business: { name: "Бизнесмен", pwr: 20, img: "assets/character_business.png" },
-        magnate: { name: "Магнат", pwr: 100, img: "assets/character_magnate.png" },
-        legendary: { name: "Легенда", pwr: 500, img: "assets/character_legendary.png" }
+        business: { name: "Бизнесмен", pwr: 25, img: "assets/character_business.png" }
     };
 
-    // Инициализация
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
-        activeID: localStorage.getItem("activeCharacter") || "clicker",
+        active: localStorage.getItem("activeCharacter") || "clicker",
         effects: JSON.parse(localStorage.getItem("activeEffects")) || {},
-        // Статистика
-        totalClicks: +localStorage.getItem("stat_clicks") || 0,
-        totalEarned: +localStorage.getItem("stat_earned") || 0
+        clicks: +localStorage.getItem("stat_clicks") || 0,
+        earned: +localStorage.getItem("stat_earned") || 0
     };
-
-    function save() {
-        localStorage.setItem("coins", state.coins);
-        localStorage.setItem("crystals", state.crystals);
-        localStorage.setItem("stat_clicks", state.totalClicks);
-        localStorage.setItem("stat_earned", state.totalEarned);
-        localStorage.setItem("activeEffects", JSON.stringify(state.effects));
-    }
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals;
-        
-        const hero = heroData[state.activeID] || heroData.default;
+        const hero = heroes[state.active] || heroes.default;
         document.getElementById("charImg").src = hero.img;
-        document.getElementById("heroNameDisplay").textContent = hero.name;
 
-        // Эффекты
         document.getElementById("auraGold").style.opacity = state.effects.gold ? "1" : "0";
         document.getElementById("auraFire").style.opacity = state.effects.fire ? "1" : "0";
-        document.getElementById("auraRGB").style.opacity = state.effects.rgb ? "1" : "0";
 
-        // Обновление статы в модалке
-        document.getElementById("stat-clicks").textContent = state.totalClicks.toLocaleString();
-        document.getElementById("stat-total-coins").textContent = Math.floor(state.totalEarned).toLocaleString();
-        document.getElementById("stat-pwr").textContent = hero.pwr;
+        document.getElementById("s-clicks").textContent = state.clicks;
+        document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
         
-        // Расчет пассива
-        const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
-        const rates = { lemonade: 1, shop: 8, factory: 50 };
-        let totalPassive = 0;
-        for (let key in incomes) totalPassive += (rates[key] || 0) * incomes[key];
-        document.getElementById("stat-passive").textContent = totalPassive + "/сек";
+        if(state.effects.gold) document.getElementById("btn-gold").textContent = "ЕСТЬ";
+        if(state.effects.fire) document.getElementById("btn-fire").textContent = "ЕСТЬ";
     }
 
-    // Клик по персонажу
-    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
-        const hero = heroData[state.activeID] || heroData.default;
-        state.coins += hero.pwr;
-        state.totalEarned += hero.pwr;
-        state.totalClicks += 1;
+    function save() {
+        localStorage.setItem("coins", state.coins);
+        localStorage.setItem("crystals", state.crystals);
+        localStorage.setItem("stat_clicks", state.clicks);
+        localStorage.setItem("stat_earned", state.earned);
+        localStorage.setItem("activeEffects", JSON.stringify(state.effects));
+    }
 
-        // Анимация текста
+    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
+        const hero = heroes[state.active] || heroes.default;
+        state.coins += hero.pwr;
+        state.earned += hero.pwr;
+        state.clicks++;
+
         const t = document.createElement("div");
         t.className = "float-text";
-        t.style.left = e.clientX + "px";
-        t.style.top = e.clientY + "px";
+        t.style.left = e.clientX + "px"; t.style.top = e.clientY + "px";
         t.textContent = `+${hero.pwr}`;
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 600);
 
-        updateUI();
-        save();
+        updateUI(); save();
     });
 
-    function openModal(id) { document.getElementById(id).style.display = "flex"; updateUI(); }
+    function openModal(id) { document.getElementById(id).style.display = "flex"; }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
 
-    function buyEffect(id, price) {
-        if (state.crystals >= price) {
+    function buyEff(id, price) {
+        if(state.crystals >= price) {
             state.crystals -= price;
             state.effects[id] = true;
-            save();
-            updateUI();
-        } else { alert("Недостаточно кристаллов! 💎"); }
+            save(); updateUI();
+        } else { alert("Нужно больше кристаллов! 💎"); }
     }
 
-    // Пассивный доход
-    setInterval(() => {
-        const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
-        const rates = { lemonade: 1, shop: 8, factory: 50 };
-        let total = 0;
-        for (let key in incomes) total += (rates[key] || 0) * incomes[key];
-        
-        if (total > 0) {
-            state.coins += total;
-            state.totalEarned += total;
-            updateUI();
-            save();
-        }
-    }, 1000);
-
-    // Если первый запуск
+    // Первый запуск
     if (!localStorage.getItem("activeCharacter")) {
         localStorage.setItem("activeCharacter", "clicker");
-        let owned = { default: true, clicker: true };
-        localStorage.setItem("characters", JSON.stringify(owned));
+        localStorage.setItem("characters", JSON.stringify({default:true, clicker:true}));
     }
 
     updateUI();
