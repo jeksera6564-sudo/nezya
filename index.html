@@ -3,70 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker</title>
-
+    <title>Nezya Clicker — Главная</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         body {
             width: 100vw; height: 100vh;
             background: #1a1a1a center/cover no-repeat;
             font-family: 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
-            user-select: none;
-            color: white;
+            overflow: hidden; user-select: none; color: white;
         }
-
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
-
         .top-bar {
-            position: absolute; top: 20px; left: 50%;
-            transform: translateX(-50%);
-            display: flex; flex-direction: column;
-            gap: 10px; align-items: center; z-index: 10;
-            width: 90%;
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 10px; align-items: center; z-index: 10; width: 90%;
         }
-
         .balances { display: flex; gap: 15px; }
         .balance {
-            background: rgba(0,0,0,0.7);
-            padding: 8px 16px; border-radius: 20px;
+            background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px;
             font-weight: 900; display: flex; gap: 8px; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-
         .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d); border: 2px solid #f9a825; }
         .crystal { width: 18px; height: 18px; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); background: linear-gradient(135deg, #7dd3fc, #0284c7); }
-
         .level-wrap { width: 100%; max-width: 250px; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 4px; position: relative; }
         .level-bar { height: 8px; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 6px; width: 0%; transition: width 0.3s ease; }
-        .level-text { text-align: center; font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-
+        .level-text { text-align: center; font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase; }
         .combo { font-weight: 900; color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); font-size: 14px; }
-
         .game { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 5; }
-        
-        .character-wrap { position: relative; perspective: 1000px; }
-        .character { width: 280px; max-width: 75vw; cursor: pointer; transition: transform 0.1s active; touch-action: manipulation; }
-        
-        /* Вылетающий текст урона */
+        .character-wrap { position: relative; }
+        .character { width: 280px; max-width: 75vw; cursor: pointer; transition: transform 0.1s ease; touch-action: manipulation; }
         .float-text {
-            position: absolute; color: #fff; font-weight: 900; font-size: 24px;
+            position: absolute; color: #fff; font-weight: 900; font-size: 26px;
             pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 100;
         }
         @keyframes floatUp {
             0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+            100% { transform: translateY(-100px) scale(1.3); opacity: 0; }
         }
-
         .bottom-menu { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 10; }
         .menu-btn { padding: 14px 24px; border-radius: 20px; background: rgba(0,0,0,0.8); color: white; font-weight: bold; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
-
 <div class="overlay"></div>
-
 <div class="top-bar">
     <div class="balances">
         <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
@@ -78,88 +56,58 @@
     </div>
     <div class="combo" id="combo">Комбо x1</div>
 </div>
-
 <div class="game">
     <div class="character-wrap" id="charWrap">
-        <img id="character" class="character" alt="Player">
+        <img id="character" class="character" src="assets/player.png">
     </div>
 </div>
-
 <div class="bottom-menu">
     <a href="shop.html" class="menu-btn">🛒 Магазин</a>
     <a href="characters.html" class="menu-btn">🧍 Герои</a>
 </div>
 
 <script>
-// --- Инициализация данных ---
 const characters = {
-    default: { img: "assets/player.png", power: 1, crystal: 0 },
-    clicker: { img: "assets/character_clicker.png", power: 2, crystal: 0 },
-    business: { img: "assets/character_business.png", power: 4, crystal: 1 },
-    magnate: { img: "assets/character_magnate.png", power: 7, crystal: 2 },
-    legendary: { img: "assets/character_legendary.png", power: 15, crystal: 5 }
+    default: { power: 1, crystal: 0 },
+    clicker: { power: 2, crystal: 0 },
+    business: { power: 4, crystal: 1 },
+    magnate: { power: 7, crystal: 2 },
+    legendary: { power: 15, crystal: 5 }
 };
+
+const incomeValues = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
 
 let state = {
     active: localStorage.getItem("activeCharacter") || "default",
     coins: +localStorage.getItem("coins") || 0,
     crystals: +localStorage.getItem("crystals") || 0,
     clicks: +localStorage.getItem("clicks") || 0,
-    upgrades: JSON.parse(localStorage.getItem("upgrades")) || { crystalClick: 0, crystalIncome: 0, ultraBoost: 0 }
+    incomes: JSON.parse(localStorage.getItem("incomes")) || {},
+    upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
 };
 
-let combo = 1;
-let lastClick = 0;
-
-// Элементы
+let combo = 1, lastClick = 0;
 const charImg = document.getElementById("character");
-const wrap = document.getElementById("charWrap");
-const coinsEl = document.getElementById("coins");
-const crystalsEl = document.getElementById("crystals");
-const levelEl = document.getElementById("level");
-const levelBar = document.getElementById("levelBar");
-const comboEl = document.getElementById("combo");
-
-// Настройка
-charImg.src = characters[state.active]?.img || characters.default.img;
-document.body.style.backgroundImage = "url('assets/bg.jpg')";
 
 function updateUI() {
-    coinsEl.textContent = Math.floor(state.coins).toLocaleString();
-    crystalsEl.textContent = state.crystals;
-    
-    const lvl = Math.floor(state.clicks / 100) + 1;
-    levelEl.textContent = lvl;
-    levelBar.style.width = (state.clicks % 100) + "%";
-    comboEl.textContent = `Комбо x${combo}`;
+    document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+    document.getElementById("crystals").textContent = state.crystals;
+    document.getElementById("level").textContent = Math.floor(state.clicks / 100) + 1;
+    document.getElementById("levelBar").style.width = (state.clicks % 100) + "%";
+    document.getElementById("combo").textContent = `Комбо x${combo}`;
 }
 
-// Рандомный множитель
-function getMulti() {
-    if (!state.upgrades.ultraBoost) return 1;
-    const r = Math.random();
-    if (r < 0.05) return 5;
-    if (r < 0.15) return 3;
-    if (r < 0.35) return 2;
-    return 1;
+function getPassiveIncome() {
+    let sum = 0;
+    for (let key in state.incomes) {
+        sum += (incomeValues[key] || 0) * state.incomes[key];
+    }
+    if (state.upgrades.ultraBoost) sum *= 2;
+    return sum;
 }
 
-// Визуальный эффект при клике
-function spawnText(x, y, val) {
-    const txt = document.createElement("div");
-    txt.className = "float-text";
-    txt.textContent = `+${val}`;
-    txt.style.left = `${x}px`;
-    txt.style.top = `${y}px`;
-    document.body.appendChild(txt);
-    setTimeout(() => txt.remove(), 600);
-}
-
-// Клик (используем pointerdown для скорости на мобильных)
 charImg.addEventListener('pointerdown', (e) => {
     e.preventDefault();
-    
-    // Анимация нажатия
     charImg.style.transform = "scale(0.95)";
     setTimeout(() => charImg.style.transform = "scale(1)", 100);
 
@@ -168,33 +116,29 @@ charImg.addEventListener('pointerdown', (e) => {
     lastClick = now;
 
     const ch = characters[state.active] || characters.default;
-    const multi = getMulti();
-    const gain = ch.power * combo * multi;
+    let gain = ch.power * combo;
+    if (state.upgrades.ultraBoost && Math.random() < 0.2) gain *= 2; // Бонус от апгрейда на клик
 
     state.coins += gain;
     state.clicks++;
+    state.crystals += ch.crystal;
 
-    // Кристаллы от персонажа
-    if (ch.crystal > 0) state.crystals += ch.crystal;
+    if (state.upgrades.crystalClick && Math.random() < (0.05 * state.upgrades.crystalClick)) state.crystals++;
 
-    // Шанс кристалла от апгрейда
-    if (state.upgrades.crystalClick > 0) {
-        if (Math.random() < (0.05 * state.upgrades.crystalClick)) state.crystals++;
-    }
-
-    spawnText(e.clientX, e.clientY, gain);
+    const txt = document.createElement("div");
+    txt.className = "float-text";
+    txt.textContent = `+${gain}`;
+    txt.style.left = `${e.clientX}px`; txt.style.top = `${e.clientY}px`;
+    document.body.appendChild(txt);
+    setTimeout(() => txt.remove(), 600);
     updateUI();
 });
 
-// Пассивный доход
 setInterval(() => {
-    if (state.upgrades.crystalIncome > 0) {
-        state.coins += state.upgrades.crystalIncome;
-        updateUI();
-    }
+    state.coins += getPassiveIncome();
+    updateUI();
 }, 1000);
 
-// Сохранение (раз в 3 секунды, чтобы не лагало)
 setInterval(() => {
     localStorage.setItem("coins", state.coins);
     localStorage.setItem("crystals", state.crystals);
