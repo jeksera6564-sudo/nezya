@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker v1.1.2 — Релиз</title>
+    <title>Nezya Clicker v1.1.2 — Full Build</title>
     <style>
         :root {
             --gold: #ffd700;
             --neon-blue: #00d2ff;
             --glass: rgba(255, 255, 255, 0.1);
+            --purple: #a020f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -27,60 +28,44 @@
             pointer-events: auto; backdrop-filter: blur(10px);
         }
 
-        /* Игровая зона */
+        /* Персонаж и Игра */
         .game { height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
-        
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        
         .character { 
-            width: 270px; max-width: 75vw; cursor: pointer; 
-            z-index: 50; position: relative; pointer-events: auto;
+            width: 270px; max-width: 75vw; cursor: pointer; z-index: 50; position: relative; pointer-events: auto;
             filter: drop-shadow(0 0 20px rgba(0,0,0,0.6));
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: idleBreath 3s ease-in-out infinite;
-            -webkit-user-drag: none;
         }
-
         @keyframes idleBreath {
             0%, 100% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-15px) scale(1.02); }
         }
+        .character.pressed { transform: scale(0.85) translateY(5px) !important; }
 
-        .character.pressed { transform: scale(0.85) translateY(5px) !important; animation-play-state: paused; }
-
-        #displayNickname { margin-top: 15px; font-weight: 900; letter-spacing: 2px; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); z-index: 60; }
-
-        /* Ауры */
-        .aura { position: absolute; width: 380px; height: 380px; border-radius: 50%; z-index: 1; opacity: 0; transition: 1s; filter: blur(65px); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
-        .aura-fire { background: radial-gradient(circle, #ff4500 0%, transparent 70%); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } }
-
-        /* Кнопки меню */
+        /* Меню боковое */
         .side-menu { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 200; }
         .side-btn { width: 52px; height: 52px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; text-decoration: none; color: white; }
-        
+        .side-btn.online-btn { border-color: var(--purple); box-shadow: 0 0 10px rgba(160, 32, 240, 0.4); }
+
+        /* Меню нижнее */
         .bottom-menu { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 10px; padding: 0 15px; z-index: 200; }
-        .bottom-btn { flex: 1; max-width: 100px; height: 60px; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        .bottom-btn { flex: 1; max-width: 100px; height: 60px; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; font-weight: 900; }
 
-        /* Всплывающий текст */
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 40px; color: var(--gold); text-shadow: 0 0 10px #000; animation: float 0.7s ease-out forwards; z-index: 500; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-180px); } }
+        /* Всплывающие модалки */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(20px); text-align: center; }
+        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; max-height: 70vh; }
+        .close-btn { margin-top: 30px; padding: 15px 80px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; }
 
-        /* Модалки */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 20px; backdrop-filter: blur(20px); }
-        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; flex: 1; padding-right: 5px; }
-        .modal-body::-webkit-scrollbar { width: 4px; }
-        .modal-body::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        /* Стили для Онлайн окна */
+        .online-status { font-size: 18px; color: var(--purple); margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .loader { width: 50px; height: 50px; border: 5px solid var(--glass); border-top-color: var(--purple); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .card { width: 100%; background: var(--glass); padding: 15px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .eff-info h4 { color: var(--gold); font-size: 14px; margin-bottom: 2px; }
-        .eff-info small { color: #aaa; font-size: 11px; }
-
-        .buy-btn { padding: 10px 15px; background: var(--gold); border: none; border-radius: 12px; font-weight: 900; font-size: 12px; cursor: pointer; min-width: 90px; }
-        .buy-btn.owned { background: #4ae38d; color: black; }
-
-        .close-btn { margin-top: 20px; padding: 15px 80px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; }
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 40px; color: var(--gold); animation: float 0.7s ease-out forwards; z-index: 500; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-180px); } }
     </style>
 </head>
 <body>
@@ -95,16 +80,16 @@
     <div class="side-menu">
         <div class="side-btn" onclick="openModal('statModal')">📊</div>
         <div class="side-btn" onclick="openModal('effModal')">✨</div>
+        <div class="side-btn online-btn" onclick="openModal('onlineModal')">🌐</div>
         <a href="settings.html" class="side-btn">⚙️</a>
     </div>
 
     <div class="game">
         <div class="char-container">
-            <div id="auraGold" class="aura aura-gold"></div>
-            <div id="auraFire" class="aura aura-fire"></div>
-            <img id="charImg" class="character" src="" alt="Hero">
+            <div id="auraGold" class="aura aura-gold" style="position: absolute; width: 380px; height: 380px; border-radius: 50%; z-index: 1; opacity: 0; filter: blur(65px); pointer-events: none;"></div>
+            <img id="charImg" class="character" src="assets/character_default.png" alt="Hero">
         </div>
-        <div id="displayNickname">ЗАГРУЗКА...</div>
+        <div id="displayNickname" style="margin-top:15px; color:var(--gold); font-weight:900;">ИГРОК</div>
     </div>
 
     <div class="bottom-menu">
@@ -113,132 +98,69 @@
         <a href="characters.html" class="bottom-btn"><b>🧍</b>Герои</a>
     </div>
 
+    <div id="onlineModal" class="modal">
+        <div class="loader"></div>
+        <h2 style="color:var(--purple); margin-top:20px;">ОНЛАЙН РЕЖИМ</h2>
+        <p class="online-status">В разработке...</p>
+        <p style="color:#777; margin-top:10px; font-size:14px;">Скоро: PvP битвы и кланы</p>
+        <div class="close-btn" onclick="closeModal()">НАЗАД</div>
+    </div>
+
     <div id="statModal" class="modal">
-        <h2 style="margin: 20px 0;">СТАТИСТИКА</h2>
+        <h2>СТАТИСТИКА</h2>
         <div class="modal-body">
-            <div class="card"><span>Всего кликов</span><b id="s-clicks">0</b></div>
-            <div class="card"><span>Всего монет</span><b id="s-total">0</b></div>
+            <div class="card"><span>Кликов:</span><b id="s-clicks">0</b></div>
+            <div class="card"><span>Всего монет:</span><b id="s-total">0</b></div>
         </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
     <div id="effModal" class="modal">
-        <h2 style="margin: 20px 0;">МАГАЗИН ЭФФЕКТОВ</h2>
-        <div class="modal-body" id="effList">
-            </div>
+        <h2>ЭФФЕКТЫ</h2>
+        <div class="modal-body" id="effList"></div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
 <script>
-    const heroes = {
-        default: { pwr: 1, img: "assets/character_default.png" },
-        clicker: { pwr: 5, img: "assets/character_clicker.png" },
-        business: { pwr: 25, img: "assets/character_business.png" }
-    };
-
-    const effectData = [
-        { id: 'gold', name: 'Золотое Сияние', price: 150, desc: 'Эффект богатства' },
-        { id: 'fire', name: 'Огненный Шторм', price: 500, desc: 'Дыхание пламени' },
-        { id: 'frost', name: 'Морозный Иней', price: 1000, desc: 'Ледяная свежесть' },
-        { id: 'void', name: 'Пустота', price: 2500, desc: 'Космический вакуум' },
-        { id: 'toxic', name: 'Токсичный Туман', price: 5000, desc: 'Кислотный стиль' },
-        { id: 'rgb', name: 'RGB Подсветка', price: 10000, desc: '+100% к FPS' },
-        { id: 'plasma', name: 'Плазма', price: 15000, desc: 'Энергия солнца' },
-        { id: 'ghost', name: 'Призрак', price: 25000, desc: 'Неуловимый клик' },
-        { id: 'diamond', name: 'Алмазная Пыль', price: 50000, desc: 'Ослепительный блеск' },
-        { id: 'cyber', name: 'Киберпанк', price: 100000, desc: 'Взлом реальности' },
-        { id: 'god', name: 'Сила Богов', price: 1000000, desc: 'Конец игры' }
-    ];
-
+    // Базовые данные и состояние
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
-        active: localStorage.getItem("activeCharacter") || "clicker",
-        effects: JSON.parse(localStorage.getItem("activeEffects")) || {},
         clicks: +localStorage.getItem("stat_clicks") || 0,
         earned: +localStorage.getItem("stat_earned") || 0,
-        settings: {
-            name: localStorage.getItem("userName") || "Nezya Player",
-            vibrate: localStorage.getItem("set_vibrate") !== "false"
-        }
+        name: localStorage.getItem("userName") || "Nezya Player",
+        effects: JSON.parse(localStorage.getItem("activeEffects")) || {}
     };
-
-    function initEffects() {
-        const list = document.getElementById('effList');
-        list.innerHTML = '';
-        effectData.forEach(eff => {
-            const isOwned = state.effects[eff.id];
-            list.innerHTML += `
-                <div class="card">
-                    <div class="eff-info">
-                        <h4>${eff.name}</h4>
-                        <small>${eff.desc} • ${eff.price} 💎</small>
-                    </div>
-                    <button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyEff('${eff.id}', ${eff.price})">
-                        ${isOwned ? 'АКТИВНО' : 'КУПИТЬ'}
-                    </button>
-                </div>
-            `;
-        });
-    }
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals.toLocaleString();
-        document.getElementById("displayNickname").textContent = state.settings.name;
-        
-        const hero = heroes[state.active] || heroes.default;
-        document.getElementById("charImg").src = hero.img;
-
-        document.getElementById("auraGold").style.opacity = state.effects.gold ? "1" : "0";
-        document.getElementById("auraFire").style.opacity = state.effects.fire ? "1" : "0";
-
+        document.getElementById("displayNickname").textContent = state.name;
         document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
         document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
     }
 
+    // Логика клика
     const charEl = document.getElementById("charImg");
-
     charEl.addEventListener("pointerdown", (e) => {
         charEl.classList.add("pressed");
-        const hero = heroes[state.active] || heroes.default;
-        state.coins += hero.pwr; state.earned += hero.pwr; state.clicks++;
-
-        if (state.settings.vibrate && navigator.vibrate) navigator.vibrate(12);
-
+        state.coins += 5; state.earned += 5; state.clicks++;
+        
         const t = document.createElement("div");
         t.className = "float-text";
         t.style.left = e.clientX + "px"; t.style.top = e.clientY + "px";
-        t.textContent = `+${hero.pwr}`;
+        t.textContent = "+5";
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 600);
-
-        updateUI(); save();
-    });
-
-    window.addEventListener("pointerup", () => charEl.classList.remove("pressed"));
-
-    function save() {
+        
+        updateUI();
         localStorage.setItem("coins", state.coins);
-        localStorage.setItem("crystals", state.crystals);
         localStorage.setItem("stat_clicks", state.clicks);
         localStorage.setItem("stat_earned", state.earned);
-        localStorage.setItem("activeEffects", JSON.stringify(state.effects));
-    }
+    });
+    window.addEventListener("pointerup", () => charEl.classList.remove("pressed"));
 
-    function buyEff(id, price) {
-        if(state.effects[id]) return;
-        if(state.crystals >= price) {
-            state.crystals -= price;
-            state.effects[id] = true;
-            save(); initEffects(); updateUI();
-        } else { alert("Недостаточно кристаллов! 💎"); }
-    }
-
-    function openModal(id) { 
-        document.getElementById(id).style.display = "flex"; 
-        if(id === 'effModal') initEffects();
-    }
+    function openModal(id) { document.getElementById(id).style.display = "flex"; }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
 
     updateUI();
