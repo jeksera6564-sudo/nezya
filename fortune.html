@@ -18,77 +18,65 @@
         body { 
             background: #020205; font-family: 'Segoe UI', sans-serif; color: white;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            overflow-y: auto; overflow-x: hidden; padding-bottom: 50px;
+            overflow: hidden; /* Убираем лишнюю прокрутку */
         }
 
         /* --- UI ЭЛЕМЕНТЫ --- */
-        .balance-top { position: sticky; top: 0; display: flex; gap: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 15px; width: 100%; justify-content: center; backdrop-filter: blur(10px); border-bottom: 1px solid #333; }
+        .balance-top { display: flex; gap: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 15px; width: 100%; justify-content: center; border-bottom: 1px solid #333; }
         .bal { background: #111; padding: 8px 15px; border-radius: 12px; border: 1px solid var(--gold); font-weight: 900; min-width: 100px; text-align: center; font-size: 14px; }
 
         /* --- НАВИГАЦИЯ --- */
         .game-nav { 
             display: flex; gap: 8px; margin: 20px 0; background: #111; padding: 5px; border-radius: 15px; border: 1px solid #333; 
-            width: 95%; max-width: 450px; justify-content: space-around;
+            width: 95%; max-width: 450px;
         }
-        .nav-btn { padding: 10px 12px; border-radius: 10px; border: none; background: transparent; color: #666; font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 11px; flex: 1; text-align: center; }
+        .nav-btn { padding: 12px; border-radius: 10px; border: none; background: transparent; color: #666; font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 11px; flex: 1; text-align: center; }
         .nav-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
         .btn-home { color: var(--neon-purple); border: 1px solid rgba(157, 0, 255, 0.3); }
 
-        .section-title { margin: 10px 0 15px; text-transform: uppercase; letter-spacing: 2px; font-size: 18px; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue); }
-
-        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s ease; }
+        /* --- ОБЩИЕ СЕКЦИИ --- */
+        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; height: calc(100vh - 150px); animation: fadeIn 0.3s ease; }
         .game-section.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- КОЛЕСО (УЛУЧШЕНО) --- */
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 20px; }
-        .mode-tab { padding: 8px 15px; border-radius: 20px; border: 1px solid #333; background: #111; color: #555; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .mode-tab.active { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2); }
-        .mode-tab.vip-active { border-color: var(--neon-purple); color: var(--neon-purple); box-shadow: 0 0 10px rgba(157, 0, 255, 0.2); }
+        /* --- СТИЛИ КОЛЕСА --- */
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-tab { padding: 8px 15px; border-radius: 20px; border: 1px solid #333; background: #111; color: #555; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .mode-tab.active-norm { border-color: var(--gold); color: var(--gold); }
+        .mode-tab.active-vip { border-color: var(--neon-purple); color: var(--neon-purple); }
 
-        .wheel-container { position: relative; width: 320px; height: 320px; margin-bottom: 20px; }
-        .wheel { 
-            width: 100%; height: 100%; border-radius: 50%; border: 8px solid #222; 
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); 
-            position: relative; overflow: hidden; background: #111;
-        }
-        .wheel-segment {
-            position: absolute; width: 50%; height: 50%; left: 50%; top: 50%;
-            transform-origin: 0% 0%; display: flex; align-items: center;
-            justify-content: center; padding-left: 60px; font-weight: 900; font-size: 10px;
-        }
-        .pointer { 
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
-            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; 
-            border-top: 35px solid var(--neon-red); z-index: 10; filter: drop-shadow(0 0 5px red);
-        }
+        .wheel-container { position: relative; width: 300px; height: 300px; margin-bottom: 20px; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; border: 6px solid #222; transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); position: relative; overflow: hidden; }
+        .wheel-segment { position: absolute; width: 50%; height: 50%; left: 50%; top: 50%; transform-origin: 0% 0%; display: flex; align-items: center; justify-content: center; padding-left: 55px; font-weight: 900; font-size: 10px; }
+        .pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 35px solid var(--neon-red); z-index: 10; }
 
-        /* --- CRASH --- */
+        /* --- СТИЛИ CRASH --- */
         .crash-area {
-            width: 90%; max-width: 400px; height: 250px; 
-            background: radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.1), transparent);
-            border: 2px solid rgba(0, 210, 255, 0.2); border-radius: 20px;
+            width: 90%; max-width: 400px; height: 220px; 
+            background: #050508; border: 2px solid #1a1a1f; border-radius: 20px;
             position: relative; overflow: hidden; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: center;
         }
-        #rocket { position: absolute; bottom: 10%; left: 10%; font-size: 40px; display: none; }
-        #multText { font-size: 55px; font-weight: 900; z-index: 10; text-shadow: 0 0 20px var(--neon-blue); }
+        #rocket { position: absolute; bottom: 10%; left: 10%; font-size: 40px; display: none; z-index: 5; }
+        #multText { font-size: 60px; font-weight: 900; z-index: 10; transition: 0.1s; text-shadow: 0 0 20px var(--neon-blue); }
         
-        .main-btn { width: 250px; padding: 15px; border-radius: 12px; border: none; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.2s; text-transform: uppercase; margin-top: 10px; }
-        .btn-spin { background: var(--gold); color: #000; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
-        .btn-vip { background: var(--neon-purple); color: #fff; box-shadow: 0 5px 15px rgba(157, 0, 255, 0.3); }
+        /* --- КНОПКИ --- */
+        .main-btn { width: 260px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 18px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-spin { background: var(--gold); color: #000; }
+        .btn-vip { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(157,0,255,0.4); }
         .btn-crash { background: var(--neon-blue); color: #000; }
-        .btn-cashout { background: var(--neon-green); color: #000; animation: pulse 1s infinite; }
+        .btn-cashout { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); animation: pulse 0.8s infinite; }
         
-        .explosion { animation: shake 0.5s both; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px,0,0); } 20%, 80% { transform: translate3d(2px,0,0); } 50% { transform: translate3d(-4px,0,0); } }
-        .boom { color: var(--neon-red) !important; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .explosion { animation: shake 0.4s linear; }
+        @keyframes shake { 0% { transform: translate(0); } 25% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -5px); } 100% { transform: translate(0); } }
+        .boom { color: var(--neon-red) !important; text-shadow: 0 0 30px var(--neon-red) !important; }
     </style>
 </head>
 <body>
 
     <div class="balance-top">
-        <div class="bal" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
+        <div class="bal">🪙 <span id="coins">0</span></div>
         <div class="bal" style="border-color: var(--neon-blue);">💎 <span id="crys">0</span></div>
     </div>
 
@@ -99,66 +87,51 @@
     </div>
 
     <div id="section-wheel" class="game-section active">
-        <h2 class="section-title">Fortune Wheel</h2>
-        
         <div class="mode-selector">
-            <div id="tab-norm" class="mode-tab active" onclick="setWheelMode('norm')">ОБЫЧНОЕ</div>
-            <div id="tab-vip" class="mode-tab" onclick="setWheelMode('vip')">VIP КОЛЕСО</div>
+            <div id="tab-norm" class="mode-tab active-norm" onclick="setWheelMode('norm')">ОБЫЧНОЕ</div>
+            <div id="tab-vip" class="mode-tab" onclick="setWheelMode('vip')">VIP 🔥</div>
         </div>
-
         <div class="wheel-container">
             <div class="pointer"></div>
             <div class="wheel" id="wheel"></div>
         </div>
-        
         <button id="spinBtn" class="main-btn btn-spin" onclick="spin()">КРУТИТЬ (50k 🪙)</button>
     </div>
 
     <div id="section-crash" class="game-section">
-        <h2 class="section-title">Neon Crash</h2>
         <div class="crash-area" id="canvas">
             <div id="rocket">🚀</div>
             <div id="multText">1.00x</div>
         </div>
-        <input type="number" id="betAmount" style="background:#111; border:1px solid #444; color:#fff; padding:10px; width:250px; border-radius:10px; text-align:center; font-size:18px;" value="1000">
+        <input type="number" id="betAmount" style="background:#111; border:1px solid #333; color:#fff; padding:12px; width:260px; border-radius:12px; text-align:center; font-size:20px; margin-bottom:15px;" value="1000">
         <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">ПОСТАВИТЬ</button>
     </div>
 
 <script>
-    let isSpinning = false;
-    let isFlying = false;
-    let wheelMode = 'norm'; 
-    let crashInt;
-    let currentMult = 1.0;
-
-    // Конфигурация призов
-    const prizes = {
-        norm: [
-            { n: "10k 🪙", v: 10000, t: 'c' }, { n: "100k 🪙", v: 100000, t: 'c' },
-            { n: "5 💎", v: 5, t: 'd' }, { n: "50k 🪙", v: 50000, t: 'c' },
-            { n: "0", v: 0, t: 'c' }, { n: "20k 🪙", v: 20000, t: 'c' },
-            { n: "1 💎", v: 1, t: 'd' }, { n: "200k 🪙", v: 200000, t: 'c' }
-        ],
-        vip: [
-            { n: "500k 🪙", v: 500000, t: 'c' }, { n: "50 💎", v: 50, t: 'd' },
-            { n: "1M 🪙", v: 1000000, t: 'c' }, { n: "100 💎", v: 100, t: 'd' },
-            { n: "2M 🪙", v: 2000000, t: 'c' }, { n: "500 💎", v: 500, t: 'd' },
-            { n: "5M 🪙", v: 5000000, t: 'c' }, { n: "1k 💎", v: 1000, t: 'd' }
-        ]
-    };
-
     let state = {
         coins: +localStorage.getItem("coins") || 100000,
         crys: +localStorage.getItem("crystals") || 10
     };
 
-    function goHome() {
-        if(isSpinning || isFlying) return alert("Сначала дождись окончания игры!");
-        window.location.href = "index.html";
-    }
+    let isSpinning = false, isFlying = false, wheelMode = 'norm', currentMult = 1.0, crashInt;
+
+    const prizes = {
+        norm: [
+            { n: "50k 🪙", v: 50000, t: 'c' }, { n: "5 💎", v: 5, t: 'd' },
+            { n: "10k 🪙", v: 10000, t: 'c' }, { n: "100k 🪙", v: 100000, t: 'c' },
+            { n: "0 🪙", v: 0, t: 'c' }, { n: "25k 🪙", v: 25000, t: 'c' },
+            { n: "1 💎", v: 1, t: 'd' }, { n: "200k 🪙", v: 200000, t: 'c' }
+        ],
+        vip: [
+            { n: "1M 🪙", v: 1000000, t: 'c' }, { n: "50 💎", v: 50, t: 'd' },
+            { n: "500k 🪙", v: 500000, t: 'c' }, { n: "100 💎", v: 100, t: 'd' },
+            { n: "5M 🪙", v: 5000000, t: 'c' }, { n: "500 💎", v: 500, t: 'd' },
+            { n: "2M 🪙", v: 2000000, t: 'c' }, { n: "1k 💎", v: 1000, t: 'd' }
+        ]
+    };
 
     function switchGame(game) {
-        if(isSpinning || isFlying) return alert("Сначала дождись окончания игры!");
+        if(isSpinning || isFlying) return alert("Игра еще идет!");
         document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         if(game === 'wheel') {
@@ -170,125 +143,87 @@
         }
     }
 
-    // ЛОГИКА КОЛЕСА
-    function setWheelMode(mode) {
+    function setWheelMode(m) {
         if(isSpinning) return;
-        wheelMode = mode;
-        const btn = document.getElementById("spinBtn");
-        document.getElementById("tab-norm").className = "mode-tab" + (mode==='norm'?' active':'');
-        document.getElementById("tab-vip").className = "mode-tab" + (mode==='vip'?' vip-active':'');
-        
-        if(mode === 'norm') {
-            btn.textContent = "КРУТИТЬ (50k 🪙)";
-            btn.className = "main-btn btn-spin";
-        } else {
-            btn.textContent = "КРУТИТЬ (100 💎)";
-            btn.className = "main-btn btn-vip";
-        }
+        wheelMode = m;
+        document.getElementById('tab-norm').className = m==='norm' ? 'mode-tab active-norm' : 'mode-tab';
+        document.getElementById('tab-vip').className = m==='vip' ? 'mode-tab active-vip' : 'mode-tab';
+        document.getElementById('spinBtn').textContent = m==='norm' ? "КРУТИТЬ (50k 🪙)" : "КРУТИТЬ (100 💎)";
+        document.getElementById('spinBtn').className = m==='norm' ? "main-btn btn-spin" : "main-btn btn-vip";
         renderWheel();
     }
 
     function renderWheel() {
-        const wheel = document.getElementById("wheel");
-        wheel.innerHTML = "";
-        const data = prizes[wheelMode];
-        const colors = wheelMode === 'norm' ? ['#1a1a1a', '#ffd700'] : ['#1a1a1a', '#9d00ff'];
-        
-        data.forEach((p, i) => {
-            const seg = document.createElement("div");
-            seg.className = "wheel-segment";
-            seg.style.transform = `rotate(${i * 45}deg)`;
-            seg.style.background = i % 2 === 0 ? colors[0] : colors[1];
-            seg.style.color = i % 2 === 0 ? 'white' : 'black';
-            seg.innerHTML = `<span style="transform: rotate(90deg)">${p.n}</span>`;
-            wheel.appendChild(seg);
+        const w = document.getElementById("wheel");
+        w.innerHTML = "";
+        const clrs = wheelMode==='norm' ? ['#1a1a1a','#ffd700'] : ['#1a1a1a','#9d00ff'];
+        prizes[wheelMode].forEach((p, i) => {
+            const s = document.createElement("div");
+            s.className = "wheel-segment";
+            s.style.transform = `rotate(${i*45}deg)`;
+            s.style.background = i%2===0 ? clrs[0] : clrs[1];
+            s.style.color = i%2===0 ? 'white' : 'black';
+            s.innerHTML = `<span style="transform:rotate(90deg)">${p.n}</span>`;
+            w.appendChild(s);
         });
     }
 
     function spin() {
         if(isSpinning) return;
+        if(wheelMode==='norm' && state.coins < 50000) return alert("Мало монет!");
+        if(wheelMode==='vip' && state.crys < 100) return alert("Мало кристаллов!");
         
-        // Проверка цены
-        if(wheelMode === 'norm') {
-            if(state.coins < 50000) return alert("Недостаточно монет!");
-            state.coins -= 50000;
-        } else {
-            if(state.crys < 100) return alert("Недостаточно кристаллов!");
-            state.crys -= 100;
-        }
-        
-        isSpinning = true;
-        saveState();
+        wheelMode==='norm' ? state.coins -= 50000 : state.crys -= 100;
+        isSpinning = true; saveState();
 
-        const wheel = document.getElementById("wheel");
-        const randomSector = Math.floor(Math.random() * 8);
-        const extraDegrees = 3600; // 10 полных кругов
-        const totalRotation = extraDegrees + (randomSector * 45);
-        
-        wheel.style.transition = "transform 5s cubic-bezier(0.15, 0, 0.15, 1)";
-        wheel.style.transform = `rotate(-${totalRotation}deg)`;
+        const sec = Math.floor(Math.random()*8);
+        const rot = 3600 + (sec * 45);
+        const w = document.getElementById("wheel");
+        w.style.transition = "transform 5s cubic-bezier(0.15, 0, 0.15, 1)";
+        w.style.transform = `rotate(-${rot}deg)`;
 
         setTimeout(() => {
             isSpinning = false;
-            const prize = prizes[wheelMode][randomSector];
-            
-            if(prize.t === 'c') state.coins += prize.v;
-            else state.crys += prize.v;
-            
-            alert(`Выигрыш: ${prize.n}`);
+            const p = prizes[wheelMode][sec];
+            p.t === 'c' ? state.coins += p.v : state.crys += p.v;
+            alert("Выпало: " + p.n);
             saveState();
-            
-            // Сброс колеса без анимации для следующего раза
-            wheel.style.transition = "none";
-            wheel.style.transform = `rotate(-${totalRotation % 360}deg)`;
+            w.style.transition = "none";
+            w.style.transform = `rotate(-${rot%360}deg)`;
         }, 5100);
     }
 
-    // ЛОГИКА КРАША
     function crashAction() {
-        const btn = document.getElementById("crashBtn");
-        const rocket = document.getElementById("rocket");
-        const canvas = document.getElementById("canvas");
-        const disp = document.getElementById("multText");
-
+        const btn = document.getElementById("crashBtn"), r = document.getElementById("rocket"), 
+              c = document.getElementById("canvas"), d = document.getElementById("multText");
         if(!isFlying) {
             const bet = +document.getElementById("betAmount").value;
             if(bet > state.coins || bet <= 0) return alert("Мало монет!");
-            state.coins -= bet; 
-            saveState();
+            state.coins -= bet; saveState();
             isFlying = true; currentMult = 1.0;
             btn.textContent = "ЗАБРАТЬ"; btn.className = "main-btn btn-cashout";
-            disp.classList.remove("boom"); canvas.classList.remove("explosion");
-            rocket.style.display = "block"; rocket.textContent = "🚀";
-            
-            let boomPoint = 1 + (Math.random() * Math.random() * 8);
+            d.classList.remove("boom"); c.classList.remove("explosion");
+            r.style.display = "block"; r.textContent = "🚀";
+            let boom = 1 + (Math.random() * Math.random() * 10);
             crashInt = setInterval(() => {
-                currentMult += 0.01 + (currentMult/120);
-                disp.textContent = currentMult.toFixed(2) + "x";
-                rocket.style.left = Math.min(10 + (currentMult * 8), 80) + "%";
-                rocket.style.bottom = Math.min(10 + (currentMult * 10), 70) + "%";
-                if(currentMult >= boomPoint) {
+                currentMult += 0.01 + (currentMult/150);
+                d.textContent = currentMult.toFixed(2) + "x";
+                r.style.left = Math.min(10 + (currentMult * 7), 80) + "%";
+                r.style.bottom = Math.min(10 + (currentMult * 9), 75) + "%";
+                if(currentMult >= boom) {
                     clearInterval(crashInt); isFlying = false;
-                    disp.textContent = "BOOM!"; disp.classList.add("boom");
-                    canvas.classList.add("explosion"); rocket.textContent = "💥";
-                    setTimeout(() => {
-                        rocket.style.display = "none";
-                        btn.textContent = "ПОСТАВИТЬ"; btn.className = "main-btn btn-crash";
-                    }, 1500);
+                    d.textContent = "BOOM!"; d.classList.add("boom");
+                    c.classList.add("explosion"); r.textContent = "💥";
+                    setTimeout(() => { r.style.display="none"; btn.textContent="ПОСТАВИТЬ"; btn.className="main-btn btn-crash"; }, 1500);
                 }
             }, 80);
         } else {
             clearInterval(crashInt); isFlying = false;
-            const bet = +document.getElementById("betAmount").value;
-            state.coins += Math.floor(bet * currentMult);
+            state.coins += Math.floor(+document.getElementById("betAmount").value * currentMult);
             saveState();
-            rocket.style.transition = "all 0.5s ease-in";
-            rocket.style.left = "150%"; rocket.style.bottom = "150%";
+            r.style.transition = "0.5s"; r.style.left = "150%"; r.style.bottom = "150%";
             btn.textContent = "ПОСТАВИТЬ"; btn.className = "main-btn btn-crash";
-            setTimeout(() => {
-                rocket.style.display = "none";
-                rocket.style.transition = "none";
-            }, 500);
+            setTimeout(() => { r.style.display="none"; r.style.transition="none"; }, 500);
         }
     }
 
@@ -299,9 +234,12 @@
         document.getElementById("crys").textContent = state.crys.toLocaleString();
     }
 
-    // Инициализация
-    renderWheel();
-    saveState();
+    function goHome() {
+        if(isSpinning || isFlying) return alert("Закончи игру!");
+        window.location.href = "index.html";
+    }
+
+    renderWheel(); saveState();
 </script>
 </body>
 </html>
