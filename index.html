@@ -3,23 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker</title>
+    <title>Nezya Clicker — Бусты</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             width: 100vw; height: 100vh; 
             background: url('assets/bg.jpg') center/cover no-repeat; 
-            font-family: sans-serif; overflow: hidden; color: white; 
+            font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
         .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
         .balances { display: flex; gap: 15px; margin-bottom: 10px; }
         .balance { background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: bold; border: 1px solid rgba(255,215,0,0.3); }
         .level-wrap { width: 200px; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
         .level-bar { height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00); width: 0%; transition: 0.3s; }
+        
         .game { height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
         .character { width: 280px; max-width: 80vw; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.5)); }
-        .bottom-menu { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 15px; }
-        .menu-btn { padding: 15px 25px; background: rgba(0,0,0,0.8); border: 1px solid #ffd700; color: white; text-decoration: none; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 14px; }
+        
+        /* Нижнее меню */
+        .bottom-menu { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 10px; padding: 0 10px; }
+        .menu-btn { 
+            flex: 1; max-width: 110px; padding: 12px 5px; 
+            background: rgba(0,0,0,0.85); border: 1px solid #ffd700; 
+            color: white; text-decoration: none; border-radius: 15px; 
+            font-weight: bold; font-size: 11px; text-align: center; text-transform: uppercase;
+        }
+
+        /* Окно БУСТОВ */
+        #boostsModal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+            z-index: 100; display: none; flex-direction: column; align-items: center; padding: 40px 20px;
+        }
+        .boost-card {
+            width: 100%; max-width: 350px; background: rgba(255,255,255,0.1); 
+            margin: 10px 0; padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .boost-info h4 { color: #ffd700; margin-bottom: 5px; }
+        .boost-info p { font-size: 12px; opacity: 0.8; }
+        .buy-boost-btn { 
+            background: #ffd700; color: black; border: none; padding: 8px 15px; 
+            border-radius: 10px; font-weight: bold; cursor: pointer;
+        }
+        .buy-boost-btn:disabled { background: #555; color: #888; }
+        .close-boosts { margin-top: 20px; color: #ffd700; font-weight: bold; cursor: pointer; text-decoration: underline; }
+
         .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 28px; color: #ffd700; text-shadow: 2px 2px 0 #000; animation: float 0.6s forwards; z-index: 100; }
         @keyframes float { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
     </style>
@@ -31,7 +59,7 @@
             <div class="balance">💎 <span id="crystals">0</span></div>
         </div>
         <div class="level-wrap"><div id="levelBar" class="level-bar"></div></div>
-        <div id="combo" style="margin-top:5px; color:#4ade80; font-weight: 900; text-shadow: 1px 1px 2px #000;">Комбо x1</div>
+        <div id="combo" style="margin-top:5px; color:#4ade80; font-weight: 900;">Комбо x1</div>
     </div>
 
     <div class="game">
@@ -39,8 +67,33 @@
     </div>
 
     <div class="bottom-menu">
-        <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+        <a href="shop.html" class="menu-btn">🛒 Рынок</a>
+        <a href="#" class="menu-btn" onclick="openBoosts()">🚀 Бусты</a>
         <a href="characters.html" class="menu-btn">🧍 Герои</a>
+    </div>
+
+    <div id="boostsModal">
+        <h2 style="color: #ffd700; margin-bottom: 20px;">УСИЛЕНИЯ</h2>
+        
+        <div class="boost-card">
+            <div class="boost-info">
+                <h4>🚀 Ультра x2</h4>
+                <p>Удваивает весь доход навсегда</p>
+                <p><b>Цена: 50 💎</b></p>
+            </div>
+            <button class="buy-boost-btn" id="btn-ultraBoost" onclick="buyBoost('ultraBoost', 50)">Купить</button>
+        </div>
+
+        <div class="boost-card">
+            <div class="boost-info">
+                <h4>💎 Кристальный шанс</h4>
+                <p>+5% к выпадению кристаллов</p>
+                <p><b>Цена: 30 💎</b></p>
+            </div>
+            <button class="buy-boost-btn" id="btn-crystalClick" onclick="buyBoost('crystalClick', 30)">Купить</button>
+        </div>
+
+        <div class="close-boosts" onclick="closeBoosts()">ЗАКРЫТЬ</div>
     </div>
 
 <script>
@@ -70,6 +123,7 @@
         localStorage.setItem("coins", state.coins);
         localStorage.setItem("crystals", state.crystals);
         localStorage.setItem("clicks", state.clicks);
+        localStorage.setItem("upgrades", JSON.stringify(state.upgrades));
     }
 
     function updateUI() {
@@ -78,6 +132,31 @@
         document.getElementById("levelBar").style.width = (state.clicks % 100) + "%";
         document.getElementById("charImg").src = charData[state.active]?.img || charData.default.img;
         document.getElementById("combo").textContent = "Комбо x" + combo;
+        
+        // Обновляем кнопки в бустах
+        if(state.upgrades.ultraBoost) {
+            document.getElementById("btn-ultraBoost").textContent = "АКТИВНО";
+            document.getElementById("btn-ultraBoost").disabled = true;
+        }
+        if(state.upgrades.crystalClick) {
+            document.getElementById("btn-crystalClick").textContent = "АКТИВНО";
+            document.getElementById("btn-crystalClick").disabled = true;
+        }
+    }
+
+    // ЛОГИКА БУСТОВ
+    function openBoosts() { document.getElementById("boostsModal").style.display = "flex"; }
+    function closeBoosts() { document.getElementById("boostsModal").style.display = "none"; }
+    
+    function buyBoost(id, price) {
+        if (state.crystals >= price && !state.upgrades[id]) {
+            state.crystals -= price;
+            state.upgrades[id] = 1;
+            save();
+            updateUI();
+        } else if (state.crystals < price) {
+            alert("Недостаточно кристаллов!");
+        }
     }
 
     document.getElementById("charImg").addEventListener("pointerdown", (e) => {
@@ -90,11 +169,20 @@
 
         const currentPos = charData[state.active] || charData.default;
         let gain = currentPos.power * combo;
+        
+        // Если куплен буст UltraBoost, удваиваем клик
         if (state.upgrades.ultraBoost) gain *= 2;
 
         state.coins += gain;
         state.clicks++;
+        
+        // Кристаллы от персонажа
         state.crystals += currentPos.crystal;
+
+        // Шанс кристалла от буста
+        if (state.upgrades.crystalClick && Math.random() < 0.05) {
+            state.crystals++;
+        }
 
         const t = document.createElement("div");
         t.className = "float-text";
@@ -107,6 +195,7 @@
         save();
     });
 
+    // Пассивный доход
     setInterval(() => {
         let sum = 0;
         for (let k in state.incomes) sum += (incomeRates[k] || 0) * state.incomes[k];
