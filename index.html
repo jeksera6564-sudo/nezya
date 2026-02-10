@@ -6,33 +6,36 @@
     <title>Nezya Clicker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { width: 100vw; height: 100vh; background: #111 center/cover no-repeat; font-family: sans-serif; overflow: hidden; color: white; }
+        body { 
+            width: 100vw; height: 100vh; 
+            background: url('assets/bg.jpg') center/cover no-repeat; 
+            font-family: sans-serif; overflow: hidden; color: white; 
+        }
         .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
         .balances { display: flex; gap: 15px; margin-bottom: 10px; }
-        .balance { background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        .coin-icon { color: gold; } .cryst-icon { color: #38bdf8; }
-        .level-wrap { width: 200px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
-        .level-bar { height: 100%; background: gold; width: 0%; transition: 0.3s; }
-        .game { height: 100%; display: flex; align-items: center; justify-content: center; }
-        .character { width: 250px; cursor: pointer; transition: transform 0.1s; }
+        .balance { background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: bold; border: 1px solid rgba(255,215,0,0.3); }
+        .level-wrap { width: 200px; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        .level-bar { height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00); width: 0%; transition: 0.3s; }
+        .game { height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .character { width: 280px; max-width: 80vw; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.5)); }
         .bottom-menu { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 15px; }
-        .menu-btn { padding: 12px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 15px; font-weight: bold; }
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 24px; animation: float 0.6s forwards; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
+        .menu-btn { padding: 15px 25px; background: rgba(0,0,0,0.8); border: 1px solid #ffd700; color: white; text-decoration: none; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 14px; }
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 28px; color: #ffd700; text-shadow: 2px 2px 0 #000; animation: float 0.6s forwards; z-index: 100; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-120px) scale(1.2); } }
     </style>
 </head>
 <body>
     <div class="top-bar">
         <div class="balances">
-            <div class="balance"><span class="coin-icon">🪙</span> <span id="coins">0</span></div>
-            <div class="balance"><span class="cryst-icon">💎</span> <span id="crystals">0</span></div>
+            <div class="balance">🪙 <span id="coins">0</span></div>
+            <div class="balance">💎 <span id="crystals">0</span></div>
         </div>
         <div class="level-wrap"><div id="levelBar" class="level-bar"></div></div>
-        <div id="combo" style="margin-top:5px; color:#4ade80">Комбо x1</div>
+        <div id="combo" style="margin-top:5px; color:#4ade80; font-weight: 900; text-shadow: 1px 1px 2px #000;">Комбо x1</div>
     </div>
 
     <div class="game">
-        <img id="charImg" class="character" src="assets/player.png" alt="Player">
+        <img id="charImg" class="character" src="assets/character_default.png">
     </div>
 
     <div class="bottom-menu">
@@ -41,17 +44,16 @@
     </div>
 
 <script>
-    // Конфигурация персонажей (сила клика)
     const charData = {
-        default: { power: 1, crystal: 0, img: "assets/player.png" },
+        default: { power: 1, crystal: 0, img: "assets/character_default.png" },
         clicker: { power: 2, crystal: 0, img: "assets/character_clicker.png" },
         business: { power: 5, crystal: 1, img: "assets/character_business.png" },
         magnate: { power: 12, crystal: 2, img: "assets/character_magnate.png" },
         legendary: { power: 30, crystal: 5, img: "assets/character_legendary.png" }
     };
 
-    // Конфигурация доходов (для пассива)
     const incomeRates = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
+    const clickSound = new Audio('assets/click.mp3');
 
     let state = {
         coins: +localStorage.getItem("coins") || 0,
@@ -78,8 +80,10 @@
         document.getElementById("combo").textContent = "Комбо x" + combo;
     }
 
-    // Клик
     document.getElementById("charImg").addEventListener("pointerdown", (e) => {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(()=>{});
+        
         const now = Date.now();
         combo = (now - lastClick < 800) ? Math.min(combo + 1, 20) : 1;
         lastClick = now;
@@ -92,7 +96,6 @@
         state.clicks++;
         state.crystals += currentPos.crystal;
 
-        // Эффект
         const t = document.createElement("div");
         t.className = "float-text";
         t.style.left = e.clientX + "px"; t.style.top = e.clientY + "px";
@@ -101,14 +104,13 @@
         setTimeout(() => t.remove(), 600);
 
         updateUI();
+        save();
     });
 
-    // Пассивный доход
     setInterval(() => {
         let sum = 0;
         for (let k in state.incomes) sum += (incomeRates[k] || 0) * state.incomes[k];
         if (state.upgrades.ultraBoost) sum *= 2;
-        
         state.coins += sum;
         updateUI();
         save();
