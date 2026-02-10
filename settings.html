@@ -8,6 +8,7 @@
         :root {
             --gold: #ffd700;
             --neon-blue: #00d2ff;
+            --purple: #a020f0;
             --red: #ff4d4d;
             --glass: rgba(255, 255, 255, 0.07);
         }
@@ -43,12 +44,29 @@
             flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3);
             padding: 12px; border-radius: 12px; color: white; font-weight: bold; outline: none; transition: 0.3s;
         }
-        input[type="text"]:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.2); }
 
-        /* Переключатели */
+        /* Ряды и переключатели */
         .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .row:last-child { margin-bottom: 0; }
         .row span { font-size: 15px; font-weight: 500; }
+
+        /* Эффект мерцания для разработки */
+        .in-dev {
+            font-size: 10px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            letter-spacing: 1px;
+            animation: neonPulse 2s infinite ease-in-out;
+            border: 1px solid rgba(160, 32, 240, 0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { opacity: 0.4; filter: blur(0.5px); }
+            50% { opacity: 1; filter: blur(0px); text-shadow: 0 0 8px var(--purple); }
+        }
 
         .switch { position: relative; width: 50px; height: 26px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -67,16 +85,13 @@
         .btn {
             width: 100%; padding: 16px; border-radius: 16px; border: none;
             font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s;
-            margin-top: 10px; font-size: 13px; letter-spacing: 1px;
+            margin-top: 10px; font-size: 13px;
         }
         .btn-save { background: var(--gold); color: #000; box-shadow: 0 5px 15px rgba(255,215,0,0.2); }
         .btn-back { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
         .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--red); border: 1px solid var(--red); margin-top: 30px; }
 
-        .btn:active { transform: scale(0.96); }
-
-        /* Инфо */
-        .info-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; line-height: 1.6; }
+        .info-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
         .info-footer b { color: var(--gold); }
     </style>
 </head>
@@ -94,7 +109,7 @@
         </div>
 
         <div class="section">
-            <p class="section-title">Система и Звук</p>
+            <p class="section-title">Система и Эффекты</p>
             <div class="row">
                 <span>Звуковые эффекты</span>
                 <label class="switch">
@@ -109,12 +124,23 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="row">
-                <span>Экономный режим</span>
-                <label class="switch">
-                    <input type="checkbox" id="setEco">
-                    <span class="slider"></span>
-                </label>
+        </div>
+
+        <div class="section" style="border-color: rgba(160, 32, 240, 0.2); background: rgba(160, 32, 240, 0.03);">
+            <p class="section-title" style="color: var(--purple);">Аудиосистема</p>
+            
+            <div class="row" style="opacity: 0.6;">
+                <span>Фоновая музыка</span>
+                <div class="in-dev">В РАЗРАБОТКЕ</div>
+            </div>
+
+            <div class="row" style="opacity: 0.6; margin-top: 15px;">
+                <span>Голос Nezya</span>
+                <div class="in-dev">В РАЗРАБОТКЕ</div>
+            </div>
+            
+            <div style="font-size: 10px; color: #555; text-align: center; margin-top: 10px;">
+                СЛЕДУЮЩЕЕ ОБНОВЛЕНИЕ 2.0
             </div>
         </div>
 
@@ -130,17 +156,13 @@
     </div>
 
 <script>
-    // Загрузка данных при открытии
     window.onload = function() {
         document.getElementById("userName").value = localStorage.getItem("userName") || "Nezya Player";
         document.getElementById("setSound").checked = localStorage.getItem("set_sound") !== "false";
         document.getElementById("setVibrate").checked = localStorage.getItem("set_vibrate") !== "false";
-        document.getElementById("setEco").checked = localStorage.getItem("set_eco") === "true";
-        
         updateAvatar();
     };
 
-    // Обновление иконки (простая логика первой буквы)
     document.getElementById("userName").oninput = updateAvatar;
     function updateAvatar() {
         const name = document.getElementById("userName").value;
@@ -152,14 +174,11 @@
         const name = document.getElementById("userName").value.trim() || "Nezya Player";
         const sound = document.getElementById("setSound").checked;
         const vibrate = document.getElementById("setVibrate").checked;
-        const eco = document.getElementById("setEco").checked;
 
         localStorage.setItem("userName", name);
         localStorage.setItem("set_sound", sound);
         localStorage.setItem("set_vibrate", vibrate);
-        localStorage.setItem("set_eco", eco);
 
-        // Маленький визуальный фидбек
         const btn = document.querySelector(".btn-save");
         btn.textContent = "СОХРАНЕНО! ✓";
         btn.style.background = "#4ae38d";
@@ -173,12 +192,10 @@
         const check1 = confirm("Ты уверен, что хочешь СБРОСИТЬ всё? Монеты, герои и кристаллы исчезнут!");
         if (check1) {
             const check2 = prompt("Напиши слово 'УДАЛИТЬ' для подтверждения:");
-            if (check2 === "УДАЛИТЬ" || check2 === "удалить") {
+            if (check2?.toUpperCase() === "УДАЛИТЬ") {
                 localStorage.clear();
-                alert("Данные успешно удалены. Перезапуск...");
+                alert("Данные успешно удалены.");
                 location.href = "index.html";
-            } else {
-                alert("Сброс отменен.");
             }
         }
     }
