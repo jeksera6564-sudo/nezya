@@ -1,228 +1,207 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Nezya</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nezya Clicker</title>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{
-  width:100vw;height:100vh;
-  background:center/cover no-repeat;
-  font-family:Arial,sans-serif;
-  overflow:hidden;
-  user-select:none;
-}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            width: 100vw; height: 100vh;
+            background: #1a1a1a center/cover no-repeat;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+            user-select: none;
+            color: white;
+        }
 
-.top-bar{
-  position:absolute;top:12px;left:50%;
-  transform:translateX(-50%);
-  display:flex;flex-direction:column;
-  gap:6px;align-items:center;z-index:5;
-}
-.balances{display:flex;gap:12px}
-.balance{
-  background:rgba(0,0,0,.65);
-  padding:8px 14px;border-radius:18px;
-  font-weight:900;color:#fff;
-  display:flex;gap:6px;align-items:center;
-}
-.coin{
-  width:18px;height:18px;border-radius:50%;
-  background:radial-gradient(circle at 30% 30%,#fff9c4,#fbc02d)
-}
-.crystal{
-  width:16px;height:16px;
-  clip-path:polygon(50% 0%,90% 25%,70% 100%,30% 100%,10% 25%);
-  background:linear-gradient(135deg,#7dd3fc,#38bdf8)
-}
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
 
-.level-wrap{
-  width:200px;background:rgba(0,0,0,.6);
-  border-radius:12px;padding:5px;
-}
-.level-bar{
-  height:10px;background:gold;
-  border-radius:8px;width:0%;
-}
-.level-text{
-  text-align:center;font-size:12px;
-  font-weight:bold;color:white;margin-top:3px;
-}
-.combo{
-  font-weight:900;color:#22c55e;
-  text-shadow:0 0 10px #22c55e;font-size:13px;
-}
-.game{
-  position:relative;width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-}
-.character-wrap{position:relative}
-.character{
-  width:280px;max-width:80vw;
-  cursor:pointer;transition:transform .12s ease;
-}
-.aura{
-  position:absolute;inset:-30px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
-  opacity:0;animation:aura .4s ease-out forwards;
-  pointer-events:none;
-}
-@keyframes aura{
-  from{transform:scale(.6);opacity:.9}
-  to{transform:scale(1.4);opacity:0}
-}
-.bottom-menu{
-  position:absolute;bottom:22%;left:50%;
-  transform:translateX(-50%);
-  display:flex;gap:14px;
-}
-.menu-btn{
-  padding:12px 18px;border-radius:18px;
-  background:rgba(0,0,0,.65);
-  color:white;font-weight:900;text-decoration:none;
-}
-</style>
+        .top-bar {
+            position: absolute; top: 20px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column;
+            gap: 10px; align-items: center; z-index: 10;
+            width: 90%;
+        }
+
+        .balances { display: flex; gap: 15px; }
+        .balance {
+            background: rgba(0,0,0,0.7);
+            padding: 8px 16px; border-radius: 20px;
+            font-weight: 900; display: flex; gap: 8px; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d); border: 2px solid #f9a825; }
+        .crystal { width: 18px; height: 18px; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); background: linear-gradient(135deg, #7dd3fc, #0284c7); }
+
+        .level-wrap { width: 100%; max-width: 250px; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 4px; position: relative; }
+        .level-bar { height: 8px; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 6px; width: 0%; transition: width 0.3s ease; }
+        .level-text { text-align: center; font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .combo { font-weight: 900; color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); font-size: 14px; }
+
+        .game { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        
+        .character-wrap { position: relative; perspective: 1000px; }
+        .character { width: 280px; max-width: 75vw; cursor: pointer; transition: transform 0.1s active; touch-action: manipulation; }
+        
+        /* Вылетающий текст урона */
+        .float-text {
+            position: absolute; color: #fff; font-weight: 900; font-size: 24px;
+            pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 100;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+
+        .bottom-menu { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 10; }
+        .menu-btn { padding: 14px 24px; border-radius: 20px; background: rgba(0,0,0,0.8); color: white; font-weight: bold; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); }
+    </style>
 </head>
-
 <body>
-
-<script>
-if(!localStorage.getItem("nickname")){
-  location.href="register.html";
-}
-</script>
 
 <div class="overlay"></div>
 
 <div class="top-bar">
-  <div class="balances">
-    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
-  </div>
-  <div class="level-wrap">
-    <div class="level-bar" id="levelBar"></div>
-    <div class="level-text">Уровень <span id="level">1</span></div>
-  </div>
-  <div class="combo" id="combo">Комбо x1</div>
+    <div class="balances">
+        <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
+        <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+    </div>
+    <div class="level-wrap">
+        <div class="level-bar" id="levelBar"></div>
+        <div class="level-text">Уровень <span id="level">1</span></div>
+    </div>
+    <div class="combo" id="combo">Комбо x1</div>
 </div>
 
 <div class="game">
-  <div class="character-wrap" id="charWrap">
-    <img id="character" class="character">
-  </div>
+    <div class="character-wrap" id="charWrap">
+        <img id="character" class="character" alt="Player">
+    </div>
 </div>
 
 <div class="bottom-menu">
-  <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-  <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
+    <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+    <a href="characters.html" class="menu-btn">🧍 Герои</a>
 </div>
 
 <script>
-document.body.style.backgroundImage="url('assets/bg.jpg')";
-
-/* ПЕРСОНАЖИ */
-const characters={
-  default:{img:"assets/player.png",power:1,crystal:0},
-  clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
-  business:{img:"assets/character_business.png",power:4,crystal:1},
-  magnate:{img:"assets/character_magnate.png",power:7,crystal:2},
-  legendary:{img:"assets/character_legendary.png",power:15,crystal:5}
+// --- Инициализация данных ---
+const characters = {
+    default: { img: "assets/player.png", power: 1, crystal: 0 },
+    clicker: { img: "assets/character_clicker.png", power: 2, crystal: 0 },
+    business: { img: "assets/character_business.png", power: 4, crystal: 1 },
+    magnate: { img: "assets/character_magnate.png", power: 7, crystal: 2 },
+    legendary: { img: "assets/character_legendary.png", power: 15, crystal: 5 }
 };
 
-/* СОХРАНЕНИЯ */
-let active=localStorage.getItem("activeCharacter")||"default";
-let coins=+localStorage.getItem("coins")||0;
-let crystals=+localStorage.getItem("crystals")||0;
-let clicks=+localStorage.getItem("clicks")||0;
-let combo=1,lastClick=0;
-
-/* АПГРЕЙДЫ */
-let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
-  crystalClick:0,     // шанс кристалла с клика
-  crystalIncome:0,   // пассивный доход монет
-  ultraBoost:0       // открывает x2–x5
+let state = {
+    active: localStorage.getItem("activeCharacter") || "default",
+    coins: +localStorage.getItem("coins") || 0,
+    crystals: +localStorage.getItem("crystals") || 0,
+    clicks: +localStorage.getItem("clicks") || 0,
+    upgrades: JSON.parse(localStorage.getItem("upgrades")) || { crystalClick: 0, crystalIncome: 0, ultraBoost: 0 }
 };
 
-const character=document.getElementById("character");
-const wrap=document.getElementById("charWrap");
-character.src=characters[active].img;
+let combo = 1;
+let lastClick = 0;
 
-const coinsEl=document.getElementById("coins");
-const crystalsEl=document.getElementById("crystals");
-const levelEl=document.getElementById("level");
-const levelBar=document.getElementById("levelBar");
-const comboEl=document.getElementById("combo");
+// Элементы
+const charImg = document.getElementById("character");
+const wrap = document.getElementById("charWrap");
+const coinsEl = document.getElementById("coins");
+const crystalsEl = document.getElementById("crystals");
+const levelEl = document.getElementById("level");
+const levelBar = document.getElementById("levelBar");
+const comboEl = document.getElementById("combo");
 
-/* МУЛЬТИПЛИКАТОР x2–x5 */
-function getClickMultiplier(){
-  if(!upgrades.ultraBoost) return 1;
+// Настройка
+charImg.src = characters[state.active]?.img || characters.default.img;
+document.body.style.backgroundImage = "url('assets/bg.jpg')";
 
-  const r=Math.random();
-  if(r<0.05) return 5;   // 5%
-  if(r<0.15) return 3;   // 10%
-  if(r<0.35) return 2;   // 20%
-  return 1;
+function updateUI() {
+    coinsEl.textContent = Math.floor(state.coins).toLocaleString();
+    crystalsEl.textContent = state.crystals;
+    
+    const lvl = Math.floor(state.clicks / 100) + 1;
+    levelEl.textContent = lvl;
+    levelBar.style.width = (state.clicks % 100) + "%";
+    comboEl.textContent = `Комбо x${combo}`;
 }
 
-function updateUI(){
-  coinsEl.textContent=coins;
-  crystalsEl.textContent=crystals;
-  const lvl=Math.floor(clicks/100)+1;
-  levelEl.textContent=lvl;
-  levelBar.style.width=(clicks%100)+"%";
-  comboEl.textContent="Комбо x"+combo;
+// Рандомный множитель
+function getMulti() {
+    if (!state.upgrades.ultraBoost) return 1;
+    const r = Math.random();
+    if (r < 0.05) return 5;
+    if (r < 0.15) return 3;
+    if (r < 0.35) return 2;
+    return 1;
 }
 
-/* КЛИК */
-character.onclick=()=>{
-  character.style.transform="scale(.9)";
-  setTimeout(()=>character.style.transform="scale(1)",120);
-
-  const a=document.createElement("div");
-  a.className="aura";
-  wrap.appendChild(a);
-  setTimeout(()=>a.remove(),400);
-
-  const now=Date.now();
-  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
-  lastClick=now;
-
-  const ch=characters[active];
-  const multi=getClickMultiplier();
-
-  let gain = ch.power * combo * multi;
-  coins += gain;
-  crystals += ch.crystal;
-  clicks++;
-
-  /* шанс кристалла с клика */
-  if(upgrades.crystalClick){
-    const chance = 0.05 * upgrades.crystalClick;
-    if(Math.random()<chance) crystals++;
-  }
-
-  save();updateUI();
-};
-
-/* ПАССИВНЫЙ ДОХОД */
-setInterval(()=>{
-  if(upgrades.crystalIncome){
-    coins += upgrades.crystalIncome;
-    save();updateUI();
-  }
-},1000);
-
-function save(){
-  localStorage.setItem("coins",coins);
-  localStorage.setItem("crystals",crystals);
-  localStorage.setItem("clicks",clicks);
-  localStorage.setItem("activeCharacter",active);
+// Визуальный эффект при клике
+function spawnText(x, y, val) {
+    const txt = document.createElement("div");
+    txt.className = "float-text";
+    txt.textContent = `+${val}`;
+    txt.style.left = `${x}px`;
+    txt.style.top = `${y}px`;
+    document.body.appendChild(txt);
+    setTimeout(() => txt.remove(), 600);
 }
+
+// Клик (используем pointerdown для скорости на мобильных)
+charImg.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    
+    // Анимация нажатия
+    charImg.style.transform = "scale(0.95)";
+    setTimeout(() => charImg.style.transform = "scale(1)", 100);
+
+    const now = Date.now();
+    combo = (now - lastClick < 800) ? Math.min(combo + 1, 20) : 1;
+    lastClick = now;
+
+    const ch = characters[state.active] || characters.default;
+    const multi = getMulti();
+    const gain = ch.power * combo * multi;
+
+    state.coins += gain;
+    state.clicks++;
+
+    // Кристаллы от персонажа
+    if (ch.crystal > 0) state.crystals += ch.crystal;
+
+    // Шанс кристалла от апгрейда
+    if (state.upgrades.crystalClick > 0) {
+        if (Math.random() < (0.05 * state.upgrades.crystalClick)) state.crystals++;
+    }
+
+    spawnText(e.clientX, e.clientY, gain);
+    updateUI();
+});
+
+// Пассивный доход
+setInterval(() => {
+    if (state.upgrades.crystalIncome > 0) {
+        state.coins += state.upgrades.crystalIncome;
+        updateUI();
+    }
+}, 1000);
+
+// Сохранение (раз в 3 секунды, чтобы не лагало)
+setInterval(() => {
+    localStorage.setItem("coins", state.coins);
+    localStorage.setItem("crystals", state.crystals);
+    localStorage.setItem("clicks", state.clicks);
+}, 3000);
+
 updateUI();
 </script>
-
 </body>
 </html>
