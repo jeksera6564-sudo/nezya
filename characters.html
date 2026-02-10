@@ -2,79 +2,135 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Персонажи</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Персонажи — Nezya Clicker</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             background: url('assets/characters-bg.jpg') center/cover no-repeat fixed; 
-            color: white; font-family: sans-serif; padding: 20px; margin: 0;
+            color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
         }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: -1; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
-        .card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 25px; text-align: center; border: 2px solid transparent; transition: 0.3s; }
-        .card.active { border-color: #22c55e; background: rgba(34, 197, 94, 0.2); }
-        img { width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
-        button { width: 100%; padding: 12px; margin-top: 15px; border-radius: 15px; border: none; background: #ffd700; font-weight: bold; cursor: pointer; }
-        button:disabled { background: #444; color: #888; }
-        .back { display: block; text-align: center; margin: 40px auto; color: white; text-decoration: none; font-weight: bold; background: #ffd700; color: black; width: fit-content; padding: 12px 40px; border-radius: 25px; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
+        
+        h1 { text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 3px; color: #ffd700; text-shadow: 0 0 10px rgba(255,214,0,0.5); }
+
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 15px; max-width: 900px; margin: 0 auto; 
+        }
+
+        .card { 
+            background: rgba(255,255,255,0.07); 
+            padding: 20px; border-radius: 25px; 
+            text-align: center; border: 2px solid rgba(255,215,0,0.1); 
+            transition: 0.3s; backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .card.active { 
+            border-color: #ffd700; 
+            background: rgba(255, 215, 0, 0.15); 
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .card img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); margin-bottom: 15px; }
+        .card h3 { font-size: 18px; margin-bottom: 5px; color: #fff; }
+        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 10px; font-weight: bold; }
+        .card .price { font-size: 14px; color: #ffd700; margin-bottom: 15px; }
+
+        button { 
+            width: 100%; padding: 12px; border-radius: 15px; border: none; 
+            background: #ffd700; color: #000; font-weight: 900; 
+            cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 12px;
+        }
+        button:active { transform: scale(0.95); }
+        button:disabled { background: #333; color: #777; cursor: default; }
+
+        .back-btn { 
+            display: block; text-align: center; margin: 40px auto; 
+            color: #000; text-decoration: none; font-weight: 900; 
+            background: #ffd700; width: fit-content; padding: 15px 50px; 
+            border-radius: 30px; box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <h1 style="text-align:center; margin-bottom:30px; text-transform: uppercase;">Выберите Героя</h1>
+    <h1>Ваши Герои</h1>
+    
     <div class="grid" id="heroList"></div>
 
+    <a href="index.html" class="back-btn">⬅ В БОЙ</a>
+
     <script>
+        // База данных героев
+        const heroes = [
+            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, img: "assets/character_default.png" },
+            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, img: "assets/character_clicker.png" },
+            { id: "business", name: "Бизнесмен", price: 25000, pwr: 20, cry: 1, img: "assets/character_business.png" },
+            { id: "magnate", name: "Магнат", price: 100000, pwr: 100, cry: 3, img: "assets/character_magnate.png" },
+            { id: "legendary", name: "Легенда", price: 500000, pwr: 500, cry: 10, img: "assets/character_legendary.png" }
+        ];
+
+        // Загрузка состояния
         let state = {
-            active: localStorage.getItem("activeCharacter") || "default",
-            owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
+            active: localStorage.getItem("activeCharacter") || "clicker", // По умолчанию ставим второго
+            owned: JSON.parse(localStorage.getItem("characters")) || { default: true, clicker: true }, // Второй тоже сразу куплен
             coins: +localStorage.getItem("coins") || 0
         };
 
-        const heroes = [
-            { id: "default", name: "Новичок", price: 0, img: "assets/character_default.png" },
-            { id: "clicker", name: "Про-Кликер", price: 5000, img: "assets/character_clicker.png" },
-            { id: "business", name: "Бизнесмен", price: 25000, img: "assets/character_business.png" },
-            { id: "magnate", name: "Магнат", price: 100000, img: "assets/character_magnate.png" },
-            { id: "legendary", name: "Легенда", price: 500000, img: "assets/character_legendary.png" }
-        ];
+        // Сохраняем начальный выбор, если его еще нет
+        if (!localStorage.getItem("activeCharacter")) {
+            localStorage.setItem("activeCharacter", "clicker");
+            localStorage.setItem("characters", JSON.stringify(state.owned));
+        }
 
         function render() {
             const container = document.getElementById("heroList");
             container.innerHTML = "";
+
             heroes.forEach(h => {
-                let isOwned = state.owned[h.id];
-                let isActive = state.active === h.id;
+                const isOwned = state.owned[h.id];
+                const isActive = state.active === h.id;
+                
                 container.innerHTML += `
                     <div class="card ${isActive ? 'active' : ''}">
                         <img src="${h.img}">
                         <h3>${h.name}</h3>
-                        <p>${isOwned ? 'В коллекции' : h.price.toLocaleString() + ' 🪙'}</p>
-                        <button ${isActive ? 'disabled' : ''} onclick="handle('${h.id}', ${h.price})">
+                        <div class="stats">Урон: +${h.pwr} ${h.cry > 0 ? ' | 💎: +' + h.cry : ''}</div>
+                        <p class="price">${isOwned ? 'В коллекции' : h.price.toLocaleString() + ' 🪙'}</p>
+                        <button ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
                             ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
                         </button>
                     </div>`;
             });
         }
 
-        window.handle = (id, price) => {
+        window.handleAction = (id, price) => {
             if (state.owned[id]) {
+                // Если уже есть — просто выбираем
                 state.active = id;
             } else if (state.coins >= price) {
+                // Если нет — покупаем
                 state.coins -= price;
                 state.owned[id] = true;
                 state.active = id;
             } else {
-                alert("Недостаточно монет!");
+                alert("Недостаточно монет для покупки этого героя! 🪙");
                 return;
             }
+
+            // Сохранение
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("characters", JSON.stringify(state.owned));
             localStorage.setItem("activeCharacter", state.active);
+            
             render();
-        }
+        };
+
         render();
     </script>
-    <a href="index.html" class="back">⬅ НАЗАД В ИГРУ</a>
 </body>
 </html>
