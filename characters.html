@@ -2,206 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Персонажи — Nezya</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Герои</title>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            margin: 0; font-family: 'Segoe UI', sans-serif; color: white; min-height: 100vh;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
-                        url("assets/characters-bg.jpg") center/cover no-repeat fixed;
-            user-select: none;
-        }
-
-        .top {
-            position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: center; gap: 14px;
-            padding: 15px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
-        }
-        .balance {
-            background: rgba(255,255,255,0.1); padding: 10px 18px;
-            border-radius: 20px; font-weight: 900; display: flex; gap: 8px; align-items: center;
-        }
-        .coin { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d); }
-        .crystal { width: 16px; height: 16px; clip-path: polygon(50% 0%, 90% 25%, 70% 100%, 30% 100%, 10% 25%); background: linear-gradient(135deg, #7dd3fc, #38bdf8); }
-
-        h1 { text-align: center; margin: 20px 0; color: #fbbf24; text-transform: uppercase; letter-spacing: 2px; }
-
-        .shop {
-            padding: 20px; display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 20px; max-width: 1000px; margin: 0 auto 100px;
-        }
-
-        .card {
-            background: rgba(255,255,255,0.08); border-radius: 24px; padding: 20px;
-            text-align: center; transition: 0.3s ease; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.12); }
-
-        .common { border-color: #9ca3af; }
-        .rare { border-color: #3b82f6; }
-        .epic { border-color: #a855f7; }
-        .legendary { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
-
-        .card img { width: 120px; height: 120px; object-fit: contain; margin-bottom: 15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
-
-        button {
-            margin-top: 15px; width: 100%; padding: 10px; border-radius: 15px;
-            border: none; font-weight: 900; background: #fbbf24; color: black;
-            cursor: pointer; transition: 0.2s;
-        }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; }
-        button:active:not(:disabled) { transform: scale(0.95); }
-
-        .active { outline: 3px solid #22c55e; animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 rgba(34, 197, 94, 0); }
-            50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
-        }
-
-        .lock { color: #ff6b6b; font-size: 12px; font-weight: bold; margin-top: 8px; }
-
-        .bottom { position: fixed; bottom: 20px; width: 100%; text-align: center; z-index: 100; }
-        .back {
-            background: #fbbf24; padding: 12px 35px; border-radius: 30px;
-            color: black; font-weight: 900; text-decoration: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        body { background: #111; color: white; font-family: sans-serif; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .card { background: #222; padding: 15px; border-radius: 20px; text-align: center; border: 2px solid transparent; }
+        .active { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        img { width: 100px; height: 100px; object-fit: contain; }
+        button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 10px; border: none; background: #fbbf24; font-weight: bold; }
+        .back { display: block; text-align: center; margin-top: 30px; color: gold; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
+    <h2 style="text-align:center; margin-bottom:20px;">ВЫБЕРИ ГЕРОЯ</h2>
+    <div class="grid" id="heroList"></div>
 
-<div class="top">
-    <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-    <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
-</div>
+    <script>
+        let state = {
+            active: localStorage.getItem("activeCharacter") || "default",
+            owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
+            coins: +localStorage.getItem("coins") || 0
+        };
 
-<h1>🧍 Герои</h1>
-<div class="shop" id="list"></div>
+        const heroes = [
+            { id: "default", name: "Новичок", price: 0 },
+            { id: "clicker", name: "Кликер", price: 5000 },
+            { id: "business", name: "Бизнесмен", price: 25000 }
+        ];
 
-<div class="bottom">
-    <a href="index.html" class="back">⬅ В МЕНЮ</a>
-</div>
-
-<script>
-// Тот же конфиг, что и в главном меню для синхронизации пассивного дохода
-const incomeValues = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
-
-let state = {
-    coins: +localStorage.getItem("coins") || 0,
-    crystals: +localStorage.getItem("crystals") || 0,
-    clicks: +localStorage.getItem("clicks") || 0,
-    active: localStorage.getItem("activeCharacter") || "default",
-    owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
-    incomes: JSON.parse(localStorage.getItem("incomes")) || {},
-    upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
-};
-
-const level = Math.floor(state.clicks / 100) + 1;
-
-const characters = [
-    { id: "default", name: "👦 Новичок", img: "assets/player.png", price: 0, curr: "free", rar: "common" },
-    { id: "clicker", name: "⚡ Кликер", img: "assets/character_clicker.png", price: 5000, curr: "coins", rar: "rare" },
-    { id: "business", name: "🏪 Бизнесмен", img: "assets/character_business.png", price: 25000, curr: "coins", rar: "epic" },
-    { id: "magnate", name: "🏦 Магнат", img: "assets/character_magnate.png", price: 50, curr: "crystals", lvl: 10, rar: "legendary" },
-    { id: "legendary", name: "👑 Легенда", img: "assets/character_legendary.png", price: 100, curr: "crystals", lvl: 25, rar: "legendary" }
-];
-
-function updateBalances() {
-    document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-    document.getElementById("crystals").textContent = state.crystals;
-}
-
-function render() {
-    const list = document.getElementById("list");
-    list.innerHTML = "";
-
-    characters.forEach(c => {
-        const isOwned = state.owned[c.id];
-        const isLocked = c.lvl && level < c.lvl;
-        const isActive = state.active === c.id;
-
-        const card = document.createElement("div");
-        card.className = `card ${c.rar} ${isActive ? "active" : ""}`;
-
-        let priceText = "БЕСПЛАТНО";
-        if (c.curr === "coins") priceText = c.price.toLocaleString() + " 🪙";
-        if (c.curr === "crystals") priceText = c.price + " 💎";
-
-        card.innerHTML = `
-            <img src="${c.img}" alt="${c.name}">
-            <h3>${c.name}</h3>
-            <p>${isOwned ? "Куплено" : priceText}</p>
-            ${isLocked ? `<div class="lock">Нужен ${c.lvl} уровень</div>` : ""}
-        `;
-
-        const btn = document.createElement("button");
-        if (isActive) {
-            btn.textContent = "ВЫБРАН";
-            btn.disabled = true;
-        } else if (isOwned) {
-            btn.textContent = "ВЫБРАТЬ";
-            btn.onclick = () => select(c.id);
-        } else if (isLocked) {
-            btn.textContent = "ЗАБЛОКИРОВАН";
-            btn.disabled = true;
-        } else {
-            btn.textContent = "КУПИТЬ";
-            btn.onclick = () => buy(c);
+        function render() {
+            const container = document.getElementById("heroList");
+            container.innerHTML = "";
+            heroes.forEach(h => {
+                let isOwned = state.owned[h.id];
+                let isActive = state.active === h.id;
+                container.innerHTML += `
+                    <div class="card ${isActive ? 'active' : ''}">
+                        <img src="assets/${h.id}.png" onerror="this.src='https://via.placeholder.com/100'">
+                        <h3>${h.name}</h3>
+                        <p>${isOwned ? 'Куплено' : h.price + ' 🪙'}</p>
+                        <button ${isActive ? 'disabled' : ''} onclick="handle('${h.id}', ${h.price})">
+                            ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
+                        </button>
+                    </div>`;
+            });
         }
 
-        card.appendChild(btn);
-        list.appendChild(card);
-    });
-}
-
-function buy(c) {
-    if (c.curr === "coins" && state.coins < c.price) return;
-    if (c.curr === "crystals" && state.crystals < c.price) return;
-
-    if (c.curr === "coins") state.coins -= c.price;
-    if (c.curr === "crystals") state.crystals -= c.price;
-
-    state.owned[c.id] = true;
-    localStorage.setItem("characters", JSON.stringify(state.owned));
-    select(c.id);
-}
-
-function select(id) {
-    state.active = id;
-    localStorage.setItem("activeCharacter", id);
-    save();
-    render();
-}
-
-function save() {
-    localStorage.setItem("coins", state.coins);
-    localStorage.setItem("crystals", state.crystals);
-    updateBalances();
-}
-
-// Пассивный доход в реальном времени
-setInterval(() => {
-    let sum = 0;
-    for (let key in state.incomes) {
-        sum += (incomeValues[key] || 0) * state.incomes[key];
-    }
-    if (state.upgrades.ultraBoost) sum *= 2;
-    
-    if (sum > 0) {
-        state.coins += sum;
-        updateBalances();
-    }
-}, 1000);
-
-// Сохранение баланса каждые 5 секунд
-setInterval(save, 5000);
-
-updateBalances();
-render();
-</script>
-
+        window.handle = (id, price) => {
+            if (state.owned[id]) {
+                state.active = id;
+            } else if (state.coins >= price) {
+                state.coins -= price;
+                state.owned[id] = true;
+                state.active = id;
+            } else {
+                alert("Недостаточно монет!");
+                return;
+            }
+            localStorage.setItem("coins", state.coins);
+            localStorage.setItem("characters", JSON.stringify(state.owned));
+            localStorage.setItem("activeCharacter", state.active);
+            render();
+        }
+        render();
+    </script>
+    <a href="index.html" class="back">⬅ НАЗАД В ИГРУ</a>
 </body>
 </html>
