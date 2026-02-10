@@ -3,149 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker — Главная</title>
+    <title>Nezya Clicker</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            width: 100vw; height: 100vh;
-            background: #1a1a1a center/cover no-repeat;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden; user-select: none; color: white;
-        }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1; }
-        .top-bar {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; gap: 10px; align-items: center; z-index: 10; width: 90%;
-        }
-        .balances { display: flex; gap: 15px; }
-        .balance {
-            background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px;
-            font-weight: 900; display: flex; gap: 8px; align-items: center;
-        }
-        .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff9c4, #fbc02d); border: 2px solid #f9a825; }
-        .crystal { width: 18px; height: 18px; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); background: linear-gradient(135deg, #7dd3fc, #0284c7); }
-        .level-wrap { width: 100%; max-width: 250px; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 4px; position: relative; }
-        .level-bar { height: 8px; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 6px; width: 0%; transition: width 0.3s ease; }
-        .level-text { text-align: center; font-size: 11px; font-weight: bold; margin-top: 4px; text-transform: uppercase; }
-        .combo { font-weight: 900; color: #4ade80; text-shadow: 0 0 10px rgba(74, 222, 128, 0.5); font-size: 14px; }
-        .game { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 5; }
-        .character-wrap { position: relative; }
-        .character { width: 280px; max-width: 75vw; cursor: pointer; transition: transform 0.1s ease; touch-action: manipulation; }
-        .float-text {
-            position: absolute; color: #fff; font-weight: 900; font-size: 26px;
-            pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 100;
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100px) scale(1.3); opacity: 0; }
-        }
-        .bottom-menu { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; z-index: 10; }
-        .menu-btn { padding: 14px 24px; border-radius: 20px; background: rgba(0,0,0,0.8); color: white; font-weight: bold; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); }
+        body { width: 100vw; height: 100vh; background: #111 center/cover no-repeat; font-family: sans-serif; overflow: hidden; color: white; }
+        .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .balances { display: flex; gap: 15px; margin-bottom: 10px; }
+        .balance { background: rgba(0,0,0,0.7); padding: 8px 15px; border-radius: 20px; display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .coin-icon { color: gold; } .cryst-icon { color: #38bdf8; }
+        .level-wrap { width: 200px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
+        .level-bar { height: 100%; background: gold; width: 0%; transition: 0.3s; }
+        .game { height: 100%; display: flex; align-items: center; justify-content: center; }
+        .character { width: 250px; cursor: pointer; transition: transform 0.1s; }
+        .bottom-menu { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; gap: 15px; }
+        .menu-btn { padding: 12px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; text-decoration: none; border-radius: 15px; font-weight: bold; }
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 24px; animation: float 0.6s forwards; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-100px); } }
     </style>
 </head>
 <body>
-<div class="overlay"></div>
-<div class="top-bar">
-    <div class="balances">
-        <div class="balance"><div class="coin"></div><span id="coins">0</span></div>
-        <div class="balance"><div class="crystal"></div><span id="crystals">0</span></div>
+    <div class="top-bar">
+        <div class="balances">
+            <div class="balance"><span class="coin-icon">🪙</span> <span id="coins">0</span></div>
+            <div class="balance"><span class="cryst-icon">💎</span> <span id="crystals">0</span></div>
+        </div>
+        <div class="level-wrap"><div id="levelBar" class="level-bar"></div></div>
+        <div id="combo" style="margin-top:5px; color:#4ade80">Комбо x1</div>
     </div>
-    <div class="level-wrap">
-        <div class="level-bar" id="levelBar"></div>
-        <div class="level-text">Уровень <span id="level">1</span></div>
+
+    <div class="game">
+        <img id="charImg" class="character" src="assets/player.png" alt="Player">
     </div>
-    <div class="combo" id="combo">Комбо x1</div>
-</div>
-<div class="game">
-    <div class="character-wrap" id="charWrap">
-        <img id="character" class="character" src="assets/player.png">
+
+    <div class="bottom-menu">
+        <a href="shop.html" class="menu-btn">🛒 Магазин</a>
+        <a href="characters.html" class="menu-btn">🧍 Герои</a>
     </div>
-</div>
-<div class="bottom-menu">
-    <a href="shop.html" class="menu-btn">🛒 Магазин</a>
-    <a href="characters.html" class="menu-btn">🧍 Герои</a>
-</div>
 
 <script>
-const characters = {
-    default: { power: 1, crystal: 0 },
-    clicker: { power: 2, crystal: 0 },
-    business: { power: 4, crystal: 1 },
-    magnate: { power: 7, crystal: 2 },
-    legendary: { power: 15, crystal: 5 }
-};
+    // Конфигурация персонажей (сила клика)
+    const charData = {
+        default: { power: 1, crystal: 0, img: "assets/player.png" },
+        clicker: { power: 2, crystal: 0, img: "assets/character_clicker.png" },
+        business: { power: 5, crystal: 1, img: "assets/character_business.png" },
+        magnate: { power: 12, crystal: 2, img: "assets/character_magnate.png" },
+        legendary: { power: 30, crystal: 5, img: "assets/character_legendary.png" }
+    };
 
-const incomeValues = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
+    // Конфигурация доходов (для пассива)
+    const incomeRates = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
 
-let state = {
-    active: localStorage.getItem("activeCharacter") || "default",
-    coins: +localStorage.getItem("coins") || 0,
-    crystals: +localStorage.getItem("crystals") || 0,
-    clicks: +localStorage.getItem("clicks") || 0,
-    incomes: JSON.parse(localStorage.getItem("incomes")) || {},
-    upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
-};
+    let state = {
+        coins: +localStorage.getItem("coins") || 0,
+        crystals: +localStorage.getItem("crystals") || 0,
+        clicks: +localStorage.getItem("clicks") || 0,
+        active: localStorage.getItem("activeCharacter") || "default",
+        incomes: JSON.parse(localStorage.getItem("incomes")) || {},
+        upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
+    };
 
-let combo = 1, lastClick = 0;
-const charImg = document.getElementById("character");
+    let combo = 1, lastClick = 0;
 
-function updateUI() {
-    document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-    document.getElementById("crystals").textContent = state.crystals;
-    document.getElementById("level").textContent = Math.floor(state.clicks / 100) + 1;
-    document.getElementById("levelBar").style.width = (state.clicks % 100) + "%";
-    document.getElementById("combo").textContent = `Комбо x${combo}`;
-}
-
-function getPassiveIncome() {
-    let sum = 0;
-    for (let key in state.incomes) {
-        sum += (incomeValues[key] || 0) * state.incomes[key];
+    function save() {
+        localStorage.setItem("coins", state.coins);
+        localStorage.setItem("crystals", state.crystals);
+        localStorage.setItem("clicks", state.clicks);
     }
-    if (state.upgrades.ultraBoost) sum *= 2;
-    return sum;
-}
 
-charImg.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    charImg.style.transform = "scale(0.95)";
-    setTimeout(() => charImg.style.transform = "scale(1)", 100);
+    function updateUI() {
+        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+        document.getElementById("crystals").textContent = state.crystals;
+        document.getElementById("levelBar").style.width = (state.clicks % 100) + "%";
+        document.getElementById("charImg").src = charData[state.active]?.img || charData.default.img;
+        document.getElementById("combo").textContent = "Комбо x" + combo;
+    }
 
-    const now = Date.now();
-    combo = (now - lastClick < 800) ? Math.min(combo + 1, 20) : 1;
-    lastClick = now;
+    // Клик
+    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
+        const now = Date.now();
+        combo = (now - lastClick < 800) ? Math.min(combo + 1, 20) : 1;
+        lastClick = now;
 
-    const ch = characters[state.active] || characters.default;
-    let gain = ch.power * combo;
-    if (state.upgrades.ultraBoost && Math.random() < 0.2) gain *= 2; // Бонус от апгрейда на клик
+        const currentPos = charData[state.active] || charData.default;
+        let gain = currentPos.power * combo;
+        if (state.upgrades.ultraBoost) gain *= 2;
 
-    state.coins += gain;
-    state.clicks++;
-    state.crystals += ch.crystal;
+        state.coins += gain;
+        state.clicks++;
+        state.crystals += currentPos.crystal;
 
-    if (state.upgrades.crystalClick && Math.random() < (0.05 * state.upgrades.crystalClick)) state.crystals++;
+        // Эффект
+        const t = document.createElement("div");
+        t.className = "float-text";
+        t.style.left = e.clientX + "px"; t.style.top = e.clientY + "px";
+        t.textContent = "+" + gain;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 600);
 
-    const txt = document.createElement("div");
-    txt.className = "float-text";
-    txt.textContent = `+${gain}`;
-    txt.style.left = `${e.clientX}px`; txt.style.top = `${e.clientY}px`;
-    document.body.appendChild(txt);
-    setTimeout(() => txt.remove(), 600);
+        updateUI();
+    });
+
+    // Пассивный доход
+    setInterval(() => {
+        let sum = 0;
+        for (let k in state.incomes) sum += (incomeRates[k] || 0) * state.incomes[k];
+        if (state.upgrades.ultraBoost) sum *= 2;
+        
+        state.coins += sum;
+        updateUI();
+        save();
+    }, 1000);
+
     updateUI();
-});
-
-setInterval(() => {
-    state.coins += getPassiveIncome();
-    updateUI();
-}, 1000);
-
-setInterval(() => {
-    localStorage.setItem("coins", state.coins);
-    localStorage.setItem("crystals", state.crystals);
-    localStorage.setItem("clicks", state.clicks);
-}, 3000);
-
-updateUI();
 </script>
 </body>
 </html>
