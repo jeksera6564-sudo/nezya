@@ -25,102 +25,87 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: -1; }
         
         h1 { 
-            text-align: center; margin: 20px 0 40px; text-transform: uppercase; 
+            text-align: center; margin: 20px 0 10px; text-transform: uppercase; 
             letter-spacing: 5px; color: var(--gold); 
             text-shadow: 0 0 20px rgba(255,214,0,0.4); 
         }
 
+        .balance-display {
+            text-align: center; font-weight: 900; color: var(--gold); margin-bottom: 30px; font-size: 18px;
+        }
+
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
-            gap: 25px; max-width: 1000px; margin: 0 auto; 
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 20px; max-width: 1000px; margin: 0 auto; 
         }
 
-        /* Базовая карточка */
         .card { 
             background: rgba(255,255,255,0.03); 
-            padding: 25px 20px; border-radius: 30px; 
+            padding: 20px 15px; border-radius: 30px; 
             text-align: center; border: 2px solid rgba(255,255,255,0.1); 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            transition: 0.3s;
             backdrop-filter: blur(15px);
             display: flex; flex-direction: column; align-items: center;
-            position: relative; overflow: hidden;
+            position: relative;
         }
 
-        /* Редкости */
-        .rare-common { border-color: var(--common); box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.1); }
-        .rare-rare { border-color: var(--rare); box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.1); }
-        .rare-epic { border-color: var(--epic); box-shadow: inset 0 0 15px rgba(160, 32, 240, 0.1); }
-        .rare-legendary { border-color: var(--legendary); box-shadow: inset 0 0 20px rgba(255, 140, 0, 0.2); }
-        .rare-mythic { border-color: var(--mythic); box-shadow: inset 0 0 20px rgba(255, 77, 77, 0.2); }
+        .rare-common { border-color: var(--common); }
+        .rare-rare { border-color: var(--rare); }
+        .rare-epic { border-color: var(--epic); }
+        .rare-legendary { border-color: var(--legendary); }
+        .rare-mythic { border-color: var(--mythic); }
 
-        /* Анимация парения персонажа */
         .card img { 
-            width: 130px; height: 130px; object-fit: contain; 
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); 
-            margin-bottom: 20px;
+            width: 110px; height: 110px; object-fit: contain; 
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
+            margin-bottom: 15px;
             animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+            50% { transform: translateY(-10px); }
         }
 
-        /* Эффект активного героя */
-        .card.active { 
-            transform: scale(1.05);
-            background: rgba(255, 215, 0, 0.08);
-            border-color: var(--gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-            z-index: 10;
-        }
+        .card.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.05); transform: scale(1.02); }
+        .level-badge { position: absolute; top: 15px; left: 15px; background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 10px; }
 
-        .card.active::before {
-            content: "ВЫБРАН";
-            position: absolute; top: 10px; right: 10px;
-            font-size: 8px; font-weight: 900; background: var(--gold);
-            color: #000; padding: 3px 8px; border-radius: 10px;
-        }
+        .card h3 { font-size: 18px; margin-bottom: 5px; font-weight: 900; }
+        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 10px; min-height: 34px; }
 
-        .card h3 { font-size: 20px; margin-bottom: 8px; font-weight: 900; letter-spacing: 1px; }
-        .card .stats { font-size: 13px; color: #4ade80; margin-bottom: 15px; font-weight: bold; }
+        .actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
-        /* Кнопки в стиле редкости */
         button { 
-            width: 100%; padding: 14px; border-radius: 18px; border: none; 
-            background: #fff; color: #000; font-weight: 900; 
-            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 11px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%; padding: 12px; border-radius: 14px; border: none; 
+            color: #000; font-weight: 900; 
+            cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 10px;
         }
+
+        .btn-upgrade { background: #fff; border: 2px solid #fff; }
+        .btn-upgrade:disabled { background: transparent; color: #444; border-color: #222; }
 
         .btn-common { background: var(--common); }
         .btn-rare { background: var(--rare); }
         .btn-epic { background: var(--epic); color: #fff; }
         .btn-legendary { background: var(--legendary); color: #fff; }
-        .btn-mythic { background: var(--mythic); color: #fff; animation: mythicPulse 2s infinite; }
+        .btn-mythic { background: var(--mythic); color: #fff; }
 
-        @keyframes mythicPulse {
-            0%, 100% { box-shadow: 0 0 5px var(--mythic); }
-            50% { box-shadow: 0 0 20px var(--mythic); }
-        }
-
-        button:active { transform: scale(0.92); }
-        button:disabled { background: #1a1a1a !important; color: #444 !important; cursor: default; box-shadow: none; }
+        button:active { transform: scale(0.95); }
+        button:disabled:not(.btn-upgrade) { background: #1a1a1a !important; color: #555 !important; }
 
         .back-btn { 
-            display: block; text-align: center; margin: 50px auto; 
+            display: block; text-align: center; margin: 40px auto; 
             color: #000; text-decoration: none; font-weight: 900; 
-            background: var(--gold); width: fit-content; padding: 18px 60px; 
-            border-radius: 40px; box-shadow: 0 10px 25px rgba(255,215,0,0.3);
-            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+            background: var(--gold); width: fit-content; padding: 15px 50px; 
+            border-radius: 40px; text-transform: uppercase; transition: 0.3s;
         }
-        .back-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <h1>Ваши Герои</h1>
+    <h1>Персонажи</h1>
+    <div class="balance-display">🪙 <span id="balance">0</span></div>
     
     <div class="grid" id="heroList"></div>
 
@@ -128,42 +113,59 @@
 
     <script>
         const heroes = [
-            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png" },
-            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png" },
-            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png" },
-            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png" },
-            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png" }
+            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png", upPrice: 1000 },
+            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png", upPrice: 5000 },
+            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png", upPrice: 20000 },
+            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png", upPrice: 100000 },
+            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png", upPrice: 500000 }
         ];
 
         let state = {
             active: localStorage.getItem("activeCharacter") || "default",
             owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
+            levels: JSON.parse(localStorage.getItem("heroLevels")) || { default: 1, clicker: 1, business: 1, magnate: 1, legendary: 1 },
             coins: +localStorage.getItem("coins") || 0
         };
+
+        function updateBalance() {
+            document.getElementById("balance").textContent = Math.floor(state.coins).toLocaleString();
+        }
 
         function render() {
             const container = document.getElementById("heroList");
             container.innerHTML = "";
+            updateBalance();
 
             heroes.forEach(h => {
                 const isOwned = state.owned[h.id];
                 const isActive = state.active === h.id;
+                const lvl = state.levels[h.id] || 1;
                 
+                // Расчет стоимости улучшения: Базовая цена * (Уровень ^ 1.5)
+                const currentUpPrice = Math.floor(h.upPrice * Math.pow(lvl, 1.6));
+                const currentPwr = h.pwr * lvl;
+
                 container.innerHTML += `
                     <div class="card ${h.rare} ${isActive ? 'active' : ''}">
-                        <img src="${h.img}" style="animation-delay: ${Math.random()}s">
+                        <div class="level-badge">LVL ${lvl}</div>
+                        <img src="${h.img}">
                         <h3>${h.name}</h3>
-                        <div class="stats">🔥 УРОН: +${h.pwr} ${h.cry > 0 ? '<br>💎 ШАНС: +' + h.cry + '%' : ''}</div>
-                        <p style="font-size: 14px; margin-bottom: 15px; color: ${isOwned ? '#4ade80' : 'var(--gold)'}; font-weight: 900;">
-                            ${isOwned ? 'СОБРАН' : h.price.toLocaleString() + ' 🪙'}
-                        </p>
-                        <button class="${h.btn}" ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
-                            ${isActive ? 'ТЕКУЩИЙ' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
-                        </button>
+                        <div class="stats">🔥 УРОН: +${currentPwr} <br> ${h.cry > 0 ? '💎 ШАНС: +' + h.cry + '%' : ''}</div>
+                        
+                        <div class="actions">
+                            <button class="${h.btn}" ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
+                                ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : h.price.toLocaleString() + ' 🪙')}
+                            </button>
+                            
+                            <button class="btn-upgrade" ${!isOwned ? 'disabled' : ''} onclick="upgradeHero('${h.id}', ${currentUpPrice})">
+                                🆙 ${currentUpPrice.toLocaleString()} 🪙
+                            </button>
+                        </div>
                     </div>`;
             });
         }
 
+        // Логика покупки/выбора
         window.handleAction = (id, price) => {
             if (state.owned[id]) {
                 state.active = id;
@@ -171,17 +173,40 @@
                 state.coins -= price;
                 state.owned[id] = true;
                 state.active = id;
-                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                save();
             } else {
-                alert("Нужно больше золота! 🪙");
-                return;
+                alert("Недостаточно монет! 🪙");
             }
+            render();
+        };
 
+        // Логика УЛУЧШЕНИЯ
+        window.upgradeHero = (id, upPrice) => {
+            if (state.coins >= upPrice) {
+                state.coins -= upPrice;
+                state.levels[id] = (state.levels[id] || 1) + 1;
+                
+                // Визуальный эффект
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                save();
+                render();
+            } else {
+                alert("Недостаточно монет для улучшения! 🪙");
+            }
+        };
+
+        function save() {
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("characters", JSON.stringify(state.owned));
             localStorage.setItem("activeCharacter", state.active);
-            render();
-        };
+            localStorage.setItem("heroLevels", JSON.stringify(state.levels));
+            
+            // Также обновляем общий урон для главного экрана (Power * Level)
+            const activeHero = heroes.find(h => h.id === state.active);
+            const totalPower = activeHero.pwr * state.levels[state.active];
+            localStorage.setItem("clickPower", totalPower);
+        }
 
         render();
     </script>
