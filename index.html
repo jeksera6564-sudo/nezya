@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker — Главная</title>
+    <title>Nezya Clicker — Official</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
@@ -11,62 +11,71 @@
             background: url('assets/bg.jpg') center/cover no-repeat; 
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
-        /* Шапка */
-        .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .balances { display: flex; gap: 15px; margin-bottom: 10px; }
-        .balance { background: rgba(0,0,0,0.85); padding: 8px 18px; border-radius: 25px; display: flex; align-items: center; gap: 8px; font-weight: bold; border: 1px solid #ffd700; }
-        .level-wrap { width: 220px; height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        .level-bar { height: 100%; background: linear-gradient(90deg, #ffd700, #ffae00); width: 0%; transition: 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
 
-        /* Игровое поле */
+        /* Верхняя панель */
+        .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        .balances { display: flex; gap: 12px; margin-bottom: 8px; }
+        .balance { 
+            background: rgba(0,0,0,0.8); padding: 8px 16px; border-radius: 20px; 
+            display: flex; align-items: center; gap: 8px; font-weight: 900; 
+            border: 1px solid #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        .level-wrap { width: 200px; height: 10px; background: rgba(0,0,0,0.5); border-radius: 5px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
+        .level-bar { height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00); width: 0%; transition: 0.3s; }
+
+        /* Игровая зона */
         .game { height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
-        .character { width: 300px; max-width: 85vw; cursor: pointer; transition: transform 0.05s; filter: drop-shadow(0 0 25px rgba(0,0,0,0.6)); }
-        .character:active { transform: scale(0.92); }
+        .character { 
+            width: 280px; max-width: 80vw; cursor: pointer; 
+            transition: transform 0.05s; filter: drop-shadow(0 0 25px rgba(0,0,0,0.6)); 
+            user-select: none; -webkit-user-drag: none;
+        }
+        .character:active { transform: scale(0.95); }
 
         /* Нижнее меню */
-        .bottom-menu { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 12px; padding: 0 15px; }
+        .bottom-menu { 
+            position: absolute; bottom: 25px; width: 100%; 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            gap: 8px; padding: 0 10px; z-index: 20;
+        }
         .menu-btn { 
-            flex: 1; max-width: 120px; padding: 14px 5px; 
             background: rgba(0,0,0,0.9); border: 1px solid #ffd700; 
-            color: white; text-decoration: none; border-radius: 18px; 
-            font-weight: 900; font-size: 11px; text-align: center; text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            color: white; text-decoration: none; border-radius: 12px; 
+            font-weight: bold; font-size: 10px; text-align: center; 
+            padding: 12px 2px; text-transform: uppercase;
         }
 
-        /* Окно БУСТОВ */
+        /* Попап Бустов */
         #boostsOverlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 50px 20px;
-            backdrop-filter: blur(10px);
+            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 40px 20px;
+            backdrop-filter: blur(8px);
         }
-        .boost-item {
-            width: 100%; max-width: 380px; background: rgba(255,255,255,0.05); 
-            margin: 8px 0; padding: 18px; border-radius: 22px; border: 1px solid rgba(255,215,0,0.3);
+        .boost-card {
+            width: 100%; max-width: 360px; background: rgba(255,255,255,0.05); 
+            margin: 10px 0; padding: 15px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.3);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .boost-text h4 { color: #ffd700; font-size: 16px; margin-bottom: 4px; }
-        .boost-text p { font-size: 12px; color: #ccc; }
-        .buy-btn { 
-            background: #ffd700; color: #000; border: none; padding: 10px 16px; 
-            border-radius: 12px; font-weight: 900; cursor: pointer; min-width: 90px;
-        }
-        .buy-btn:disabled { background: #333; color: #777; }
+        .boost-info h4 { color: #ffd700; margin-bottom: 4px; }
+        .boost-info p { font-size: 11px; color: #bbb; }
+        .buy-btn { background: #ffd700; color: #000; border: none; padding: 10px; border-radius: 10px; font-weight: 900; cursor: pointer; }
+        .buy-btn:disabled { background: #444; color: #888; }
+        .close-btn { margin-top: 20px; padding: 10px 30px; border: 1px solid #ffd700; color: #ffd700; border-radius: 15px; font-weight: bold; }
 
-        .close-btn { margin-top: 30px; padding: 10px 40px; border-radius: 20px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold; cursor: pointer; }
-
-        /* Эффект клика */
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 32px; color: #ffd700; text-shadow: 2px 2px 0 #000; animation: float 0.7s ease-out forwards; z-index: 100; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-130px) rotate(10deg); } }
+        /* Анимация клика */
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 30px; color: #ffd700; text-shadow: 2px 2px 0 #000; animation: float 0.6s forwards; z-index: 100; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-120px); } }
     </style>
 </head>
 <body>
+
     <div class="top-bar">
         <div class="balances">
             <div class="balance">🪙 <span id="coins">0</span></div>
             <div class="balance">💎 <span id="crystals">0</span></div>
         </div>
         <div class="level-wrap"><div id="levelBar" class="level-bar"></div></div>
-        <div id="combo" style="margin-top:8px; color:#4ade80; font-weight: 900; text-transform: uppercase; font-size: 12px;">Комбо x1</div>
+        <div id="combo" style="margin-top:5px; color:#4ade80; font-weight: 900; font-size: 12px;">COMBO X1</div>
     </div>
 
     <div class="game">
@@ -75,45 +84,41 @@
 
     <div class="bottom-menu">
         <a href="shop.html" class="menu-btn">🛒 Рынок</a>
+        <a href="fortune.html" class="menu-btn">🎡 Удача</a>
         <a href="#" class="menu-btn" onclick="toggleBoosts(true)">🚀 Бусты</a>
         <a href="characters.html" class="menu-btn">🧍 Герои</a>
     </div>
 
     <div id="boostsOverlay">
-        <h1 style="color: #ffd700; margin-bottom: 25px;">МАГАЗИН БУСТОВ</h1>
-        
-        <div class="boost-item">
-            <div class="boost-text">
-                <h4>🚀 Ультра x2</h4>
-                <p>Удваивает прибыль навсегда</p>
-                <p><b>Цена: 50 💎</b></p>
+        <h2 style="color: #ffd700; margin-bottom: 20px;">УСИЛЕНИЯ</h2>
+        <div class="boost-card">
+            <div class="boost-info">
+                <h4>🚀 Ultra X2</h4>
+                <p>Весь доход умножается на 2</p>
+                <p><b>50 💎</b></p>
             </div>
-            <button class="buy-btn" id="boost-ultra" onclick="buyFeature('ultraBoost', 50)">Купить</button>
+            <button class="buy-btn" id="boost-ultra" onclick="buyBoost('ultraBoost', 50)">Купить</button>
         </div>
-
-        <div class="boost-item">
-            <div class="boost-text">
+        <div class="boost-card">
+            <div class="boost-info">
                 <h4>💎 Магнит</h4>
-                <p>+5% шанс кристалла за клик</p>
-                <p><b>Цена: 30 💎</b></p>
+                <p>+5% шанс кристалла при клике</p>
+                <p><b>30 💎</b></p>
             </div>
-            <button class="buy-btn" id="boost-magnet" onclick="buyFeature('crystalClick', 30)">Купить</button>
+            <button class="buy-btn" id="boost-magnet" onclick="buyBoost('crystalClick', 30)">Купить</button>
         </div>
-
-        <div class="boost-item">
-            <div class="boost-text">
-                <h4>⚡ Авто-Клик</h4>
-                <p>Кликает сам (1 клик/сек)</p>
-                <p><b>Цена: 100 💎</b></p>
+        <div class="boost-card">
+            <div class="boost-info">
+                <h4>🤖 Авто-Бот</h4>
+                <p>Автоматический клик каждую сек.</p>
+                <p><b>100 💎</b></p>
             </div>
-            <button class="buy-btn" id="boost-autoclick" onclick="buyFeature('autoClick', 100)">Купить</button>
+            <button class="buy-btn" id="boost-auto" onclick="buyBoost('autoClick', 100)">Купить</button>
         </div>
-
-        <div class="close-btn" onclick="toggleBoosts(false)">ВЕРНУТЬСЯ В ИГРУ</div>
+        <div class="close-btn" onclick="toggleBoosts(false)">ЗАКРЫТЬ</div>
     </div>
 
 <script>
-    // Конфигурация персонажей и доходов
     const charConf = {
         default: { pwr: 1, cry: 0, img: "assets/character_default.png" },
         clicker: { pwr: 2, cry: 0, img: "assets/character_clicker.png" },
@@ -121,109 +126,95 @@
         magnate: { pwr: 12, cry: 2, img: "assets/character_magnate.png" },
         legendary: { pwr: 30, cry: 5, img: "assets/character_legendary.png" }
     };
+    
     const passiveRates = { lemonade: 3, shop: 30, factory: 300, bank: 3000, corporation: 9000, legendary: 50000 };
     const clickSfx = new Audio('assets/click.mp3');
 
-    // Состояние игры
-    let game = {
+    let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
         clicks: +localStorage.getItem("clicks") || 0,
-        activeID: localStorage.getItem("activeCharacter") || "default",
+        active: localStorage.getItem("activeCharacter") || "default",
         incomes: JSON.parse(localStorage.getItem("incomes")) || {},
         upgrades: JSON.parse(localStorage.getItem("upgrades")) || {}
     };
 
-    let comboCount = 1, lastTime = 0;
+    let combo = 1, lastClick = 0;
 
     function save() {
-        localStorage.setItem("coins", game.coins);
-        localStorage.setItem("crystals", game.crystals);
-        localStorage.setItem("clicks", game.clicks);
-        localStorage.setItem("upgrades", JSON.stringify(game.upgrades));
+        localStorage.setItem("coins", state.coins);
+        localStorage.setItem("crystals", state.crystals);
+        localStorage.setItem("clicks", state.clicks);
+        localStorage.setItem("upgrades", JSON.stringify(state.upgrades));
     }
 
-    function updateDisplay() {
-        document.getElementById("coins").textContent = Math.floor(game.coins).toLocaleString();
-        document.getElementById("crystals").textContent = game.crystals;
-        document.getElementById("levelBar").style.width = (game.clicks % 100) + "%";
-        document.getElementById("charImg").src = charConf[game.activeID]?.img || charConf.default.img;
-        document.getElementById("combo").textContent = "Combo x" + comboCount;
+    function updateUI() {
+        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+        document.getElementById("crystals").textContent = state.crystals;
+        document.getElementById("levelBar").style.width = (state.clicks % 100) + "%";
+        document.getElementById("charImg").src = charConf[state.active]?.img || charConf.default.img;
+        document.getElementById("combo").textContent = "COMBO X" + combo;
 
-        // Кнопки бустов
-        toggleBtn("boost-ultra", game.upgrades.ultraBoost);
-        toggleBtn("boost-magnet", game.upgrades.crystalClick);
-        toggleBtn("boost-autoclick", game.upgrades.autoClick);
-    }
-
-    function toggleBtn(id, isBought) {
-        const b = document.getElementById(id);
-        if(isBought) { b.textContent = "АКТИВНО"; b.disabled = true; }
+        // Состояние кнопок бустов
+        if(state.upgrades.ultraBoost) { document.getElementById("boost-ultra").textContent="OK"; document.getElementById("boost-ultra").disabled=true; }
+        if(state.upgrades.crystalClick) { document.getElementById("boost-magnet").textContent="OK"; document.getElementById("boost-magnet").disabled=true; }
+        if(state.upgrades.autoClick) { document.getElementById("boost-auto").textContent="OK"; document.getElementById("boost-auto").disabled=true; }
     }
 
     function toggleBoosts(show) { document.getElementById("boostsOverlay").style.display = show ? "flex" : "none"; }
 
-    function buyFeature(id, price) {
-        if (game.crystals >= price && !game.upgrades[id]) {
-            game.crystals -= price;
-            game.upgrades[id] = 1;
+    function buyBoost(id, price) {
+        if (state.crystals >= price && !state.upgrades[id]) {
+            state.crystals -= price;
+            state.upgrades[id] = 1;
             save();
-            updateDisplay();
-        } else if (game.crystals < price) { alert("Нужно больше кристаллов! 💎"); }
+            updateUI();
+        } else if (state.crystals < price) { alert("Мало кристаллов! 💎"); }
     }
 
-    // Клик мышкой/пальцем
-    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
-        clickSfx.currentTime = 0; clickSfx.play().catch(()=>{});
-        
-        const now = Date.now();
-        comboCount = (now - lastTime < 800) ? Math.min(comboCount + 1, 20) : 1;
-        lastTime = now;
+    function doClick(x, y) {
+        const hero = charConf[state.active] || charConf.default;
+        let gain = hero.pwr * combo;
+        if (state.upgrades.ultraBoost) gain *= 2;
 
-        processClick(e.clientX, e.clientY);
-    });
+        state.coins += gain;
+        state.clicks++;
+        state.crystals += hero.cry;
+        if (state.upgrades.crystalClick && Math.random() < 0.05) state.crystals++;
 
-    function processClick(x, y) {
-        const hero = charConf[game.activeID] || charConf.default;
-        let val = hero.pwr * comboCount;
-        if (game.upgrades.ultraBoost) val *= 2;
-
-        game.coins += val;
-        game.clicks++;
-        game.crystals += hero.cry;
-
-        if (game.upgrades.crystalClick && Math.random() < 0.05) game.crystals++;
-
-        if(x && y) {
+        if (x && y) {
             const t = document.createElement("div");
             t.className = "float-text";
             t.style.left = x + "px"; t.style.top = y + "px";
-            t.textContent = "+" + val;
+            t.textContent = "+" + gain;
             document.body.appendChild(t);
-            setTimeout(() => t.remove(), 700);
+            setTimeout(() => t.remove(), 600);
         }
-        updateDisplay();
-        save();
+        updateUI();
     }
 
-    // Пассивные процессы
+    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
+        clickSfx.currentTime = 0; clickSfx.play().catch(()=>{});
+        const now = Date.now();
+        combo = (now - lastClick < 800) ? Math.min(combo + 1, 20) : 1;
+        lastClick = now;
+        doClick(e.clientX, e.clientY);
+    });
+
+    // Цикл дохода и авто-клика
     setInterval(() => {
         let pps = 0;
-        for (let k in game.incomes) pps += (passiveRates[k] || 0) * game.incomes[k];
-        if (game.upgrades.ultraBoost) pps *= 2;
-        
-        game.coins += pps;
+        for (let k in state.incomes) pps += (passiveRates[k] || 0) * state.incomes[k];
+        if (state.upgrades.ultraBoost) pps *= 2;
+        state.coins += pps;
 
-        // Логика авто-клика
-        if(game.upgrades.autoClick) {
-            processClick(null, null);
-        }
-        
-        updateDisplay();
+        if (state.upgrades.autoClick) doClick(null, null);
+
         save();
+        updateUI();
     }, 1000);
 
-    updateDisplay();
+    updateUI();
 </script>
 </body>
 </html>
