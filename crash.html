@@ -3,304 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON CRASH — VIP FLIGHT</title>
+    <title>NEON CASINO — VIP EDITION</title>
     <style>
         :root {
-            --neon-green: #39ff14;
-            --neon-red: #ff3131;
+            --gold: #ffd700;
             --neon-blue: #00d2ff;
-            --neon-purple: #bc13fe;
-            --bg: #050505;
+            --neon-purple: #9d00ff;
+            --neon-red: #ff3131;
+            --neon-green: #39ff14;
+            --bg: #020205;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
         
-        body {
-            background: var(--bg); color: white; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; overflow: hidden;
+        body { 
+            background: var(--bg); color: white;
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+            overflow-x: hidden; padding-bottom: 50px;
         }
 
-        /* Экран графика */
-        .crash-canvas {
-            width: 90%; height: 45vh; margin-top: 60px;
-            border: 2px solid rgba(0, 210, 255, 0.2);
-            border-radius: 20px; position: relative;
-            background: radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.1), transparent);
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .balance-top { position: sticky; top: 0; display: flex; gap: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 15px; width: 100%; justify-content: center; backdrop-filter: blur(10px); border-bottom: 1px solid #333; }
+        .bal { background: #111; padding: 8px 15px; border-radius: 12px; border: 1px solid var(--gold); font-weight: 900; min-width: 100px; text-align: center; font-size: 14px; }
+
+        /* --- НАВИГАЦИЯ --- */
+        .game-nav { display: flex; gap: 10px; margin: 20px 0; background: #111; padding: 5px; border-radius: 15px; border: 1px solid #333; }
+        .nav-btn { padding: 10px 20px; border-radius: 10px; border: none; background: transparent; color: #666; font-weight: 900; cursor: pointer; transition: 0.3s; }
+        .nav-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
+
+        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s ease; }
+        .game-section.active { display: flex; }
+
+        /* --- ИГРОВАЯ ЗОНА CRASH --- */
+        .crash-area {
+            width: 92%; max-width: 400px; height: 320px; 
+            background: radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.15), transparent);
+            border: 2px solid rgba(0, 210, 255, 0.3); border-radius: 24px;
+            position: relative; overflow: hidden; margin-bottom: 20px;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden; box-shadow: inset 0 0 50px rgba(0, 210, 255, 0.05);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
         }
 
+        /* Ракета */
         #rocket {
-            position: absolute; bottom: 10%; left: 10%;
-            font-size: 50px; z-index: 5;
-            transition: transform 0.1s linear; display: none;
-            filter: drop-shadow(0 0 15px var(--neon-blue));
+            position: absolute; bottom: 10%; left: 10%; font-size: 45px; z-index: 5;
+            display: none; filter: drop-shadow(0 0 15px var(--neon-blue));
+            transform-origin: center;
         }
 
-        #multiplier {
-            font-size: 80px; font-weight: 900; z-index: 10;
-            text-shadow: 0 0 30px var(--neon-blue); transition: 0.1s;
-            pointer-events: none;
-        }
+        #multText { font-size: 65px; font-weight: 900; z-index: 10; text-shadow: 0 0 25px var(--neon-blue); transition: 0.1s; pointer-events: none; }
 
-        /* Магазин Бустов */
-        .shop-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 100;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-        .shop-card {
-            background: #111; border: 2px solid var(--neon-purple);
-            padding: 30px; border-radius: 20px; width: 85%; max-width: 400px;
-            text-align: center;
-        }
-        .boost-item {
-            background: rgba(255,255,255,0.05); border: 1px solid #333;
-            padding: 15px; border-radius: 12px; margin: 10px 0;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: 0.3s;
-        }
+        /* --- МАГАЗИН БУСТОВ (MODAL) --- */
+        .shop-btn { background: var(--neon-purple); color: white; border: none; padding: 12px 20px; border-radius: 14px; margin-bottom: 15px; cursor: pointer; font-weight: 900; box-shadow: 0 0 10px var(--neon-purple); }
+        .shop-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        .shop-card { background: #0a0a0c; border: 2px solid var(--neon-purple); padding: 30px; border-radius: 25px; width: 85%; max-width: 380px; text-align: center; }
+        .boost-item { background: #151518; padding: 18px; border-radius: 15px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
         .boost-item.active { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); }
-        .boost-btn {
-            background: var(--neon-purple); border: none; padding: 8px 12px;
-            border-radius: 8px; color: white; font-weight: bold; cursor: pointer;
-        }
 
-        /* Кнопка открытия шопа */
-        .open-shop {
-            position: absolute; right: 20px; top: 20px;
-            background: var(--neon-purple); border: none; padding: 10px;
-            border-radius: 10px; color: white; cursor: pointer; font-size: 14px;
-        }
+        /* --- КНОПКИ УПРАВЛЕНИЯ --- */
+        .main-btn { width: 260px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 20px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-crash { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+        .btn-cashout { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); animation: pulse 1s infinite; }
 
-        .explosion { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+
+        /* --- ЭФФЕКТЫ --- */
+        .explosion { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
         }
+        .boom { color: var(--neon-red) !important; text-shadow: 0 0 35px var(--neon-red) !important; }
 
-        .stats { position: absolute; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 5px; }
-        .stat-box { background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 10px; border: 1px solid var(--neon-blue); font-size: 14px; }
-
-        .controls { width: 100%; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .bet-input { background: #111; border: 2px solid var(--neon-blue); color: white; padding: 12px; border-radius: 10px; width: 180px; text-align: center; font-size: 20px; outline: none; }
-        
-        .main-btn { width: 250px; padding: 18px; border-radius: 50px; border: none; font-size: 22px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .btn-start { background: var(--neon-blue); box-shadow: 0 0 20px var(--neon-blue); }
-        .btn-cashout { background: var(--neon-green); box-shadow: 0 0 20px var(--neon-green); }
-        
-        .history { display: flex; gap: 8px; margin-top: 15px; overflow-x: auto; width: 90%; padding: 10px; scrollbar-width: none; }
-        .history-item { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; background: rgba(255,255,255,0.05); flex-shrink: 0; }
-        .boom { color: var(--neon-red) !important; text-shadow: 0 0 30px var(--neon-red) !important; }
-        
-        .active-boosts-bar { display: flex; gap: 10px; margin-top: 5px; }
-        .mini-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #333; }
+        input { background: #111; border: 2px solid #333; color: white; padding: 12px; border-radius: 12px; width: 200px; text-align: center; font-size: 22px; margin-bottom: 20px; outline: none; }
+        input:focus { border-color: var(--neon-blue); }
     </style>
 </head>
 <body>
 
-    <button class="open-shop" onclick="toggleShop(true)">🛒 БУСТЫ</button>
-
-    <div class="stats">
-        <div class="stat-box">🪙 <span id="coins">0</span></div>
-        <div class="stat-box" style="border-color: var(--neon-purple);">💎 <span id="crys">0</span></div>
-        <div class="active-boosts-bar" id="activeBoosts"></div>
-    </div>
-
     <div class="shop-overlay" id="shop">
         <div class="shop-card">
-            <h2 style="color: var(--neon-purple); margin-bottom: 20px;">UPGRADES</h2>
-            
-            <div class="boost-item" id="item-shield">
-                <div style="text-align: left;">
-                    <b>🛡️ Страховка</b><br><small>Вернет 50% при взрыве</small>
-                </div>
-                <button class="boost-btn" onclick="buyBoost('shield', 500)">500 💎</button>
+            <h2 style="color: var(--neon-purple); margin-bottom: 20px;">УСИЛЕНИЯ</h2>
+            <div class="boost-item" id="boost-shield">
+                <div style="text-align: left;">🛡️ <b>Страховка</b><br><small style="color: #888;">Вернет 50% при взрыве</small></div>
+                <button onclick="buyBoost('shield', 500)" style="background:var(--neon-purple); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight: bold; cursor:pointer;">500 💎</button>
             </div>
-
-            <div class="boost-item" id="item-fast">
-                <div style="text-align: left;">
-                    <b>🚀 Форсаж</b><br><small>Рост x2 быстрее</small>
-                </div>
-                <button class="boost-btn" onclick="buyBoost('fast', 1000)">1000 💎</button>
-            </div>
-
-            <button class="main-btn btn-start" style="width: 100%; margin-top: 20px; font-size: 16px;" onclick="toggleShop(false)">ЗАКРЫТЬ</button>
+            <p style="font-size: 11px; color: #555; margin-bottom: 20px;">Буст действует только на один следующий раунд</p>
+            <button class="main-btn" style="background: #222; color: white; width: 100%; font-size: 16px;" onclick="document.getElementById('shop').style.display='none'">ЗАКРЫТЬ</button>
         </div>
     </div>
 
-    <div class="crash-canvas" id="canvas">
-        <div id="rocket">🚀</div>
-        <div id="multiplier">1.00x</div>
+    <div class="balance-top">
+        <div class="bal" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
+        <div class="bal" style="border-color: var(--neon-purple);">💎 <span id="crys">0</span></div>
     </div>
 
-    <div class="history" id="history"></div>
-
-    <div class="controls">
-        <input type="number" id="betAmount" class="bet-input" value="1000" step="1000">
-        <button id="mainBtn" class="main-btn btn-start" onclick="action()">СТАВКА</button>
-        <a href="index.html" style="color: #555; text-decoration: none; font-size: 14px;">ВЕРНУТЬСЯ</a>
+    <div class="game-nav">
+        <button id="nav-fortune" class="nav-btn" onclick="location.href='fortune.html'">КОЛЕСО</button>
+        <button id="nav-crash" class="nav-btn active">CRASH 🚀</button>
     </div>
+
+    <div id="section-crash" class="game-section active">
+        <button class="shop-btn" onclick="document.getElementById('shop').style.display='flex'">🛒 КУПИТЬ БУСТЫ</button>
+        
+        <div class="crash-area" id="canvas">
+            <div id="rocket">🚀</div>
+            <div id="multText">1.00x</div>
+        </div>
+
+        <input type="number" id="betAmount" value="1000" step="1000">
+        <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">ПОСТАВИТЬ</button>
+        
+        <div id="statusInfo" style="margin-top: 15px; font-weight: bold; min-height: 20px;"></div>
+    </div>
+
+    <a href="index.html" style="margin-top: 25px; color: #444; text-decoration: none; font-size: 13px;">← НАЗАД В ИГРУ</a>
 
 <script>
+    // Загрузка состояния из твоего проекта
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crys: +localStorage.getItem("crystals") || 0,
-        boosts: { shield: false, fast: false }
+        boostShield: false
     };
 
-    let currentMultiplier = 1.0;
     let isFlying = false;
-    let gameInterval;
-    let crashPoint;
-
-    const rocket = document.getElementById("rocket");
-    const multDisplay = document.getElementById("multiplier");
-    const mainBtn = document.getElementById("mainBtn");
+    let crashInt;
+    let currentMult = 1.0;
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crys").textContent = state.crys.toLocaleString();
         
-        // Обновление плашек бустов
-        const bar = document.getElementById("activeBoosts");
-        bar.innerHTML = "";
-        if(state.boosts.shield) bar.innerHTML += `<span class="mini-badge" style="color:var(--neon-green)">🛡️ SHIELD</span>`;
-        if(state.boosts.fast) bar.innerHTML += `<span class="mini-badge" style="color:var(--neon-blue)">🚀 FAST</span>`;
-    }
-
-    function toggleShop(show) {
-        document.getElementById("shop").style.display = show ? "flex" : "none";
+        const status = document.getElementById("statusInfo");
+        if(state.boostShield) {
+            status.innerHTML = "<span style='color: var(--neon-green)'>🛡️ СТРАХОВКА АКТИВИРОВАНА</span>";
+        } else {
+            status.innerHTML = "";
+        }
     }
 
     function buyBoost(type, price) {
-        if (state.crys < price) return alert("Недостаточно кристаллов!");
-        if (state.boosts[type]) return alert("Уже активно!");
+        if(state.crys < price) return alert("Мало кристаллов!");
+        if(state.boostShield) return alert("Буст уже активен!");
         
         state.crys -= price;
-        state.boosts[type] = true;
+        state.boostShield = true;
         localStorage.setItem("crystals", state.crys);
-        document.getElementById(`item-${type}`).classList.add('active');
         updateUI();
+        document.getElementById('shop').style.display = 'none';
     }
 
-    function action() {
-        if (!isFlying) startRound();
-        else cashOut();
-    }
+    function crashAction() {
+        const btn = document.getElementById("crashBtn");
+        const rocket = document.getElementById("rocket");
+        const canvas = document.getElementById("canvas");
+        const text = document.getElementById("multText");
 
-    function startRound() {
-        const bet = +document.getElementById("betAmount").value;
-        if (bet > state.coins || bet <= 0) return alert("Недостаточно монет!");
-
-        state.coins -= bet;
-        saveCoins();
-
-        isFlying = true;
-        currentMultiplier = 1.0;
-        mainBtn.textContent = "ЗАБРАТЬ";
-        mainBtn.className = "main-btn btn-cashout";
-        multDisplay.classList.remove("boom");
-        document.getElementById("canvas").classList.remove("explosion");
-        
-        rocket.style.display = "block";
-        rocket.style.transition = "none";
-        
-        crashPoint = generateCrashPoint();
-
-        gameInterval = setInterval(() => {
-            // Если включен форсаж, растет быстрее
-            let step = state.boosts.fast ? 0.03 : 0.015;
-            currentMultiplier += step * (currentMultiplier / 1.5);
+        if(!isFlying) {
+            // СТАРТ ИГРЫ
+            const bet = +document.getElementById("betAmount").value;
+            if(bet > state.coins || bet <= 0) return alert("Недостаточно монет!");
             
-            multDisplay.textContent = currentMultiplier.toFixed(2) + "x";
-
-            // Движение ракеты "плавающее" (вверх-вниз немного)
-            let floatEffect = Math.sin(Date.now() / 200) * 2;
-            let moveX = Math.min(10 + (currentMultiplier * 5), 80);
-            let moveY = Math.min(10 + (currentMultiplier * 7), 75) + floatEffect;
+            state.coins -= bet;
+            localStorage.setItem("coins", state.coins);
+            updateUI();
             
-            rocket.style.left = moveX + "%";
-            rocket.style.bottom = moveY + "%";
-            rocket.style.transform = `rotate(${45 + floatEffect}deg)`;
-
-            if (currentMultiplier >= crashPoint) gameOver(bet);
-        }, 80);
-    }
-
-    function generateCrashPoint() {
-        const r = Math.random();
-        if (r < 0.1) return 1.1; 
-        return Math.max(1.1, (1 / (1 - Math.random())).toFixed(2));
-    }
-
-    function cashOut() {
-        if (!isFlying) return;
-        const bet = +document.getElementById("betAmount").value;
-        const win = Math.floor(bet * currentMultiplier);
-        state.coins += win;
-        
-        rocket.style.transition = "all 0.8s ease-in";
-        rocket.style.left = "130%";
-        rocket.style.bottom = "130%";
-        
-        stopGame("win");
-        setTimeout(() => rocket.style.display = "none", 800);
-    }
-
-    function gameOver(bet) {
-        document.getElementById("canvas").classList.add("explosion");
-        rocket.textContent = "💥";
-        
-        // Логика страховки
-        if (state.boosts.shield) {
-            const refund = Math.floor(bet * 0.5);
-            state.coins += refund;
-            alert(`🛡️ Страховка сработала! Возвращено ${refund} 🪙`);
-        }
-
-        setTimeout(() => {
-            rocket.style.display = "none";
+            isFlying = true;
+            currentMult = 1.0;
+            
+            btn.textContent = "ЗАБРАТЬ";
+            btn.className = "main-btn btn-cashout";
+            text.classList.remove("boom");
+            canvas.classList.remove("explosion");
+            
+            rocket.style.display = "block";
             rocket.textContent = "🚀";
-        }, 600);
+            rocket.style.transition = "none";
+            
+            // Логика взрыва (шанс)
+            let boomPoint = 1.0 + (Math.random() * Math.random() * 10);
+            if(Math.random() < 0.05) boomPoint = 1.0; // Мгновенный краш 5%
 
-        stopGame("lose");
-        multDisplay.classList.add("boom");
-        multDisplay.textContent = "BOOM! " + currentMultiplier.toFixed(2) + "x";
+            crashInt = setInterval(() => {
+                currentMult += 0.01 + (currentMult/100);
+                text.textContent = currentMult.toFixed(2) + "x";
+                
+                // Двигаем ракету (вверх и вправо)
+                let x = Math.min(10 + (currentMult * 5), 85);
+                let y = Math.min(10 + (currentMult * 7), 75);
+                let rotate = 45 - (Math.sin(Date.now()/200) * 5); // Покачивание
+                
+                rocket.style.left = x + "%";
+                rocket.style.bottom = y + "%";
+                rocket.style.transform = `rotate(${rotate}deg)`;
+
+                if(currentMult >= boomPoint) {
+                    // КРАШ (ПРОИГРЫШ)
+                    clearInterval(crashInt);
+                    isFlying = false;
+                    text.classList.add("boom");
+                    text.textContent = "BOOM!";
+                    canvas.classList.add("explosion");
+                    rocket.textContent = "💥";
+                    rocket.style.transform = "scale(2)";
+                    
+                    if(state.boostShield) {
+                        const refund = Math.floor(bet * 0.5);
+                        state.coins += refund;
+                        localStorage.setItem("coins", state.coins);
+                        alert("🛡️ Страховка спасла! Возвращено " + refund + " 🪙");
+                    }
+                    
+                    state.boostShield = false; // Сброс буста
+                    setTimeout(() => {
+                        rocket.style.display = "none";
+                        btn.textContent = "ПОСТАВИТЬ";
+                        btn.className = "main-btn btn-crash";
+                        updateUI();
+                    }, 1500);
+                }
+            }, 60);
+
+        } else {
+            // ЗАБРАТЬ ВЫИГРЫШ
+            clearInterval(crashInt);
+            isFlying = false;
+            const bet = +document.getElementById("betAmount").value;
+            const win = Math.floor(bet * currentMult);
+            
+            state.coins += win;
+            localStorage.setItem("coins", state.coins);
+            state.boostShield = false; // Сброс буста
+            
+            // Эффект улета в космос
+            rocket.style.transition = "all 0.6s ease-in";
+            rocket.style.left = "150%"; rocket.style.bottom = "150%";
+            
+            updateUI();
+            
+            setTimeout(() => {
+                rocket.style.display = "none";
+                btn.textContent = "ПОСТАВИТЬ";
+                btn.className = "main-btn btn-crash";
+            }, 600);
+        }
     }
 
-    function stopGame(result) {
-        isFlying = false;
-        clearInterval(gameInterval);
-        mainBtn.textContent = "СТАВКА";
-        mainBtn.className = "main-btn btn-start";
-        
-        // Сброс временных бустов после раунда
-        state.boosts.shield = false;
-        state.boosts.fast = false;
-        document.querySelectorAll('.boost-item').forEach(el => el.classList.remove('active'));
-        
-        addHistory(currentMultiplier.toFixed(2), result);
-        saveCoins();
-    }
-
-    function saveCoins() {
-        localStorage.setItem("coins", state.coins);
-        updateUI();
-    }
-
-    function addHistory(val, res) {
-        const hist = document.getElementById("history");
-        const item = document.createElement("div");
-        item.className = "history-item";
-        item.style.color = res === "win" ? "var(--neon-green)" : "var(--neon-red)";
-        item.textContent = val + "x";
-        hist.prepend(item);
-        if (hist.children.length > 15) hist.lastChild.remove();
-    }
-
+    // Инициализация
     updateUI();
 </script>
 </body>
