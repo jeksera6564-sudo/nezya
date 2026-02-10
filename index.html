@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker v1.1.2 — Full Build</title>
+    <title>Nezya Clicker v1.1.2</title>
     <style>
         :root {
             --gold: #ffd700;
             --neon-blue: #00d2ff;
-            --glass: rgba(255, 255, 255, 0.1);
             --purple: #a020f0;
+            --glass: rgba(255, 255, 255, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -20,52 +20,64 @@
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
 
-        /* Баланс */
+        /* Интерфейс баланса */
         .top-bar { position: absolute; top: 20px; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
         .balance-container { 
             display: flex; gap: 15px; background: rgba(0,0,0,0.8); 
             padding: 10px 20px; border-radius: 25px; border: 1px solid var(--gold);
             pointer-events: auto; backdrop-filter: blur(10px);
         }
+        .bal-item { font-weight: 900; font-size: 16px; }
 
-        /* Персонаж и Игра */
+        /* Игровая зона */
         .game { height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
+        
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+        
         .character { 
-            width: 270px; max-width: 75vw; cursor: pointer; z-index: 50; position: relative; pointer-events: auto;
+            width: 270px; max-width: 75vw; cursor: pointer; 
+            z-index: 50; position: relative; pointer-events: auto;
             filter: drop-shadow(0 0 20px rgba(0,0,0,0.6));
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: idleBreath 3s ease-in-out infinite;
+            -webkit-user-drag: none;
         }
+
         @keyframes idleBreath {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.02); }
+            50% { transform: translateY(-15px) scale(1.03); }
         }
-        .character.pressed { transform: scale(0.85) translateY(5px) !important; }
 
-        /* Меню боковое */
+        /* Эффект сжатия при нажатии */
+        .character:active { 
+            transform: scale(0.85) translateY(10px) !important; 
+            transition: transform 0.05s;
+        }
+
+        #displayNickname { margin-top: 15px; font-weight: 900; letter-spacing: 2px; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); z-index: 60; }
+
+        /* Боковое меню */
         .side-menu { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 200; }
         .side-btn { width: 52px; height: 52px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; text-decoration: none; color: white; }
         .side-btn.online-btn { border-color: var(--purple); box-shadow: 0 0 10px rgba(160, 32, 240, 0.4); }
 
-        /* Меню нижнее */
+        /* Нижнее меню */
         .bottom-menu { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 10px; padding: 0 15px; z-index: 200; }
-        .bottom-btn { flex: 1; max-width: 100px; height: 60px; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; font-weight: 900; }
+        .bottom-btn { flex: 1; max-width: 100px; height: 60px; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; font-weight: 900; text-transform: uppercase; }
 
-        /* Всплывающие модалки */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(20px); text-align: center; }
-        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; max-height: 70vh; }
-        .close-btn { margin-top: 30px; padding: 15px 80px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; }
+        /* Всплывающие числа */
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 42px; color: var(--gold); text-shadow: 0 0 10px #000; animation: float 0.7s ease-out forwards; z-index: 500; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-200px); } }
 
-        /* Стили для Онлайн окна */
-        .online-status { font-size: 18px; color: var(--purple); margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .loader { width: 50px; height: 50px; border: 5px solid var(--glass); border-top-color: var(--purple); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
+        /* Модальные окна */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(20px); }
+        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; max-height: 60vh; margin: 20px 0; }
         .card { width: 100%; background: var(--glass); padding: 15px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 40px; color: var(--gold); animation: float 0.7s ease-out forwards; z-index: 500; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-180px); } }
+        .close-btn { padding: 15px 80px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; }
+        
+        /* Анимация Онлайн */
+        .loader { width: 50px; height: 50px; border: 5px solid var(--glass); border-top-color: var(--purple); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -86,10 +98,10 @@
 
     <div class="game">
         <div class="char-container">
-            <div id="auraGold" class="aura aura-gold" style="position: absolute; width: 380px; height: 380px; border-radius: 50%; z-index: 1; opacity: 0; filter: blur(65px); pointer-events: none;"></div>
-            <img id="charImg" class="character" src="assets/character_default.png" alt="Hero">
+            <div id="auraGold" style="position: absolute; width: 350px; height: 350px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); filter: blur(50px); opacity: 0; pointer-events: none;"></div>
+            <img id="charImg" class="character" src="" alt="Hero">
         </div>
-        <div id="displayNickname" style="margin-top:15px; color:var(--gold); font-weight:900;">ИГРОК</div>
+        <div id="displayNickname">ИГРОК</div>
     </div>
 
     <div class="bottom-menu">
@@ -100,69 +112,99 @@
 
     <div id="onlineModal" class="modal">
         <div class="loader"></div>
-        <h2 style="color:var(--purple); margin-top:20px;">ОНЛАЙН РЕЖИМ</h2>
-        <p class="online-status">В разработке...</p>
-        <p style="color:#777; margin-top:10px; font-size:14px;">Скоро: PvP битвы и кланы</p>
+        <h2 style="color:var(--purple); margin-top:20px;">ОНЛАЙН</h2>
+        <p style="margin: 10px 0;">В разработке...</p>
         <div class="close-btn" onclick="closeModal()">НАЗАД</div>
     </div>
 
     <div id="statModal" class="modal">
         <h2>СТАТИСТИКА</h2>
         <div class="modal-body">
-            <div class="card"><span>Кликов:</span><b id="s-clicks">0</b></div>
-            <div class="card"><span>Всего монет:</span><b id="s-total">0</b></div>
+            <div class="card"><span>Клики</span><b id="s-clicks">0</b></div>
+            <div class="card"><span>Всего добыто</span><b id="s-total">0</b></div>
         </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
     <div id="effModal" class="modal">
         <h2>ЭФФЕКТЫ</h2>
-        <div class="modal-body" id="effList"></div>
+        <div class="modal-body" id="effList">
+            </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
 <script>
-    // Базовые данные и состояние
+    // Конфигурация героев (убедись, что пути к картинкам верные!)
+    const heroes = {
+        default: { pwr: 1, img: "assets/character_default.png" },
+        clicker: { pwr: 5, img: "assets/character_clicker.png" },
+        business: { pwr: 25, img: "assets/character_business.png" }
+    };
+
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
         clicks: +localStorage.getItem("stat_clicks") || 0,
         earned: +localStorage.getItem("stat_earned") || 0,
+        active: localStorage.getItem("activeCharacter") || "default",
         name: localStorage.getItem("userName") || "Nezya Player",
-        effects: JSON.parse(localStorage.getItem("activeEffects")) || {}
+        effects: JSON.parse(localStorage.getItem("activeEffects")) || {},
+        vibrate: localStorage.getItem("set_vibrate") !== "false"
     };
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals.toLocaleString();
         document.getElementById("displayNickname").textContent = state.name;
+        
+        // ИСПРАВЛЕНО: Смена иконки персонажа
+        const hero = heroes[state.active] || heroes.default;
+        document.getElementById("charImg").src = hero.img;
+
+        // Статистика
         document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
         document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
+        
+        // Ауры
+        document.getElementById("auraGold").style.opacity = state.effects.gold ? "0.6" : "0";
     }
 
-    // Логика клика
+    // ИСПРАВЛЕНО: Клик и Эффект нажатия
     const charEl = document.getElementById("charImg");
     charEl.addEventListener("pointerdown", (e) => {
-        charEl.classList.add("pressed");
-        state.coins += 5; state.earned += 5; state.clicks++;
+        const hero = heroes[state.active] || heroes.default;
         
+        state.coins += hero.pwr;
+        state.earned += hero.pwr;
+        state.clicks++;
+
+        // Вибрация
+        if (state.vibrate && navigator.vibrate) navigator.vibrate(10);
+
+        // Всплывающее число
         const t = document.createElement("div");
         t.className = "float-text";
-        t.style.left = e.clientX + "px"; t.style.top = e.clientY + "px";
-        t.textContent = "+5";
+        t.style.left = e.clientX + "px";
+        t.style.top = e.clientY + "px";
+        t.textContent = `+${hero.pwr}`;
         document.body.appendChild(t);
         setTimeout(() => t.remove(), 600);
-        
+
         updateUI();
+        save();
+    });
+
+    function save() {
         localStorage.setItem("coins", state.coins);
         localStorage.setItem("stat_clicks", state.clicks);
         localStorage.setItem("stat_earned", state.earned);
-    });
-    window.addEventListener("pointerup", () => charEl.classList.remove("pressed"));
+        localStorage.setItem("activeCharacter", state.active);
+    }
 
     function openModal(id) { document.getElementById(id).style.display = "flex"; }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
 
+    // Авто-загрузка при старте
     updateUI();
 </script>
 </body>
