@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Настройки — Nezya Clicker</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --neon-blue: #00d2ff;
+            --red: #ff4d4d;
+            --glass: rgba(255, 255, 255, 0.07);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            width: 100vw; min-height: 100vh; 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            font-family: 'Segoe UI', sans-serif; color: white; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .container { width: 100%; max-width: 400px; padding-bottom: 40px; }
+
+        h1 { text-align: center; color: var(--gold); margin: 20px 0 30px; letter-spacing: 3px; text-shadow: 0 0 15px rgba(255,215,0,0.4); }
+
+        .section {
+            background: var(--glass); border-radius: 20px; padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        .section-title { font-size: 11px; color: var(--neon-blue); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px; font-weight: 900; }
+
+        /* Профиль */
+        .profile-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .avatar-preview { 
+            width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); 
+            background: #000; display: flex; align-items: center; justify-content: center; font-size: 24px;
+        }
+        input[type="text"] {
+            flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3);
+            padding: 12px; border-radius: 12px; color: white; font-weight: bold; outline: none; transition: 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+
+        /* Переключатели */
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .row:last-child { margin-bottom: 0; }
+        .row span { font-size: 15px; font-weight: 500; }
+
+        .switch { position: relative; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; inset: 0; background-color: #333;
+            transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--gold); }
+        input:checked + .slider:before { transform: translateX(24px); background-color: #000; }
+
+        /* Кнопки */
+        .btn {
+            width: 100%; padding: 16px; border-radius: 16px; border: none;
+            font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s;
+            margin-top: 10px; font-size: 13px; letter-spacing: 1px;
+        }
+        .btn-save { background: var(--gold); color: #000; box-shadow: 0 5px 15px rgba(255,215,0,0.2); }
+        .btn-back { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--red); border: 1px solid var(--red); margin-top: 30px; }
+
+        .btn:active { transform: scale(0.96); }
+
+        /* Инфо */
+        .info-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; line-height: 1.6; }
+        .info-footer b { color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>НАСТРОЙКИ</h1>
+
+        <div class="section">
+            <p class="section-title">Профиль игрока</p>
+            <div class="profile-box">
+                <div class="avatar-preview" id="avatarIcon">👤</div>
+                <input type="text" id="userName" placeholder="Твой никнейм" maxlength="12">
+            </div>
+        </div>
+
+        <div class="section">
+            <p class="section-title">Система и Звук</p>
+            <div class="row">
+                <span>Звуковые эффекты</span>
+                <label class="switch">
+                    <input type="checkbox" id="setSound" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="row">
+                <span>Вибрация клика</span>
+                <label class="switch">
+                    <input type="checkbox" id="setVibrate" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="row">
+                <span>Экономный режим</span>
+                <label class="switch">
+                    <input type="checkbox" id="setEco">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <button class="btn btn-save" onclick="saveAll()">Сохранить настройки</button>
+        <button class="btn btn-back" onclick="location.href='index.html'">Назад в игру</button>
+        
+        <button class="btn btn-danger" onclick="resetData()">Сбросить прогресс</button>
+
+        <div class="info-footer">
+            Версия игры: <b>1.1.2</b><br>
+            Разработчик: <b>Nezya</b>
+        </div>
+    </div>
+
+<script>
+    // Загрузка данных при открытии
+    window.onload = function() {
+        document.getElementById("userName").value = localStorage.getItem("userName") || "Nezya Player";
+        document.getElementById("setSound").checked = localStorage.getItem("set_sound") !== "false";
+        document.getElementById("setVibrate").checked = localStorage.getItem("set_vibrate") !== "false";
+        document.getElementById("setEco").checked = localStorage.getItem("set_eco") === "true";
+        
+        updateAvatar();
+    };
+
+    // Обновление иконки (простая логика первой буквы)
+    document.getElementById("userName").oninput = updateAvatar;
+    function updateAvatar() {
+        const name = document.getElementById("userName").value;
+        const icon = document.getElementById("avatarIcon");
+        icon.textContent = name ? name.charAt(0).toUpperCase() : "👤";
+    }
+
+    function saveAll() {
+        const name = document.getElementById("userName").value.trim() || "Nezya Player";
+        const sound = document.getElementById("setSound").checked;
+        const vibrate = document.getElementById("setVibrate").checked;
+        const eco = document.getElementById("setEco").checked;
+
+        localStorage.setItem("userName", name);
+        localStorage.setItem("set_sound", sound);
+        localStorage.setItem("set_vibrate", vibrate);
+        localStorage.setItem("set_eco", eco);
+
+        // Маленький визуальный фидбек
+        const btn = document.querySelector(".btn-save");
+        btn.textContent = "СОХРАНЕНО! ✓";
+        btn.style.background = "#4ae38d";
+        setTimeout(() => {
+            btn.textContent = "Сохранить настройки";
+            btn.style.background = "var(--gold)";
+        }, 1500);
+    }
+
+    function resetData() {
+        const check1 = confirm("Ты уверен, что хочешь СБРОСИТЬ всё? Монеты, герои и кристаллы исчезнут!");
+        if (check1) {
+            const check2 = prompt("Напиши слово 'УДАЛИТЬ' для подтверждения:");
+            if (check2 === "УДАЛИТЬ" || check2 === "удалить") {
+                localStorage.clear();
+                alert("Данные успешно удалены. Перезапуск...");
+                location.href = "index.html";
+            } else {
+                alert("Сброс отменен.");
+            }
+        }
+    }
+</script>
+</body>
+</html>
