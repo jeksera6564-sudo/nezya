@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker v1.1.2 — Full & Fixed</title>
+    <title>Nezya Clicker Gold Edition</title>
     <style>
         :root {
             --gold: #ffd700;
@@ -12,71 +12,88 @@
             --glass: rgba(255, 255, 255, 0.1);
         }
 
+        /* Базовые настройки */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        
         body { 
             width: 100vw; height: 100vh; 
             background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
 
-        /* Баланс */
+        /* Баланс сверху */
         .top-bar { position: absolute; top: 20px; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
         .balance-container { 
-            display: flex; gap: 15px; background: rgba(0,0,0,0.8); 
-            padding: 10px 20px; border-radius: 25px; border: 1px solid var(--gold);
-            pointer-events: auto; backdrop-filter: blur(10px);
+            display: flex; gap: 15px; background: rgba(0,0,0,0.85); 
+            padding: 12px 25px; border-radius: 30px; border: 1px solid var(--gold);
+            pointer-events: auto; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(255,215,0,0.2);
         }
+        .bal-item { font-weight: 900; font-size: 18px; display: flex; align-items: center; gap: 8px; }
 
         /* Игровая зона */
         .game { height: 100vh; width: 100vw; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; }
         
+        /* Персонаж и его состояния */
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
-        
-        /* ПЕРСОНАЖ И АНИМАЦИИ */
         .character { 
-            width: 270px; max-width: 75vw; cursor: pointer; 
+            width: 280px; max-width: 80vw; cursor: pointer; 
             z-index: 50; position: relative; pointer-events: auto;
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.6));
+            filter: drop-shadow(0 0 25px rgba(0,0,0,0.8));
             transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: idleBreath 3s ease-in-out infinite;
+            -webkit-user-drag: none;
         }
 
         @keyframes idleBreath {
             0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.02); }
+            50% { transform: translateY(-15px) scale(1.03); }
         }
 
-        /* Класс нажатия (активируется через JS) */
-        .char-pressed { 
-            transform: scale(0.8) translateY(10px) !important;
-            animation-play-state: paused;
+        /* Анимация при клике */
+        .char-active { transform: scale(0.82) translateY(10px) !important; animation-play-state: paused; }
+
+        #displayNickname { margin-top: 20px; font-weight: 900; letter-spacing: 3px; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); z-index: 60; text-transform: uppercase; }
+
+        /* Боковое меню */
+        .side-menu { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 18px; z-index: 200; }
+        .side-btn { 
+            width: 55px; height: 55px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-blue); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-size: 24px; cursor: pointer; transition: 0.2s; color: white; text-decoration: none;
+        }
+        .side-btn:active { transform: scale(0.9); }
+
+        /* Нижнее меню */
+        .bottom-menu { position: absolute; bottom: 25px; width: 100%; display: flex; justify-content: center; gap: 12px; padding: 0 20px; z-index: 200; }
+        .bottom-btn { 
+            flex: 1; max-width: 110px; height: 65px; background: rgba(0,0,0,0.9); 
+            border: 2px solid var(--gold); border-radius: 20px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; color: white; text-decoration: none; 
+            font-size: 11px; font-weight: 900; text-transform: uppercase;
         }
 
-        #displayNickname { margin-top: 15px; font-weight: 900; letter-spacing: 2px; color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); z-index: 60; }
-
-        /* МЕНЮ */
-        .side-menu { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 200; }
-        .side-btn { width: 52px; height: 52px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; color: white; text-decoration: none; }
-
-        .bottom-menu { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 10px; padding: 0 15px; z-index: 200; }
-        .bottom-btn { flex: 1; max-width: 100px; height: 60px; background: rgba(0,0,0,0.9); border: 2px solid var(--gold); border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-decoration: none; font-size: 10px; font-weight: 900; }
-
-        /* Всплывающий текст */
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 40px; color: var(--gold); animation: float 0.7s ease-out forwards; z-index: 500; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-180px); } }
-
-        /* МОДАЛКИ */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 20px; backdrop-filter: blur(20px); }
-        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; flex: 1; margin: 20px 0; }
-        .card { width: 100%; background: var(--glass); padding: 15px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        /* Модальные окна */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(20px); }
+        .modal-body { width: 100%; max-width: 400px; overflow-y: auto; max-height: 60vh; margin: 20px 0; }
+        .card { width: 100%; background: var(--glass); padding: 18px; border-radius: 22px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
         
-        .buy-btn { padding: 10px; background: var(--gold); border: none; border-radius: 10px; font-weight: 900; cursor: pointer; min-width: 80px; }
+        .buy-btn { padding: 12px 20px; background: var(--gold); border: none; border-radius: 12px; font-weight: 900; cursor: pointer; color: #000; }
         .buy-btn.owned { background: #4ae38d; }
-        .close-btn { padding: 15px 80px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; }
-        
+        .close-btn { padding: 15px 70px; background: #fff; color: #000; border-radius: 40px; font-weight: 900; cursor: pointer; margin-top: 10px; }
+
+        /* --- Эстетика ОНЛАЙН --- */
+        .online-title { font-size: 35px; font-weight: 900; background: linear-gradient(90deg, #a020f0, #00d2ff, #a020f0); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s linear infinite; letter-spacing: 5px; }
+        @keyframes shine { to { background-position: 200% center; } }
+        .online-status-aesthetic { margin-top: 10px; font-size: 14px; text-transform: uppercase; color: #fff; text-shadow: 0 0 10px var(--purple); animation: softBlink 2s ease-in-out infinite; }
+        @keyframes softBlink { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1); } }
+        .aesthetic-loader { width: 70px; height: 70px; border-radius: 50%; border: 3px solid transparent; border-top: 3px solid var(--purple); border-bottom: 3px solid var(--neon-blue); animation: spin 2s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Всплывающие цифры */
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 45px; color: var(--gold); text-shadow: 0 0 10px #000; animation: floatUp 0.7s ease-out forwards; z-index: 500; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-200px); } }
+
         /* Ауры */
-        .aura { position: absolute; width: 350px; height: 350px; border-radius: 50%; filter: blur(60px); opacity: 0; transition: 1s; pointer-events: none; }
+        .aura { position: absolute; width: 400px; height: 400px; border-radius: 50%; filter: blur(60px); opacity: 0; transition: 1s; pointer-events: none; z-index: 1; }
         .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
     </style>
 </head>
@@ -101,32 +118,36 @@
             <div id="auraGold" class="aura aura-gold"></div>
             <img id="charImg" class="character" src="" alt="Hero">
         </div>
-        <div id="displayNickname">ИГРОК</div>
+        <div id="displayNickname">ЗАГРУЗКА...</div>
     </div>
 
     <div class="bottom-menu">
-        <a href="shop.html" class="bottom-btn">🛒 Рынок</a>
-        <a href="fortune.html" class="bottom-btn">🎡 Удача</a>
-        <a href="characters.html" class="bottom-btn">🧍 Герои</a>
+        <a href="shop.html" class="bottom-btn"><b>🛒</b>Рынок</a>
+        <a href="fortune.html" class="bottom-btn"><b>🎡</b>Удача</a>
+        <a href="characters.html" class="bottom-btn"><b>🧍</b>Герои</a>
     </div>
 
     <div id="onlineModal" class="modal">
-        <h2 style="color:var(--purple)">ОНЛАЙН</h2>
-        <p style="margin:20px 0">В разработке...</p>
-        <div class="close-btn" onclick="closeModal()">НАЗАД</div>
+        <div style="display:flex; flex-direction:column; align-items:center; background:rgba(160,32,240,0.05); padding:40px; border-radius:30px; border:1px solid rgba(160,32,240,0.2)">
+            <div class="aesthetic-loader"></div>
+            <h2 class="online-title">ONLINE</h2>
+            <div class="online-status-aesthetic">В разработке</div>
+            <p style="color:rgba(255,255,255,0.4); margin-top:20px; font-size:12px">СКОРО: ТУРНИРЫ И КЛАНЫ</p>
+            <div class="close-btn" onclick="closeModal()" style="margin-top:30px; background:none; border:1px solid #fff; color:#fff">ВЕРНУТЬСЯ</div>
+        </div>
     </div>
 
     <div id="statModal" class="modal">
-        <h2>СТАТИСТИКА</h2>
+        <h2 style="color:var(--gold)">СТАТИСТИКА</h2>
         <div class="modal-body">
             <div class="card"><span>Всего кликов</span><b id="s-clicks">0</b></div>
-            <div class="card"><span>Добыто монет</span><b id="s-total">0</b></div>
+            <div class="card"><span>Всего монет</span><b id="s-total">0</b></div>
         </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
     <div id="effModal" class="modal">
-        <h2>ЭФФЕКТЫ</h2>
+        <h2 style="color:var(--neon-blue)">ЭФФЕКТЫ</h2>
         <div class="modal-body" id="effList"></div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
@@ -138,40 +159,34 @@
         business: { pwr: 25, img: "assets/character_business.png" }
     };
 
-    const effects = [
-        { id: 'gold', name: 'Золотая Аура', price: 100 },
-        { id: 'fire', name: 'Огонь', price: 500 },
-        { id: 'ice', name: 'Лед', price: 1000 },
-        { id: 'dark', name: 'Тьма', price: 2000 },
-        { id: 'neon', name: 'Неон', price: 5000 },
-        { id: 'plasma', name: 'Плазма', price: 10000 },
-        { id: 'wind', name: 'Ветер', price: 15000 },
-        { id: 'acid', name: 'Кислота', price: 20000 },
-        { id: 'sun', name: 'Солнце', price: 50000 },
-        { id: 'god', name: 'Бог', price: 100000 }
+    const effectList = [
+        { id: 'gold', name: 'Золотая Аура', price: 100, desc: 'Сияние богатства' },
+        { id: 'neon', name: 'Неоновый Пульс', price: 500, desc: 'Стиль будущего' },
+        { id: 'fire', name: 'Пламя Кликов', price: 1500, desc: 'Горячий прогресс' },
+        { id: 'ice', name: 'Ледяной Кристалл', price: 5000, desc: 'Холодный расчет' },
+        { id: 'dark', name: 'Тень Ночи', price: 15000, desc: 'Скрытая мощь' }
     ];
 
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
-        active: localStorage.getItem("activeCharacter") || "default",
-        ownedEffects: JSON.parse(localStorage.getItem("activeEffects")) || {},
         clicks: +localStorage.getItem("stat_clicks") || 0,
         earned: +localStorage.getItem("stat_earned") || 0,
-        name: localStorage.getItem("userName") || "Nezya Player"
+        activeHero: localStorage.getItem("activeCharacter") || "default",
+        name: localStorage.getItem("userName") || "Nezya Player",
+        boughtEffs: JSON.parse(localStorage.getItem("activeEffects")) || {}
     };
 
-    // Генерация эффектов
     function renderEffects() {
         const container = document.getElementById('effList');
         container.innerHTML = '';
-        effects.forEach(eff => {
-            const isOwned = state.ownedEffects[eff.id];
+        effectList.forEach(eff => {
+            const owned = state.boughtEffs[eff.id];
             container.innerHTML += `
                 <div class="card">
-                    <div><b>${eff.name}</b><br><small>${eff.price} 💎</small></div>
-                    <button class="buy-btn ${isOwned ? 'owned' : ''}" onclick="buyEff('${eff.id}', ${eff.price})">
-                        ${isOwned ? 'ЕСТЬ' : 'КУПИТЬ'}
+                    <div><b>${eff.name}</b><br><small style="color:#aaa">${eff.desc}</small></div>
+                    <button class="buy-btn ${owned ? 'owned' : ''}" onclick="buyEff('${eff.id}', ${eff.price})">
+                        ${owned ? 'АКТИВНО' : eff.price + ' 💎'}
                     </button>
                 </div>`;
         });
@@ -181,29 +196,30 @@
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals.toLocaleString();
         document.getElementById("displayNickname").textContent = state.name;
+        document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
+        document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
         
-        // СМЕНА ПЕРСОНАЖА
-        const hero = heroes[state.active] || heroes.default;
+        const hero = heroes[state.activeHero] || heroes.default;
         document.getElementById("charImg").src = hero.img;
 
-        // АУРА
-        document.getElementById("auraGold").style.opacity = state.ownedEffects.gold ? "0.8" : "0";
-
-        document.getElementById("s-clicks").textContent = state.clicks;
-        document.getElementById("s-total").textContent = Math.floor(state.earned);
+        document.getElementById("auraGold").style.opacity = state.boughtEffs.gold ? "0.8" : "0";
     }
 
-    // ЛОГИКА КЛИКА С АНИМАЦИЕЙ
     const charImg = document.getElementById("charImg");
 
+    // ЛОГИКА КЛИКА
     charImg.addEventListener("pointerdown", (e) => {
-        charImg.classList.add("char-pressed"); // Анимация нажатия
+        charImg.classList.add("char-active");
         
-        const hero = heroes[state.active] || heroes.default;
+        const hero = heroes[state.activeHero] || heroes.default;
         state.coins += hero.pwr;
         state.earned += hero.pwr;
         state.clicks++;
 
+        // Вибрация
+        if (navigator.vibrate) navigator.vibrate(10);
+
+        // Всплывающее число
         const t = document.createElement("div");
         t.className = "float-text";
         t.style.left = e.clientX + "px";
@@ -216,17 +232,15 @@
         save();
     });
 
-    window.addEventListener("pointerup", () => {
-        charImg.classList.remove("char-pressed"); // Возврат в idle
-    });
+    window.addEventListener("pointerup", () => charImg.classList.remove("char-active"));
 
     function buyEff(id, price) {
-        if(state.ownedEffects[id]) return;
+        if(state.boughtEffs[id]) return;
         if(state.crystals >= price) {
             state.crystals -= price;
-            state.ownedEffects[id] = true;
+            state.boughtEffs[id] = true;
             save(); renderEffects(); updateUI();
-        } else { alert("Мало кристаллов!"); }
+        } else { alert("Недостаточно кристаллов! 💎"); }
     }
 
     function save() {
@@ -234,7 +248,7 @@
         localStorage.setItem("crystals", state.crystals);
         localStorage.setItem("stat_clicks", state.clicks);
         localStorage.setItem("stat_earned", state.earned);
-        localStorage.setItem("activeEffects", JSON.stringify(state.ownedEffects));
+        localStorage.setItem("activeEffects", JSON.stringify(state.boughtEffs));
     }
 
     function openModal(id) { 
@@ -243,6 +257,7 @@
     }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
 
+    // Инициализация
     updateUI();
 </script>
 </body>
