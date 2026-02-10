@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON CASINO ULTIMATE</title>
+    <title>NEON CASINO — FULL WORKING</title>
     <style>
         :root {
             --gold: #ffd700;
@@ -18,89 +18,88 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: var(--bg); font-family: 'Segoe UI', Roboto, sans-serif; color: white;
+            background: var(--bg); font-family: 'Segoe UI', sans-serif; color: white;
             display: flex; flex-direction: column; align-items: center; min-height: 100vh;
             overflow-x: hidden; padding-bottom: 50px;
         }
 
         /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
         .balance-top { 
-            display: flex; gap: 15px; z-index: 100; background: rgba(0,0,0,0.9); 
+            display: flex; gap: 10px; z-index: 100; background: rgba(0,0,0,0.95); 
             padding: 15px; width: 100%; justify-content: center; 
             border-bottom: 2px solid #1a1a1a; position: sticky; top: 0;
         }
         .bal { 
-            background: #000; padding: 10px 18px; border-radius: 14px; 
-            border: 1px solid var(--gold); font-weight: 900; min-width: 120px; 
-            text-align: center; font-size: 14px; box-shadow: inset 0 0 10px rgba(255,215,0,0.1);
+            background: #000; padding: 8px 15px; border-radius: 12px; 
+            border: 1px solid var(--gold); font-weight: 900; min-width: 110px; 
+            text-align: center; font-size: 13px;
         }
 
         /* --- НАВИГАЦИЯ --- */
         .game-nav { 
-            display: flex; gap: 6px; margin: 20px 0; background: #111; 
-            padding: 6px; border-radius: 18px; border: 1px solid #333; 
-            width: 95%; max-width: 500px; overflow-x: auto;
+            display: flex; gap: 5px; margin: 15px 0; background: #111; 
+            padding: 5px; border-radius: 15px; border: 1px solid #333; 
+            width: 95%; max-width: 500px;
         }
         .nav-btn { 
-            padding: 12px 15px; border-radius: 12px; border: none; 
-            background: transparent; color: #666; font-weight: 900; 
-            cursor: pointer; transition: 0.3s; font-size: 10px; 
-            flex: 1; text-transform: uppercase; white-space: nowrap;
+            padding: 10px 5px; border-radius: 10px; border: none; 
+            background: transparent; color: #555; font-weight: 900; 
+            cursor: pointer; transition: 0.3s; font-size: 9px; 
+            flex: 1; text-transform: uppercase;
         }
-        .nav-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
-        .btn-dev { border: 1px dashed #444; }
+        .nav-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-blue); }
 
         /* --- КОНТЕНТ --- */
-        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s ease; }
+        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.3s ease; }
         .game-section.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         /* --- КОЛЕСО (SVG) --- */
-        .mode-selector { display: flex; gap: 15px; margin-bottom: 20px; }
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
         .mode-tab { 
-            padding: 12px 25px; border-radius: 30px; border: 2px solid #222; 
-            background: #000; color: #444; cursor: pointer; font-size: 12px; 
-            font-weight: 900; text-transform: uppercase; transition: 0.3s;
+            padding: 8px 20px; border-radius: 20px; border: 2px solid #222; 
+            background: #000; color: #444; cursor: pointer; font-size: 11px; font-weight: 900;
         }
-        .mode-tab.active-norm { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
-        .mode-tab.active-vip { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink); }
+        .mode-tab.active-norm { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+        .mode-tab.active-vip { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
 
-        .wheel-box { position: relative; width: 320px; height: 320px; margin-bottom: 25px; }
+        .wheel-box { position: relative; width: 300px; height: 300px; margin-bottom: 20px; }
         #wheel-svg { width: 100%; height: 100%; transform: rotate(-90deg); transition: transform 6s cubic-bezier(0.15, 0, 0.1, 1); }
-        
         .pointer { 
-            position: absolute; top: -12px; left: 50%; transform: translateX(-50%); 
-            width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; 
-            border-top: 38px solid #fff; z-index: 20; filter: drop-shadow(0 0 10px #fff);
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%); 
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; 
+            border-top: 30px solid #fff; z-index: 20; filter: drop-shadow(0 0 5px #fff);
+        }
+        .wheel-border { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; border: 8px solid #111; z-index: 10; pointer-events: none; }
+        .norm-glow { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
+        .vip-glow { border-color: var(--neon-pink); box-shadow: 0 0 20px rgba(255, 0, 255, 0.2); }
+
+        /* --- КРАШ РАБОЧИЙ --- */
+        .crash-area { 
+            width: 90%; max-width: 400px; height: 220px; background: #000; 
+            border: 2px solid #111; border-radius: 20px; position: relative; 
+            overflow: hidden; margin-bottom: 20px; display: flex; 
+            align-items: center; justify-content: center;
+        }
+        #rocket { position: absolute; bottom: 10%; left: 10%; font-size: 35px; display: none; z-index: 5; transition: 0.1s linear; }
+        #multText { font-size: 55px; font-weight: 900; z-index: 10; color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue); }
+        .crash-input { 
+            background: #000; border: 2px solid #222; color: #fff; 
+            padding: 15px; width: 280px; border-radius: 15px; 
+            text-align: center; font-size: 18px; margin-bottom: 15px; outline: none;
         }
 
-        .wheel-border {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; border: 10px solid #111; pointer-events: none; z-index: 10;
-        }
-        .norm-glow { border-color: var(--neon-green); box-shadow: 0 0 25px rgba(57, 255, 20, 0.3); }
-        .vip-glow { border-color: var(--neon-pink); box-shadow: 0 0 25px rgba(255, 0, 255, 0.3); }
+        /* --- КНОПКИ --- */
+        .main-btn { width: 280px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; }
+        .btn-spin { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
+        .btn-free { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+        .btn-crash { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
+        .btn-cashout { background: var(--neon-green); color: #000; animation: pulse 0.5s infinite; }
+        .timer-text { margin-top: 10px; font-size: 11px; color: #555; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
-        /* --- КНОПКИ ДЕЙСТВИЯ --- */
-        .main-btn { 
-            width: 280px; padding: 20px; border-radius: 16px; border: none; 
-            font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.3s; 
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .btn-spin { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
-        .btn-free { background: var(--gold); color: #000; box-shadow: 0 0 25px var(--gold); animation: pulse 1s infinite; }
-        .btn-vip { background: var(--neon-pink); color: #fff; box-shadow: 0 0 25px var(--neon-pink); }
-        
-        .timer-text { margin-top: 12px; font-size: 12px; color: #666; font-style: italic; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
-
-        /* --- КРАШ И РАЗРАБОТКА --- */
-        .dev-card {
-            background: #111; border: 2px dashed #333; padding: 40px 20px;
-            border-radius: 20px; text-align: center; width: 90%; max-width: 400px;
-        }
-        .dev-card h2 { color: var(--neon-purple); margin-bottom: 10px; text-shadow: 0 0 10px var(--neon-purple); }
-        .dev-card p { color: #777; font-size: 14px; }
+        /* --- РУЛЕТКА ЗАГЛУШКА --- */
+        .dev-box { padding: 40px; text-align: center; background: #111; border-radius: 20px; border: 2px dashed #333; width: 90%; }
     </style>
 </head>
 <body>
@@ -114,230 +113,186 @@
         <button class="nav-btn" onclick="location.href='index.html'">🏠 ГЛАВНАЯ</button>
         <button id="nav-wheel" class="nav-btn active" onclick="switchGame('wheel')">КОЛЕСО</button>
         <button id="nav-crash" class="nav-btn" onclick="switchGame('crash')">CRASH 🚀</button>
-        <button id="nav-roulette" class="nav-btn btn-dev" onclick="switchGame('roulette')">РУЛЕТКА 🎡</button>
+        <button id="nav-roulette" class="nav-btn" onclick="switchGame('roulette')">РУЛЕТКА 🎡</button>
     </div>
 
     <div id="section-wheel" class="game-section active">
         <div class="mode-selector">
             <div id="tab-norm" class="mode-tab active-norm" onclick="setWheelMode('norm')">GOLD</div>
-            <div id="tab-vip" class="mode-tab" onclick="setWheelMode('vip')">CRYSTAL VIP</div>
+            <div id="tab-vip" class="mode-tab" onclick="setWheelMode('vip')">VIP</div>
         </div>
-        
         <div class="wheel-box">
             <div class="pointer"></div>
             <div id="wheel-border" class="wheel-border norm-glow"></div>
             <svg id="wheel-svg" viewBox="0 0 100 100"></svg>
         </div>
-
         <button id="spinBtn" class="main-btn btn-spin" onclick="spin()">КРУТИТЬ</button>
         <div id="dailyTimer" class="timer-text"></div>
     </div>
 
     <div id="section-crash" class="game-section">
-        <div class="dev-card">
-            <h2>CRASH 🚀</h2>
-            <p>Двигатель ракеты прогревается...<br>Визуальный интерфейс появится в следующем обновлении.</p>
-            <br>
-            <button class="main-btn btn-spin" style="background: var(--neon-blue); width: 200px;" onclick="alert('Скоро!')">ИГРАТЬ</button>
+        <div class="crash-area">
+            <div id="rocket">🚀</div>
+            <div id="multText">1.00x</div>
         </div>
+        <input type="number" id="betAmount" class="crash-input" value="1000">
+        <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">ПОСТАВИТЬ</button>
     </div>
 
     <div id="section-roulette" class="game-section">
-        <div class="dev-card">
-            <h1 style="font-size: 50px; margin-bottom: 20px;">🛠️</h1>
-            <h2>В РАЗРАБОТКЕ</h2>
-            <p>Мы настраиваем шарик и стол для классической рулетки. Заходите позже!</p>
+        <div class="dev-box">
+            <h2 style="color: var(--neon-purple)">РУЛЕТКА</h2>
+            <p style="color: #666; margin-top: 10px;">ДАННЫЙ РЕЖИМ В РАЗРАБОТКЕ</p>
         </div>
     </div>
 
 <script>
-    // Инициализация данных
     let state = {
         coins: +localStorage.getItem("coins") || 100000,
         crys: +localStorage.getItem("crystals") || 10,
         lastFreeSpin: +localStorage.getItem("lastFreeSpin") || 0
     };
 
-    let isSpinning = false, wheelMode = 'norm';
+    let isSpinning = false, isFlying = false, wheelMode = 'norm', currentMult = 1.0, crashInt;
 
-    // Конфигурация призов
     const prizes = {
         norm: [
-            { n: "50k 🪙", v: 50000, t: 'c', color: '#0a0a0a', text: '#fff' },
-            { n: "500k 🪙", v: 500000, t: 'c', color: '#1de9b6', text: '#000' },
-            { n: "5k 🪙", v: 5000, t: 'c', color: '#0a0a0a', text: '#fff' },
-            { n: "1M 🪙", v: 1000000, t: 'c', color: '#ffd700', text: '#000' },
-            { n: "10k 🪙", v: 10000, t: 'c', color: '#0a0a0a', text: '#fff' },
-            { n: "100k 🪙", v: 100000, t: 'c', color: '#1de9b6', text: '#000' },
-            { n: "25k 🪙", v: 25000, t: 'c', color: '#0a0a0a', text: '#fff' },
-            { n: "250k 🪙", v: 250000, t: 'c', color: '#1de9b6', text: '#000' }
+            { n: "50k", v: 50000, t: 'c', color: '#000', text: '#fff' },
+            { n: "500k", v: 500000, t: 'c', color: '#1de9b6', text: '#000' },
+            { n: "5k", v: 5000, t: 'c', color: '#000', text: '#fff' },
+            { n: "1M", v: 1000000, t: 'c', color: '#ffd700', text: '#000' },
+            { n: "10k", v: 10000, t: 'c', color: '#000', text: '#fff' },
+            { n: "100k", v: 100000, t: 'c', color: '#1de9b6', text: '#000' },
+            { n: "25k", v: 25000, t: 'c', color: '#000', text: '#fff' },
+            { n: "250k", v: 250000, t: 'c', color: '#1de9b6', text: '#000' }
         ],
         vip: [
-            { n: "50 💎", v: 50, t: 'd', color: '#0a0a0a', text: '#fff' },
-            { n: "10k 💎", v: 10000, t: 'd', color: '#d500f9', text: '#fff' },
-            { n: "5 💎", v: 5, t: 'd', color: '#0a0a0a', text: '#fff' },
-            { n: "100k 💎", v: 100000, t: 'd', color: '#ff00ff', text: '#fff' },
-            { n: "500 💎", v: 500, t: 'd', color: '#0a0a0a', text: '#fff' },
-            { n: "25 💎", v: 25, t: 'd', color: '#d500f9', text: '#fff' },
-            { n: "50k 💎", v: 50000, t: 'd', color: '#0a0a0a', text: '#fff' },
-            { n: "100 💎", v: 100, t: 'd', color: '#d500f9', text: '#fff' }
+            { n: "50", v: 50, t: 'd', color: '#000', text: '#fff' },
+            { n: "10k", v: 10000, t: 'd', color: '#d500f9', text: '#fff' },
+            { n: "5", v: 5, t: 'd', color: '#000', text: '#fff' },
+            { n: "100k", v: 100000, t: 'd', color: '#ff00ff', text: '#fff' },
+            { n: "500", v: 500, t: 'd', color: '#000', text: '#fff' },
+            { n: "25", v: 25, t: 'd', color: '#d500f9', text: '#fff' },
+            { n: "50k", v: 50000, t: 'd', color: '#000', text: '#fff' },
+            { n: "100", v: 100, t: 'd', color: '#d500f9', text: '#fff' }
         ]
     };
 
-    function isDailyAvailable() {
-        return Date.now() - state.lastFreeSpin >= 24 * 60 * 60 * 1000;
-    }
-
-    // Отрисовка колеса через SVG
     function renderWheel() {
         const svg = document.getElementById("wheel-svg");
         svg.innerHTML = "";
         const data = prizes[wheelMode];
-        const angleStep = 360 / data.length;
-
         data.forEach((p, i) => {
-            const startAngle = i * angleStep;
-            const endAngle = (i + 1) * angleStep;
-            
-            const x1 = 50 + 50 * Math.cos(Math.PI * startAngle / 180);
-            const y1 = 50 + 50 * Math.sin(Math.PI * startAngle / 180);
-            const x2 = 50 + 50 * Math.cos(Math.PI * endAngle / 180);
-            const y2 = 50 + 50 * Math.sin(Math.PI * endAngle / 180);
-
+            const startAngle = i * 45, endAngle = (i + 1) * 45;
+            const x1 = 50 + 50 * Math.cos(Math.PI * startAngle / 180), y1 = 50 + 50 * Math.sin(Math.PI * startAngle / 180);
+            const x2 = 50 + 50 * Math.cos(Math.PI * endAngle / 180), y2 = 50 + 50 * Math.sin(Math.PI * endAngle / 180);
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("d", `M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`);
             path.setAttribute("fill", p.color);
             path.setAttribute("stroke", "#222");
-            path.setAttribute("stroke-width", "0.3");
             svg.appendChild(path);
-
-            // Текст приза
-            const textAngle = startAngle + angleStep / 2;
-            const textX = 50 + 33 * Math.cos(Math.PI * textAngle / 180);
-            const textY = 50 + 33 * Math.sin(Math.PI * textAngle / 180);
-
-            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            g.setAttribute("transform", `translate(${textX}, ${textY}) rotate(${textAngle})`);
-
-            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("fill", p.text);
-            text.setAttribute("font-size", "3.8");
-            text.setAttribute("font-weight", "900");
-            text.setAttribute("text-anchor", "middle");
-            text.setAttribute("dominant-baseline", "middle");
-            text.textContent = p.n.split(' ')[0];
-            
-            g.appendChild(text);
-            svg.appendChild(g);
+            const textAngle = startAngle + 22.5;
+            const tx = 50 + 35 * Math.cos(Math.PI * textAngle / 180), ty = 50 + 35 * Math.sin(Math.PI * textAngle / 180);
+            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            t.setAttribute("x", tx); t.setAttribute("y", ty); t.setAttribute("fill", p.text);
+            t.setAttribute("font-size", "4"); t.setAttribute("font-weight", "900"); t.setAttribute("text-anchor", "middle");
+            t.setAttribute("transform", `rotate(${textAngle}, ${tx}, ${ty})`);
+            t.textContent = p.n;
+            svg.appendChild(t);
         });
-    }
-
-    function setWheelMode(m) {
-        if(isSpinning) return;
-        wheelMode = m;
-        document.getElementById('tab-norm').className = m==='norm' ? 'mode-tab active-norm' : 'mode-tab';
-        document.getElementById('tab-vip').className = m==='vip' ? 'mode-tab active-vip' : 'mode-tab';
-        document.getElementById('wheel-border').className = m==='norm' ? 'wheel-border norm-glow' : 'wheel-border vip-glow';
-        updateUI();
-        renderWheel();
-    }
-
-    function updateUI() {
-        const btn = document.getElementById('spinBtn');
-        const timer = document.getElementById('dailyTimer');
-        
-        if(wheelMode === 'norm') {
-            if(isDailyAvailable()) {
-                btn.textContent = "🎁 БЕСПЛАТНО";
-                btn.className = "main-btn btn-free";
-                timer.textContent = "Ваш ежедневный спин готов!";
-            } else {
-                btn.textContent = "КРУТИТЬ (50k 🪙)";
-                btn.className = "main-btn btn-spin";
-                const next = state.lastFreeSpin + 86400000;
-                timer.textContent = "След. бонус: " + new Date(next).toLocaleTimeString();
-            }
-        } else {
-            btn.textContent = "КРУТИТЬ (100 💎)";
-            btn.className = "main-btn btn-vip";
-            timer.textContent = "";
-        }
-        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-        document.getElementById("crys").textContent = state.crys.toLocaleString();
     }
 
     function spin() {
         if(isSpinning) return;
+        let isFree = (wheelMode === 'norm' && (Date.now() - state.lastFreeSpin >= 86400000));
+        let cost = wheelMode === 'norm' ? (isFree ? 0 : 50000) : 100;
 
-        let cost = 0;
-        if(wheelMode === 'norm') {
-            if(!isDailyAvailable()) {
-                if(state.coins < 50000) return alert("Мало монет!");
-                cost = 50000;
-            }
-        } else {
-            if(state.crys < 100) return alert("Мало кристаллов!");
-            cost = 100;
-        }
+        if(wheelMode === 'norm' && state.coins < cost) return alert("Мало монет!");
+        if(wheelMode === 'vip' && state.crys < cost) return alert("Мало кристаллов!");
 
-        if(cost > 0) {
-            wheelMode === 'norm' ? state.coins -= cost : state.crys -= cost;
-        } else {
-            state.lastFreeSpin = Date.now();
-            localStorage.setItem("lastFreeSpin", state.lastFreeSpin);
-        }
+        if(cost === 0) { state.lastFreeSpin = Date.now(); localStorage.setItem("lastFreeSpin", state.lastFreeSpin); }
+        else { wheelMode === 'norm' ? state.coins -= cost : state.crys -= cost; }
 
-        isSpinning = true;
-        saveState();
-        updateUI();
-
+        isSpinning = true; saveState(); updateUI();
         const svg = document.getElementById("wheel-svg");
-        const secIndex = getWinIndex();
-        
-        // Угол остановки (SVG рисует от востока, поэтому -90 для компенсации севера)
-        const stopAngle = (secIndex * 45);
-        const totalRot = 3600 + stopAngle;
-
+        let rand = Math.random() * 100, sec = (rand < 3) ? 3 : (rand < 15 ? 1 : [0,2,4,5,6,7][Math.floor(Math.random()*6)]);
+        const totalRot = 3600 + (sec * 45);
         svg.style.transition = "transform 6s cubic-bezier(0.15, 0, 0.1, 1)";
         svg.style.transform = `rotate(${totalRot - 90}deg)`;
 
         setTimeout(() => {
             isSpinning = false;
-            const prize = prizes[wheelMode][secIndex];
-            prize.t === 'c' ? state.coins += prize.v : state.crys += prize.v;
-            
-            alert("🤑 ВЫИГРЫШ: " + prize.n);
-            saveState();
-            updateUI();
-            
-            svg.style.transition = "none";
-            svg.style.transform = `rotate(${stopAngle - 90}deg)`;
+            const p = prizes[wheelMode][sec];
+            p.t === 'c' ? state.coins += p.v : state.crys += p.v;
+            alert("ВЫИГРЫШ: " + p.n);
+            saveState(); updateUI();
+            svg.style.transition = "none"; svg.style.transform = `rotate(${(sec * 45) - 90}deg)`;
         }, 6100);
     }
 
-    function getWinIndex() {
-        let r = Math.random() * 100;
-        if(r < 2.5) return 3; // 1M/100k
-        if(r < 12) return 1; 
-        return [0, 2, 4, 5, 6, 7][Math.floor(Math.random() * 6)];
+    function crashAction() {
+        const btn = document.getElementById("crashBtn"), r = document.getElementById("rocket"), d = document.getElementById("multText");
+        if(!isFlying) {
+            let bet = +document.getElementById("betAmount").value;
+            if(bet > state.coins || bet <= 0) return alert("Мало монет!");
+            state.coins -= bet; saveState(); updateUI();
+            isFlying = true; currentMult = 1.0;
+            btn.textContent = "ЗАБРАТЬ"; btn.className = "main-btn btn-cashout";
+            r.style.display = "block"; r.style.left = "10%"; r.style.bottom = "10%";
+            let boom = 1 + Math.random() * Math.random() * 10;
+            crashInt = setInterval(() => {
+                currentMult += 0.01 + (currentMult/200);
+                d.textContent = currentMult.toFixed(2) + "x";
+                r.style.left = Math.min(10 + (currentMult * 5), 80) + "%";
+                r.style.bottom = Math.min(10 + (currentMult * 7), 70) + "%";
+                if(currentMult >= boom) {
+                    clearInterval(crashInt); isFlying = false;
+                    d.textContent = "BOOM!"; r.textContent = "💥";
+                    setTimeout(() => { r.style.display="none"; r.textContent="🚀"; btn.textContent="ПОСТАВИТЬ"; btn.className="main-btn btn-crash"; d.textContent="1.00x"; }, 2000);
+                }
+            }, 100);
+        } else {
+            clearInterval(crashInt); isFlying = false;
+            state.coins += Math.floor(+document.getElementById("betAmount").value * currentMult);
+            saveState(); updateUI();
+            btn.textContent = "ПОСТАВИТЬ"; btn.className = "main-btn btn-crash"; r.style.display="none";
+        }
     }
 
-    function saveState() {
-        localStorage.setItem("coins", state.coins);
-        localStorage.setItem("crystals", state.crys);
+    function updateUI() {
+        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+        document.getElementById("crys").textContent = state.crys.toLocaleString();
+        const btn = document.getElementById("spinBtn");
+        const isFree = (wheelMode === 'norm' && (Date.now() - state.lastFreeSpin >= 86400000));
+        if(wheelMode === 'norm') {
+            btn.textContent = isFree ? "🎁 БЕСПЛАТНО" : "КРУТИТЬ (50k 🪙)";
+            btn.className = isFree ? "main-btn btn-free" : "main-btn btn-spin";
+        } else {
+            btn.textContent = "КРУТИТЬ (100 💎)";
+            btn.className = "main-btn btn-vip";
+        }
+    }
+
+    function setWheelMode(m) { 
+        if(isSpinning) return; 
+        wheelMode = m; 
+        document.getElementById('tab-norm').className = m==='norm' ? 'mode-tab active-norm' : 'mode-tab';
+        document.getElementById('tab-vip').className = m==='vip' ? 'mode-tab active-vip' : 'mode-tab';
+        document.getElementById('wheel-border').className = m==='norm' ? 'wheel-border norm-glow' : 'wheel-border vip-glow';
+        updateUI(); renderWheel(); 
     }
 
     function switchGame(g) {
-        if(isSpinning) return;
+        if(isSpinning || isFlying) return;
         document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        
-        document.getElementById(`section-${g}`).classList.add('active');
-        document.getElementById(`nav-${g}`).classList.add('active');
+        document.getElementById('section-'+g).classList.add('active');
+        document.getElementById('nav-'+g).classList.add('active');
     }
 
-    renderWheel();
-    updateUI();
+    function saveState() { localStorage.setItem("coins", state.coins); localStorage.setItem("crystals", state.crys); }
+
+    renderWheel(); updateUI();
 </script>
 </body>
 </html>
