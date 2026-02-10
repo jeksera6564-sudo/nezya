@@ -14,28 +14,30 @@ body{
   overflow:hidden;
   user-select:none;
 }
-
-/* 🔥 FIX: overlay больше НЕ блокирует клики */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  pointer-events:none;
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
 
 .top-bar{
-  position:absolute;top:12px;left:50%;
+  position:absolute;
+  top:12px;
+  left:50%;
   transform:translateX(-50%);
-  display:flex;flex-direction:column;
-  gap:6px;align-items:center;z-index:5;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:center;
+  z-index:5;
 }
 
 .balances{display:flex;gap:12px}
 .balance{
   background:rgba(0,0,0,.65);
-  padding:8px 14px;border-radius:18px;
-  font-weight:900;color:#fff;
-  display:flex;gap:6px;align-items:center;
+  padding:8px 14px;
+  border-radius:18px;
+  font-weight:900;
+  color:#fff;
+  display:flex;
+  gap:6px;
+  align-items:center;
 }
 
 .coin{
@@ -49,70 +51,94 @@ body{
 }
 
 .level-wrap{
-  width:200px;background:rgba(0,0,0,.6);
-  border-radius:12px;padding:5px;
+  width:200px;
+  background:rgba(0,0,0,.6);
+  border-radius:12px;
+  padding:5px;
 }
 .level-bar{
-  height:10px;background:gold;
-  border-radius:8px;width:0%;
-  transition:width .2s linear;
+  height:10px;
+  background:gold;
+  border-radius:8px;
+  width:0%;
 }
 .level-text{
-  text-align:center;font-size:12px;
-  font-weight:bold;color:white;margin-top:3px;
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  color:white;
+  margin-top:3px;
 }
 
 .combo{
-  font-weight:900;font-size:13px;
+  font-weight:900;
   color:#22c55e;
   text-shadow:0 0 10px #22c55e;
+  font-size:13px;
 }
 
 .game{
-  position:relative;width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .character-wrap{position:relative}
 
 .character{
-  width:280px;max-width:80vw;
+  width:280px;
+  max-width:80vw;
   cursor:pointer;
   transition:transform .12s ease;
 }
 
 .aura{
-  position:absolute;inset:-40px;
+  position:absolute;
+  inset:-30px;
   border-radius:50%;
-  background:radial-gradient(circle,rgba(255,215,0,.7),transparent 70%);
-  opacity:0;pointer-events:none;
-  animation:aura .5s ease-out forwards;
+  background:radial-gradient(circle,rgba(255,215,0,.6),transparent 70%);
+  opacity:0;
+  animation:aura .4s ease-out forwards;
+  pointer-events:none;
 }
+
 @keyframes aura{
-  from{transform:scale(.5);opacity:1}
-  to{transform:scale(1.6);opacity:0}
+  from{transform:scale(.6);opacity:.9}
+  to{transform:scale(1.4);opacity:0}
 }
 
 .float{
   position:fixed;
-  font-size:26px;font-weight:900;
+  font-size:26px;
+  font-weight:900;
   pointer-events:none;
-  animation:fly 1.8s ease-out forwards;
+  animation:fly 1.6s ease-out forwards;
   z-index:9999;
 }
+
 @keyframes fly{
-  to{opacity:0;transform:translateY(-100px) scale(1.5)}
+  to{opacity:0;transform:translateY(-80px) scale(1.4)}
 }
 
 .bottom-menu{
-  position:absolute;bottom:22%;left:50%;
+  position:absolute;
+  bottom:22%;
+  left:50%;
   transform:translateX(-50%);
-  display:flex;gap:14px;
+  display:flex;
+  gap:14px;
 }
+
 .menu-btn{
-  padding:12px 18px;border-radius:18px;
+  padding:12px 18px;
+  border-radius:18px;
   background:rgba(0,0,0,.65);
-  color:white;font-weight:900;text-decoration:none;
+  color:white;
+  font-weight:900;
+  text-decoration:none;
 }
 </style>
 </head>
@@ -143,7 +169,7 @@ if(!localStorage.getItem("nickname")){
 
 <div class="game">
   <div class="character-wrap" id="charWrap">
-    <img id="character" class="character" draggable="false">
+    <img id="character" class="character">
   </div>
 </div>
 
@@ -152,12 +178,9 @@ if(!localStorage.getItem("nickname")){
   <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
 </div>
 
-<audio id="clickSound" src="click.mp3" preload="auto"></audio>
-
 <script>
 document.body.style.backgroundImage="url('assets/bg.jpg')";
 
-/* ПЕРСОНАЖИ */
 const characters={
   default:{img:"assets/player.png",power:1,crystal:0},
   clicker:{img:"assets/character_clicker.png",power:2,crystal:0},
@@ -170,9 +193,6 @@ let active=localStorage.getItem("activeCharacter")||"default";
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
-let passive=+localStorage.getItem("passive")||1;
-let expFloat=+localStorage.getItem("expFloat")||0;
-
 let combo=1,lastClick=0;
 
 const character=document.getElementById("character");
@@ -184,84 +204,45 @@ const crystalsEl=document.getElementById("crystals");
 const levelEl=document.getElementById("level");
 const levelBar=document.getElementById("levelBar");
 const comboEl=document.getElementById("combo");
-const clickSound=document.getElementById("clickSound");
 
 function updateUI(){
-  coinsEl.textContent=Math.floor(coins);
+  coinsEl.textContent=coins;
   crystalsEl.textContent=crystals;
   const lvl=Math.floor(clicks/100)+1;
   levelEl.textContent=lvl;
-  levelBar.style.width=((clicks%100))+"%";
+  levelBar.style.width=(clicks%100)+"%";
   comboEl.textContent="Комбо x"+combo;
 }
 
-/* КЛИК */
 character.onclick=()=>{
-  clickSound.currentTime=0;
-  clickSound.play();
-
   character.style.transform="scale(.9)";
   setTimeout(()=>character.style.transform="scale(1)",120);
 
   const a=document.createElement("div");
   a.className="aura";
   wrap.appendChild(a);
-  setTimeout(()=>a.remove(),500);
+  setTimeout(()=>a.remove(),400);
 
   const now=Date.now();
-  combo=(now-lastClick<800)?Math.min(combo+1,25):1;
+  combo=(now-lastClick<800)?Math.min(combo+1,20):1;
   lastClick=now;
 
-  let mult=1;
-  const r=Math.random();
-  if(r<0.01) mult=20;
-  else if(r<0.04) mult=10;
-  else if(r<0.1) mult=5;
-  else if(r<0.2) mult=2;
-
   const ch=characters[active];
-  const gain=ch.power*combo*mult;
+  const gain=ch.power*combo;
 
   coins+=gain;
   crystals+=ch.crystal;
   clicks++;
 
-  spawn("+"+gain,mult>=10?"#fb7185":mult>=5?"#a855f7":"gold",mult);
   save();updateUI();
 };
-
-/* ПАССИВ */
-setInterval(()=>{
-  coins+=passive;
-  expFloat+=0.2;
-  if(expFloat>=1){
-    clicks++;
-    expFloat=0;
-  }
-  updateUI();
-},1000);
-
-function spawn(text,color,m){
-  const e=document.createElement("div");
-  e.className="float";
-  e.textContent=text;
-  e.style.color=color;
-  e.style.fontSize=24+m*2+"px";
-  e.style.left=Math.random()*80+10+"vw";
-  e.style.top=Math.random()*40+40+"vh";
-  document.body.appendChild(e);
-  setTimeout(()=>e.remove(),1800);
-}
 
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
   localStorage.setItem("clicks",clicks);
   localStorage.setItem("activeCharacter",active);
-  localStorage.setItem("passive",passive);
-  localStorage.setItem("expFloat",expFloat);
 }
-
 updateUI();
 </script>
 
