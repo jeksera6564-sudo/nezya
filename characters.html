@@ -19,7 +19,7 @@
         body { 
             background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
             color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
-            overflow-x: hidden;
+            overflow-x: hidden; min-height: 100vh;
         }
 
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: -1; }
@@ -31,7 +31,8 @@
         }
 
         .balance-display {
-            text-align: center; font-weight: 900; color: var(--gold); margin-bottom: 30px; font-size: 18px;
+            text-align: center; font-weight: 900; color: var(--gold); margin-bottom: 30px; 
+            font-size: 22px; text-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
 
         .grid { 
@@ -44,23 +45,22 @@
             background: rgba(255,255,255,0.03); 
             padding: 20px 15px; border-radius: 30px; 
             text-align: center; border: 2px solid rgba(255,255,255,0.1); 
-            transition: 0.3s;
-            backdrop-filter: blur(15px);
+            transition: 0.3s; backdrop-filter: blur(15px);
             display: flex; flex-direction: column; align-items: center;
-            position: relative;
+            position: relative; overflow: hidden;
         }
 
-        .rare-common { border-color: var(--common); }
-        .rare-rare { border-color: var(--rare); }
-        .rare-epic { border-color: var(--epic); }
-        .rare-legendary { border-color: var(--legendary); }
-        .rare-mythic { border-color: var(--mythic); }
+        /* Цвета редкостей */
+        .rare-common { border-color: var(--common); box-shadow: inset 0 0 10px rgba(74, 222, 128, 0.2); }
+        .rare-rare { border-color: var(--rare); box-shadow: inset 0 0 10px rgba(0, 210, 255, 0.2); }
+        .rare-epic { border-color: var(--epic); box-shadow: inset 0 0 10px rgba(160, 32, 240, 0.2); }
+        .rare-legendary { border-color: var(--legendary); box-shadow: inset 0 0 10px rgba(255, 140, 0, 0.2); }
+        .rare-mythic { border-color: var(--mythic); box-shadow: inset 0 0 10px rgba(255, 77, 77, 0.2); }
 
         .card img { 
-            width: 110px; height: 110px; object-fit: contain; 
+            width: 120px; height: 120px; object-fit: contain; 
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
-            margin-bottom: 15px;
-            animation: float 4s ease-in-out infinite;
+            margin-bottom: 15px; animation: float 4s ease-in-out infinite;
         }
 
         @keyframes float {
@@ -68,22 +68,25 @@
             50% { transform: translateY(-10px); }
         }
 
-        .card.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.05); transform: scale(1.02); }
-        .level-badge { position: absolute; top: 15px; left: 15px; background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 10px; }
+        .card.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); transform: scale(1.03); }
+        .card.active::after { content: "ВЫБРАН"; position: absolute; top: 10px; right: -20px; background: var(--gold); color: #000; font-size: 8px; font-weight: 900; padding: 2px 20px; transform: rotate(45deg); }
 
-        .card h3 { font-size: 18px; margin-bottom: 5px; font-weight: 900; }
-        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 10px; min-height: 34px; }
+        .level-badge { position: absolute; top: 15px; left: 15px; background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 10px; z-index: 2; }
+
+        .card h3 { font-size: 18px; margin-bottom: 5px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 15px; font-weight: 700; line-height: 1.4; }
 
         .actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
         button { 
             width: 100%; padding: 12px; border-radius: 14px; border: none; 
-            color: #000; font-weight: 900; 
-            cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 10px;
+            color: #000; font-weight: 900; cursor: pointer; transition: 0.2s; 
+            text-transform: uppercase; font-size: 10px;
         }
 
-        .btn-upgrade { background: #fff; border: 2px solid #fff; }
-        .btn-upgrade:disabled { background: transparent; color: #444; border-color: #222; }
+        .btn-upgrade { background: #fff; border: 2px solid #fff; transition: 0.3s; }
+        .btn-upgrade:hover { background: #eee; }
+        .btn-upgrade:disabled { background: rgba(255,255,255,0.05); color: #444; border-color: #222; cursor: default; }
 
         .btn-common { background: var(--common); }
         .btn-rare { background: var(--rare); }
@@ -92,13 +95,14 @@
         .btn-mythic { background: var(--mythic); color: #fff; }
 
         button:active { transform: scale(0.95); }
-        button:disabled:not(.btn-upgrade) { background: #1a1a1a !important; color: #555 !important; }
+        button:disabled:not(.btn-upgrade) { background: #222 !important; color: #555 !important; cursor: default; }
 
         .back-btn { 
             display: block; text-align: center; margin: 40px auto; 
             color: #000; text-decoration: none; font-weight: 900; 
             background: var(--gold); width: fit-content; padding: 15px 50px; 
             border-radius: 40px; text-transform: uppercase; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
         }
     </style>
 </head>
@@ -112,12 +116,13 @@
     <a href="index.html" class="back-btn">⬅ В БОЙ</a>
 
     <script>
+        // ИСПРАВЛЕННЫЙ МАССИВ ДАННЫХ
         const heroes = [
-            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png", upPrice: 1000 },
-            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png", upPrice: 5000 },
-            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png", upPrice: 20000 },
-            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png", upPrice: 100000 },
-            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png", upPrice: 500000 }
+            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png", upPrice: 500 },
+            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png", upPrice: 3000 },
+            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png", upPrice: 15000 },
+            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png", upPrice: 80000 },
+            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png", upPrice: 400000 }
         ];
 
         let state = {
@@ -141,16 +146,16 @@
                 const isActive = state.active === h.id;
                 const lvl = state.levels[h.id] || 1;
                 
-                // Расчет стоимости улучшения: Базовая цена * (Уровень ^ 1.5)
+                // Формула цены: База * (Уровень ^ 1.6)
                 const currentUpPrice = Math.floor(h.upPrice * Math.pow(lvl, 1.6));
-                const currentPwr = h.pwr * lvl;
+                const currentPwr = h.pwr * lvl; // x1, x2, x3 и т.д.
 
                 container.innerHTML += `
                     <div class="card ${h.rare} ${isActive ? 'active' : ''}">
                         <div class="level-badge">LVL ${lvl}</div>
-                        <img src="${h.img}">
+                        <img src="${h.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
                         <h3>${h.name}</h3>
-                        <div class="stats">🔥 УРОН: +${currentPwr} <br> ${h.cry > 0 ? '💎 ШАНС: +' + h.cry + '%' : ''}</div>
+                        <div class="stats">🔥 УРОН: +${currentPwr.toLocaleString()}<br>💎 ШАНС: +${h.cry}%</div>
                         
                         <div class="actions">
                             <button class="${h.btn}" ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
@@ -158,17 +163,17 @@
                             </button>
                             
                             <button class="btn-upgrade" ${!isOwned ? 'disabled' : ''} onclick="upgradeHero('${h.id}', ${currentUpPrice})">
-                                🆙 ${currentUpPrice.toLocaleString()} 🪙
+                                🆙 УЛУЧШИТЬ (${currentUpPrice.toLocaleString()})
                             </button>
                         </div>
                     </div>`;
             });
         }
 
-        // Логика покупки/выбора
         window.handleAction = (id, price) => {
             if (state.owned[id]) {
                 state.active = id;
+                save();
             } else if (state.coins >= price) {
                 state.coins -= price;
                 state.owned[id] = true;
@@ -180,34 +185,36 @@
             render();
         };
 
-        // Логика УЛУЧШЕНИЯ
         window.upgradeHero = (id, upPrice) => {
             if (state.coins >= upPrice) {
                 state.coins -= upPrice;
                 state.levels[id] = (state.levels[id] || 1) + 1;
-                
-                // Визуальный эффект
-                if (navigator.vibrate) navigator.vibrate(50);
-                
                 save();
                 render();
             } else {
-                alert("Недостаточно монет для улучшения! 🪙");
+                alert("Нужно больше золота для апгрейда! 🪙");
             }
         };
 
         function save() {
+            // Сохраняем всё в LocalStorage
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("characters", JSON.stringify(state.owned));
             localStorage.setItem("activeCharacter", state.active);
             localStorage.setItem("heroLevels", JSON.stringify(state.levels));
             
-            // Также обновляем общий урон для главного экрана (Power * Level)
+            // СИНХРОНИЗАЦИЯ УРОНА ДЛЯ ГЛАВНОГО ЭКРАНА
             const activeHero = heroes.find(h => h.id === state.active);
-            const totalPower = activeHero.pwr * state.levels[state.active];
-            localStorage.setItem("clickPower", totalPower);
+            const currentLevel = state.levels[state.active] || 1;
+            const finalPower = activeHero.pwr * currentLevel;
+            
+            localStorage.setItem("clickPower", finalPower);
+            
+            // Если у тебя на главной используется урон кристаллов:
+            localStorage.setItem("crystalChance", activeHero.cry);
         }
 
+        // Первичная отрисовка
         render();
     </script>
 </body>
