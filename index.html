@@ -3,104 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nezya Clicker — Главная</title>
+    <title>Nezya Clicker — Mega Effects</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             width: 100vw; height: 100vh; 
-            background: url('assets/bg.jpg') center/cover no-repeat; 
+            background: radial-gradient(circle, #1a1a2e, #020205); 
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
 
         /* Верхняя панель */
         .top-bar { position: absolute; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; }
-        .balances { display: flex; gap: 15px; margin-bottom: 8px; }
-        .balance { background: rgba(0,0,0,0.85); padding: 8px 18px; border-radius: 25px; display: flex; align-items: center; gap: 8px; font-weight: 900; border: 1px solid #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
-        
+        .balances { display: flex; gap: 12px; margin-bottom: 8px; }
+        .balance { 
+            background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; 
+            display: flex; align-items: center; gap: 8px; font-weight: 900; 
+            border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            font-size: 18px;
+        }
+
         /* Игровая зона */
-        .game { height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .game { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; }
         
-        /* Визуальные ауры */
-        .aura { position: absolute; width: 350px; height: 350px; border-radius: 50%; z-index: 1; filter: blur(30px); opacity: 0; transition: 0.5s; }
-        .aura-gold { background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, transparent 70%); }
-        .aura-fire { background: radial-gradient(circle, rgba(255,69,0,0.5) 0%, transparent 70%); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 0.4; } 50% { transform: scale(1.1); opacity: 0.6; } 100% { transform: scale(1); opacity: 0.4; } }
+        /* --- СИСТЕМА ЭФФЕКТОВ --- */
+        .aura { position: absolute; width: 380px; height: 380px; border-radius: 50%; z-index: 1; opacity: 0; transition: 0.8s; filter: blur(50px); pointer-events: none; }
+        
+        .aura-gold { background: radial-gradient(circle, #ffd700 0%, transparent 70%); }
+        .aura-fire { background: radial-gradient(circle, #ff4500 0%, transparent 70%); animation: pulse 1s infinite alternate; }
+        .aura-electric { background: radial-gradient(circle, #00d2ff 0%, transparent 70%); animation: shake 0.2s infinite; filter: blur(30px) brightness(1.5); }
+        .aura-shadow { background: radial-gradient(circle, #6a0dad 0%, transparent 70%); animation: shadowMove 4s infinite linear; }
+        .aura-rgb { background: conic-gradient(red, orange, yellow, green, cyan, blue, magenta, red); animation: rotateRGB 2s infinite linear; filter: blur(60px); }
+
+        /* Анимации */
+        @keyframes pulse { from { transform: scale(1); opacity: 0.5; } to { transform: scale(1.3); opacity: 0.9; } }
+        @keyframes shake { 0% { transform: translate(2px, 2px); } 50% { transform: translate(-2px, -2px); } 100% { transform: translate(2px, -2px); } }
+        @keyframes shadowMove { 0% { border-radius: 40% 60% 70% 30%; } 50% { border-radius: 30% 60% 30% 70%; } 100% { border-radius: 40% 60% 70% 30%; } }
+        @keyframes rotateRGB { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .character { 
-            width: 280px; max-width: 85vw; cursor: pointer; transition: transform 0.05s; 
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.6)); z-index: 5; user-select: none;
+            width: 280px; max-width: 80vw; cursor: pointer; 
+            transition: transform 0.05s, filter 0.3s; z-index: 5; 
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+            user-select: none; -webkit-user-drag: none;
         }
-        .character:active { transform: scale(0.92); }
+        .character:active { transform: scale(0.9); }
+        
+        /* Эффект Money Rain */
+        #money-rain { position: absolute; inset: 0; pointer-events: none; z-index: 0; display: none; }
+
+        /* Имя героя */
+        #heroNameDisplay { font-weight: 900; text-transform: uppercase; color: #ffd700; letter-spacing: 4px; text-shadow: 0 0 15px #ffd700; margin-top: 20px; z-index: 10; }
 
         /* Нижнее меню */
-        .bottom-menu { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 8px; padding: 0 10px; z-index: 20; }
+        .bottom-menu { position: absolute; bottom: 25px; width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 15px; z-index: 20; }
         .menu-btn { 
-            flex: 1; max-width: 90px; padding: 12px 2px; background: rgba(0,0,0,0.95); 
-            border: 1px solid #ffd700; color: white; text-decoration: none; border-radius: 12px; 
-            font-weight: 900; font-size: 9px; text-align: center; text-transform: uppercase;
+            background: rgba(0,0,0,0.9); border: 2px solid #ffd700; color: white; text-decoration: none; 
+            border-radius: 15px; font-weight: 900; font-size: 10px; text-align: center; padding: 12px 2px; text-transform: uppercase;
+            box-shadow: 0 4px 0 #b8860b; transition: 0.1s;
         }
+        .menu-btn:active { transform: translateY(3px); box-shadow: none; }
 
-        /* Модальные окна */
+        /* Магазин Эффектов */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 50px 20px;
-            backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
+            z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 30px 15px;
+            overflow-y: auto;
         }
+        .modal h2 { color: #ffd700; text-shadow: 0 0 10px #ffd700; margin-bottom: 20px; }
         .item-card {
-            width: 100%; max-width: 360px; background: rgba(255,255,255,0.05); 
-            margin: 10px 0; padding: 15px; border-radius: 20px; border: 1px solid #ffd700;
+            width: 100%; max-width: 400px; background: rgba(255,255,255,0.05); 
+            margin: 8px 0; padding: 18px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.3);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .buy-btn { background: #ffd700; color: #000; border: none; padding: 10px 15px; border-radius: 12px; font-weight: 900; cursor: pointer; }
-        .close-btn { margin-top: 30px; color: #ffd700; font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .buy-btn { background: #ffd700; color: #000; border: none; padding: 12px 18px; border-radius: 12px; font-weight: 900; cursor: pointer; }
+        .buy-btn:disabled { background: #333; color: #777; }
+        .close-btn { margin: 20px 0; padding: 15px 60px; background: #ff4500; color: white; border-radius: 30px; font-weight: 900; cursor: pointer; }
 
-        /* Анимация +1 */
-        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 35px; color: #ffd700; text-shadow: 2px 2px 0 #000; animation: float 0.7s forwards; z-index: 100; }
-        @keyframes float { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-140px); } }
+        .float-text { position: absolute; pointer-events: none; font-weight: 900; font-size: 38px; color: #ffd700; text-shadow: 0 0 10px #000; animation: float 0.6s forwards; z-index: 100; }
+        @keyframes float { 0% { opacity: 1; transform: translateY(0) scale(1.2); } 100% { opacity: 0; transform: translateY(-150px) scale(0.8); } }
     </style>
 </head>
 <body>
+
+    <div id="money-rain"></div>
 
     <div class="top-bar">
         <div class="balances">
             <div class="balance">🪙 <span id="coins">0</span></div>
             <div class="balance">💎 <span id="crystals">0</span></div>
         </div>
-        <div id="heroName" style="color: #ffd700; font-size: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Герой</div>
     </div>
 
     <div class="game">
         <div class="char-container">
             <div id="auraGold" class="aura aura-gold"></div>
             <div id="auraFire" class="aura aura-fire"></div>
+            <div id="auraElectric" class="aura aura-electric"></div>
+            <div id="auraShadow" class="aura aura-shadow"></div>
+            <div id="auraRGB" class="aura aura-rgb"></div>
             <img id="charImg" class="character" src="">
         </div>
+        <div id="heroNameDisplay">ЗАГРУЗКА...</div>
     </div>
 
     <div class="bottom-menu">
         <a href="shop.html" class="menu-btn">🛒 Рынок</a>
         <a href="fortune.html" class="menu-btn">🎡 Удача</a>
-        <a href="#" class="menu-btn" onclick="openModal('effectsModal')">✨ Эффекты</a>
+        <a href="#" class="menu-btn" onclick="openModal()">✨ Эффекты</a>
         <a href="characters.html" class="menu-btn">🧍 Герои</a>
     </div>
 
     <div id="effectsModal" class="modal">
-        <h2 style="color:#ffd700; margin-bottom:20px">ВИЗУАЛЬНЫЕ ЭФФЕКТЫ</h2>
-        <div class="item-card">
-            <div><h4>Золотое Сияние</h4><p>150 💎</p></div>
-            <button class="buy-btn" id="btn-gold" onclick="buyEffect('gold', 150)">КУПИТЬ</button>
-        </div>
-        <div class="item-card">
-            <div><h4>Огненная Аура</h4><p>500 💎</p></div>
-            <button class="buy-btn" id="btn-fire" onclick="buyEffect('fire', 500)">КУПИТЬ</button>
-        </div>
-        <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
+        <h2>СУПЕР ЭФФЕКТЫ</h2>
+        <div class="item-card"><div><h4>Золото</h4><p>150 💎</p></div><button class="buy-btn" id="btn-gold" onclick="buyEffect('gold', 150)">КУПИТЬ</button></div>
+        <div class="item-card"><div><h4>Огонь</h4><p>500 💎</p></div><button class="buy-btn" id="btn-fire" onclick="buyEffect('fire', 500)">КУПИТЬ</button></div>
+        <div class="item-card"><div><h4>Молнии</h4><p>1000 💎</p></div><button class="buy-btn" id="btn-electric" onclick="buyEffect('electric', 1000)">КУПИТЬ</button></div>
+        <div class="item-card"><div><h4>Тень</h4><p>2500 💎</p></div><button class="buy-btn" id="btn-shadow" onclick="buyEffect('shadow', 2500)">КУПИТЬ</button></div>
+        <div class="item-card"><div><h4>RGB Драйв</h4><p>5000 💎</p></div><button class="buy-btn" id="btn-rgb" onclick="buyEffect('rgb', 5000)">КУПИТЬ</button></div>
+        <div class="item-card"><div><h4>Дождь монет</h4><p>10000 💎</p></div><button class="buy-btn" id="btn-rain" onclick="buyEffect('rain', 10000)">КУПИТЬ</button></div>
+        <div class="close-btn" onclick="closeModal()">ВЫХОД</div>
     </div>
 
 <script>
-    // Настройки персонажей (синхронизировано с characters.html)
-    const heroes = {
+    const heroData = {
         default: { name: "Новичок", pwr: 1, img: "assets/character_default.png" },
         clicker: { name: "Про-Кликер", pwr: 5, img: "assets/character_clicker.png" },
         business: { name: "Бизнесмен", pwr: 20, img: "assets/character_business.png" },
@@ -108,7 +134,6 @@
         legendary: { name: "Легенда", pwr: 500, img: "assets/character_legendary.png" }
     };
 
-    // 1. ПРОВЕРКА ПЕРВОГО ВХОДА: Ставим clicker по умолчанию
     if (!localStorage.getItem("activeCharacter")) {
         localStorage.setItem("activeCharacter", "clicker");
         let owned = JSON.parse(localStorage.getItem("characters")) || { default: true };
@@ -116,90 +141,77 @@
         localStorage.setItem("characters", JSON.stringify(owned));
     }
 
-    // Состояние игры
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
-        activeID: localStorage.getItem("activeCharacter"),
+        activeID: localStorage.getItem("activeCharacter") || "clicker",
         effects: JSON.parse(localStorage.getItem("activeEffects")) || {}
     };
-
-    const charImg = document.getElementById("charImg");
-    const clickSfx = new Audio('assets/click.mp3');
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals;
-        
-        // Обновляем персонажа
-        const hero = heroes[state.activeID] || heroes.default;
-        charImg.src = hero.img;
-        document.getElementById("heroName").textContent = hero.name;
+        const hero = heroData[state.activeID] || heroData.default;
+        document.getElementById("charImg").src = hero.img;
+        document.getElementById("heroNameDisplay").textContent = hero.name;
 
-        // Обновляем эффекты
+        // Видимость эффектов
         document.getElementById("auraGold").style.opacity = state.effects.gold ? "1" : "0";
         document.getElementById("auraFire").style.opacity = state.effects.fire ? "1" : "0";
+        document.getElementById("auraElectric").style.opacity = state.effects.electric ? "1" : "0";
+        document.getElementById("auraShadow").style.opacity = state.effects.shadow ? "1" : "0";
+        document.getElementById("auraRGB").style.opacity = state.effects.rgb ? "1" : "0";
+        document.getElementById("money-rain").style.display = state.effects.rain ? "block" : "none";
+
+        // Кнопки
+        ["gold", "fire", "electric", "shadow", "rgb", "rain"].forEach(id => {
+            const btn = document.getElementById("btn-" + id);
+            if(state.effects[id]) { btn.textContent = "ЕСТЬ"; btn.disabled = true; }
+        });
+    }
+
+    document.getElementById("charImg").addEventListener("pointerdown", (e) => {
+        const hero = heroData[state.activeID] || heroData.default;
+        state.coins += hero.pwr;
         
-        // Кнопки в магазине
-        if(state.effects.gold) document.getElementById("btn-gold").textContent = "АКТИВНО";
-        if(state.effects.fire) document.getElementById("btn-fire").textContent = "АКТИВНО";
-    }
-
-    function save() {
-        localStorage.setItem("coins", state.coins);
-        localStorage.setItem("crystals", state.crystals);
-        localStorage.setItem("activeEffects", JSON.stringify(state.effects));
-    }
-
-    // Клик
-    charImg.addEventListener("pointerdown", (e) => {
-        clickSfx.currentTime = 0;
-        clickSfx.play().catch(() => {});
-
-        const pwr = heroes[state.activeID]?.pwr || 1;
-        state.coins += pwr;
-
-        // Анимация текста
         const t = document.createElement("div");
         t.className = "float-text";
         t.style.left = e.clientX + "px";
         t.style.top = e.clientY + "px";
-        t.textContent = `+${pwr}`;
+        t.textContent = `+${hero.pwr}`;
         document.body.appendChild(t);
-        setTimeout(() => t.remove(), 700);
+        setTimeout(() => t.remove(), 600);
+
+        // Вспышка при клике если есть RGB
+        if(state.effects.rgb) {
+            document.body.style.filter = `hue-rotate(${Math.random()*360}deg)`;
+            setTimeout(() => document.body.style.filter = "none", 50);
+        }
 
         updateUI();
-        save();
+        localStorage.setItem("coins", state.coins);
     });
 
-    // Модалки
-    function openModal(id) { document.getElementById(id).style.display = "flex"; }
-    function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+    function openModal() { document.getElementById("effectsModal").style.display = "flex"; }
+    function closeModal() { document.getElementById("effectsModal").style.display = "none"; }
 
     function buyEffect(id, price) {
-        if (state.effects[id]) return;
         if (state.crystals >= price) {
             state.crystals -= price;
             state.effects[id] = true;
-            save();
+            localStorage.setItem("crystals", state.crystals);
+            localStorage.setItem("activeEffects", JSON.stringify(state.effects));
             updateUI();
-        } else {
-            alert("Мало кристаллов! 💎");
-        }
+        } else { alert("Недостаточно кристаллов! 💎"); }
     }
 
-    // Авто-сохранение и пассивный доход
+    // Пассивный доход
     setInterval(() => {
-        const myIncomes = JSON.parse(localStorage.getItem("incomes")) || {};
-        const rates = { lemonade: 1, shop: 10, factory: 50 }; 
-        let income = 0;
-        for (let key in myIncomes) income += (rates[key] || 0) * myIncomes[key];
-        
-        if(income > 0) {
-            state.coins += income;
-            updateUI();
-            save();
-        }
+        const incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+        const rates = { lemonade: 1, shop: 8, factory: 50 };
+        let total = 0;
+        for (let key in incomes) total += (rates[key] || 0) * incomes[key];
+        if (total > 0) { state.coins += total; updateUI(); localStorage.setItem("coins", state.coins); }
     }, 1000);
 
     updateUI();
