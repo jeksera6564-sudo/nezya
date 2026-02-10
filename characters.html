@@ -5,55 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Персонажи — Nezya Clicker</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: url('assets/characters-bg.jpg') center/cover no-repeat fixed; 
-            color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
+        :root {
+            --common: #4ade80;
+            --rare: #00d2ff;
+            --epic: #a020f0;
+            --legendary: #ff8c00;
+            --mythic: #ff4d4d;
+            --gold: #ffd700;
         }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: -1; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        h1 { text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 3px; color: #ffd700; text-shadow: 0 0 10px rgba(255,214,0,0.5); }
+        body { 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: -1; }
+        
+        h1 { 
+            text-align: center; margin: 20px 0 40px; text-transform: uppercase; 
+            letter-spacing: 5px; color: var(--gold); 
+            text-shadow: 0 0 20px rgba(255,214,0,0.4); 
+        }
 
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 15px; max-width: 900px; margin: 0 auto; 
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); 
+            gap: 25px; max-width: 1000px; margin: 0 auto; 
         }
 
+        /* Базовая карточка */
         .card { 
-            background: rgba(255,255,255,0.07); 
-            padding: 20px; border-radius: 25px; 
-            text-align: center; border: 2px solid rgba(255,215,0,0.1); 
-            transition: 0.3s; backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.03); 
+            padding: 25px 20px; border-radius: 30px; 
+            text-align: center; border: 2px solid rgba(255,255,255,0.1); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            backdrop-filter: blur(15px);
             display: flex; flex-direction: column; align-items: center;
+            position: relative; overflow: hidden;
         }
+
+        /* Редкости */
+        .rare-common { border-color: var(--common); box-shadow: inset 0 0 15px rgba(74, 222, 128, 0.1); }
+        .rare-rare { border-color: var(--rare); box-shadow: inset 0 0 15px rgba(0, 210, 255, 0.1); }
+        .rare-epic { border-color: var(--epic); box-shadow: inset 0 0 15px rgba(160, 32, 240, 0.1); }
+        .rare-legendary { border-color: var(--legendary); box-shadow: inset 0 0 20px rgba(255, 140, 0, 0.2); }
+        .rare-mythic { border-color: var(--mythic); box-shadow: inset 0 0 20px rgba(255, 77, 77, 0.2); }
+
+        /* Анимация парения персонажа */
+        .card img { 
+            width: 130px; height: 130px; object-fit: contain; 
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8)); 
+            margin-bottom: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* Эффект активного героя */
         .card.active { 
-            border-color: #ffd700; 
-            background: rgba(255, 215, 0, 0.15); 
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transform: scale(1.05);
+            background: rgba(255, 215, 0, 0.08);
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            z-index: 10;
         }
 
-        .card img { width: 120px; height: 120px; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); margin-bottom: 15px; }
-        .card h3 { font-size: 18px; margin-bottom: 5px; color: #fff; }
-        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 10px; font-weight: bold; }
-        .card .price { font-size: 14px; color: #ffd700; margin-bottom: 15px; }
+        .card.active::before {
+            content: "ВЫБРАН";
+            position: absolute; top: 10px; right: 10px;
+            font-size: 8px; font-weight: 900; background: var(--gold);
+            color: #000; padding: 3px 8px; border-radius: 10px;
+        }
 
+        .card h3 { font-size: 20px; margin-bottom: 8px; font-weight: 900; letter-spacing: 1px; }
+        .card .stats { font-size: 13px; color: #4ade80; margin-bottom: 15px; font-weight: bold; }
+
+        /* Кнопки в стиле редкости */
         button { 
-            width: 100%; padding: 12px; border-radius: 15px; border: none; 
-            background: #ffd700; color: #000; font-weight: 900; 
-            cursor: pointer; transition: 0.2s; text-transform: uppercase; font-size: 12px;
+            width: 100%; padding: 14px; border-radius: 18px; border: none; 
+            background: #fff; color: #000; font-weight: 900; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 11px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        button:active { transform: scale(0.95); }
-        button:disabled { background: #333; color: #777; cursor: default; }
+
+        .btn-common { background: var(--common); }
+        .btn-rare { background: var(--rare); }
+        .btn-epic { background: var(--epic); color: #fff; }
+        .btn-legendary { background: var(--legendary); color: #fff; }
+        .btn-mythic { background: var(--mythic); color: #fff; animation: mythicPulse 2s infinite; }
+
+        @keyframes mythicPulse {
+            0%, 100% { box-shadow: 0 0 5px var(--mythic); }
+            50% { box-shadow: 0 0 20px var(--mythic); }
+        }
+
+        button:active { transform: scale(0.92); }
+        button:disabled { background: #1a1a1a !important; color: #444 !important; cursor: default; box-shadow: none; }
 
         .back-btn { 
-            display: block; text-align: center; margin: 40px auto; 
+            display: block; text-align: center; margin: 50px auto; 
             color: #000; text-decoration: none; font-weight: 900; 
-            background: #ffd700; width: fit-content; padding: 15px 50px; 
-            border-radius: 30px; box-shadow: 0 5px 15px rgba(255,215,0,0.3);
-            text-transform: uppercase;
+            background: var(--gold); width: fit-content; padding: 18px 60px; 
+            border-radius: 40px; box-shadow: 0 10px 25px rgba(255,215,0,0.3);
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
         }
+        .back-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
     </style>
 </head>
 <body>
@@ -65,27 +127,19 @@
     <a href="index.html" class="back-btn">⬅ В БОЙ</a>
 
     <script>
-        // База данных героев
         const heroes = [
-            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, img: "assets/character_default.png" },
-            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, img: "assets/character_clicker.png" },
-            { id: "business", name: "Бизнесмен", price: 25000, pwr: 20, cry: 1, img: "assets/character_business.png" },
-            { id: "magnate", name: "Магнат", price: 100000, pwr: 100, cry: 3, img: "assets/character_magnate.png" },
-            { id: "legendary", name: "Легенда", price: 500000, pwr: 500, cry: 10, img: "assets/character_legendary.png" }
+            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png" },
+            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png" },
+            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png" },
+            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png" },
+            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png" }
         ];
 
-        // Загрузка состояния
         let state = {
-            active: localStorage.getItem("activeCharacter") || "clicker", // По умолчанию ставим второго
-            owned: JSON.parse(localStorage.getItem("characters")) || { default: true, clicker: true }, // Второй тоже сразу куплен
+            active: localStorage.getItem("activeCharacter") || "default",
+            owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
             coins: +localStorage.getItem("coins") || 0
         };
-
-        // Сохраняем начальный выбор, если его еще нет
-        if (!localStorage.getItem("activeCharacter")) {
-            localStorage.setItem("activeCharacter", "clicker");
-            localStorage.setItem("characters", JSON.stringify(state.owned));
-        }
 
         function render() {
             const container = document.getElementById("heroList");
@@ -96,13 +150,15 @@
                 const isActive = state.active === h.id;
                 
                 container.innerHTML += `
-                    <div class="card ${isActive ? 'active' : ''}">
-                        <img src="${h.img}">
+                    <div class="card ${h.rare} ${isActive ? 'active' : ''}">
+                        <img src="${h.img}" style="animation-delay: ${Math.random()}s">
                         <h3>${h.name}</h3>
-                        <div class="stats">Урон: +${h.pwr} ${h.cry > 0 ? ' | 💎: +' + h.cry : ''}</div>
-                        <p class="price">${isOwned ? 'В коллекции' : h.price.toLocaleString() + ' 🪙'}</p>
-                        <button ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
-                            ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
+                        <div class="stats">🔥 УРОН: +${h.pwr} ${h.cry > 0 ? '<br>💎 ШАНС: +' + h.cry + '%' : ''}</div>
+                        <p style="font-size: 14px; margin-bottom: 15px; color: ${isOwned ? '#4ade80' : 'var(--gold)'}; font-weight: 900;">
+                            ${isOwned ? 'СОБРАН' : h.price.toLocaleString() + ' 🪙'}
+                        </p>
+                        <button class="${h.btn}" ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
+                            ${isActive ? 'ТЕКУЩИЙ' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
                         </button>
                     </div>`;
             });
@@ -110,23 +166,20 @@
 
         window.handleAction = (id, price) => {
             if (state.owned[id]) {
-                // Если уже есть — просто выбираем
                 state.active = id;
             } else if (state.coins >= price) {
-                // Если нет — покупаем
                 state.coins -= price;
                 state.owned[id] = true;
                 state.active = id;
+                if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             } else {
-                alert("Недостаточно монет для покупки этого героя! 🪙");
+                alert("Нужно больше золота! 🪙");
                 return;
             }
 
-            // Сохранение
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("characters", JSON.stringify(state.owned));
             localStorage.setItem("activeCharacter", state.active);
-            
             render();
         };
 
