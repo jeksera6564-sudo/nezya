@@ -3,67 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Колесо Фортуны — VIP Награды</title>
+    <title>VIP Wheel — Nezya Edition</title>
     <style>
+        :root {
+            --gold: #ffd700;
+            --neon-blue: #00d2ff;
+            --neon-purple: #9d00ff;
+            --neon-pink: #ff007f;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body { 
             width: 100vw; height: 100vh; 
-            background: radial-gradient(circle, #1a1a1a, #000); 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .balance-top { position: absolute; top: 20px; display: flex; gap: 15px; z-index: 20; }
-        .bal { background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 20px; border: 2px solid #ffd700; font-weight: 900; min-width: 100px; text-align: center; }
 
-        .wheel-container { position: relative; width: 360px; height: 360px; margin-bottom: 30px; }
-        .wheel {
-            width: 100%; height: 100%; border-radius: 50%; border: 10px solid #ffd700;
-            background: conic-gradient(
-                #ff4757 0deg 45deg, #2f3542 45deg 90deg, 
-                #ffa502 90deg 135deg, #2ed573 135deg 180deg,
-                #1e90ff 180deg 225deg, #747d8c 225deg 270deg, 
-                #5352ed 270deg 315deg, #ff7f50 315deg 360deg
-            );
-            transition: transform 4.5s cubic-bezier(0.15, 0, 0.15, 1);
-            position: relative; overflow: hidden;
-            box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+        /* Баланс с неоном */
+        .balance-top { position: absolute; top: 20px; display: flex; gap: 15px; z-index: 20; }
+        .bal { 
+            background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 20px; 
+            border: 2px solid var(--gold); font-weight: 900; min-width: 110px; 
+            text-align: center; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
 
+        /* Контейнер колеса */
+        .wheel-container { 
+            position: relative; width: 360px; height: 360px; margin-bottom: 30px; 
+            filter: drop-shadow(0 0 30px rgba(157, 0, 255, 0.2));
+        }
+
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%; 
+            border: 8px solid var(--gold);
+            background: conic-gradient(
+                #ff4757 0deg 45deg, #121212 45deg 90deg, 
+                #ffa502 90deg 135deg, #121212 135deg 180deg,
+                #1e90ff 180deg 225deg, #121212 225deg 270deg, 
+                #9d00ff 270deg 315deg, #121212 315deg 360deg
+            );
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1);
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 1), inset 0 0 50px rgba(255,215,0,0.2);
+        }
+
+        /* Мерцающие сегменты */
         .segment {
             position: absolute; width: 50%; height: 50%;
             left: 50%; top: 50%; transform-origin: 0% 0%;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            padding-top: 30px; font-weight: 900; font-size: 14px; text-shadow: 2px 2px 4px #000;
-            pointer-events: none; text-align: center;
+            display: flex; align-items: center; justify-content: flex-start;
+            padding-left: 60px; font-weight: 900; font-size: 14px;
+            text-shadow: 0 0 10px rgba(0,0,0,1); pointer-events: none;
         }
 
         .pointer {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
             width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
-            border-top: 40px solid #ffd700; z-index: 50; filter: drop-shadow(0 4px 5px #000);
+            border-top: 45px solid var(--gold); z-index: 50; filter: drop-shadow(0 0 10px var(--gold));
         }
 
         .center-cap {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; background: #ffd700; border: 4px solid #fff;
-            border-radius: 50%; z-index: 60; box-shadow: 0 0 20px #000;
-            display: flex; align-items: center; justify-content: center; color: black; font-weight: 900;
+            width: 60px; height: 60px; background: var(--gold); border: 4px solid #fff;
+            border-radius: 50%; z-index: 60; box-shadow: 0 0 30px var(--gold);
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
         }
 
-        .controls { text-align: center; z-index: 20; }
+        /* Кнопка с анимацией */
         .spin-btn {
-            background: linear-gradient(#ffd700, #ff7f50); color: #000; border: none; padding: 18px 60px;
-            border-radius: 40px; font-weight: 900; font-size: 22px; cursor: pointer;
-            box-shadow: 0 6px 0 #b8860b; transition: 0.1s; text-transform: uppercase;
+            background: linear-gradient(45deg, var(--gold), #ff7f50);
+            color: #000; border: none; padding: 20px 70px;
+            border-radius: 50px; font-weight: 900; font-size: 24px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            transition: 0.3s; text-transform: uppercase;
+            animation: buttonGlow 2s infinite ease-in-out;
         }
-        .spin-btn:active { transform: translateY(3px); box-shadow: 0 3px 0 #b8860b; }
-        .spin-btn:disabled { background: #444; box-shadow: none; color: #888; }
 
-        .timer { margin-top: 15px; font-size: 14px; color: #ffd700; font-weight: bold; }
-        .back { margin-top: 25px; color: #fff; text-decoration: none; display: block; opacity: 0.5; font-size: 14px; }
+        @keyframes buttonGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); transform: scale(1); }
+            50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7); transform: scale(1.05); }
+        }
+
+        .spin-btn:disabled { background: #333; color: #666; animation: none; }
+
+        .jackpot-alert {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9); border: 3px solid var(--gold);
+            padding: 40px; border-radius: 30px; text-align: center;
+            z-index: 100; display: none; animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop { from { transform: translate(-50%, -50%) scale(0); } to { transform: translate(-50%, -50%) scale(1); } }
     </style>
 </head>
 <body>
+
+    <div class="jackpot-alert" id="jackpotBox">
+        <h1 style="color: var(--gold); margin-bottom: 10px;">🏆 JACKPOT!</h1>
+        <p style="font-size: 20px;">Вы разблокировали героя:<br><b style="color: #ff4d4d;">МАГНАТ</b></p>
+        <button class="spin-btn" style="margin-top: 20px; padding: 10px 30px; font-size: 14px;" onclick="closeJackpot()">ЗАБРАТЬ</button>
+    </div>
 
     <div class="balance-top">
         <div class="bal">🪙 <span id="coins">0</span></div>
@@ -72,78 +114,68 @@
 
     <div class="wheel-container">
         <div class="pointer"></div>
-        <div class="center-cap">🎰</div>
+        <div class="center-cap">💎</div>
         <div class="wheel" id="wheel">
-            <div class="segment" style="transform: rotate(22.5deg) translate(-50%, -100%);">💎 500<br>JACKPOT</div>
-            <div class="segment" style="transform: rotate(67.5deg) translate(-50%, -100%);">🪙 10.000</div>
-            <div class="segment" style="transform: rotate(112.5deg) translate(-50%, -100%);">💎 10</div>
-            <div class="segment" style="transform: rotate(157.5deg) translate(-50%, -100%);">🪙 5.000</div>
-            <div class="segment" style="transform: rotate(202.5deg) translate(-50%, -100%);">💎 200</div>
-            <div class="segment" style="transform: rotate(247.5deg) translate(-50%, -100%);">🪙 1.000</div>
-            <div class="segment" style="transform: rotate(292.5deg) translate(-50%, -100%);">💎 50</div>
-            <div class="segment" style="transform: rotate(337.5deg) translate(-50%, -100%);">🪙 500</div>
-        </div>
+            </div>
     </div>
 
     <div class="controls">
         <button id="spinBtn" class="spin-btn" onclick="spin()">КРУТИТЬ</button>
-        <div class="timer" id="timer">...</div>
-        <a href="index.html" class="back">НАЗАД В ИГРУ</a>
+        <div id="timer" style="margin-top: 15px; color: var(--gold); font-weight: bold; opacity: 0.8;">...</div>
+        <a href="index.html" style="margin-top: 20px; color: #666; display: block; text-decoration: none; font-size: 13px;">ВЕРНУТЬСЯ К КЛИКАМ</a>
     </div>
 
 <script>
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crystals: +localStorage.getItem("crystals") || 0,
-        lastSpin: +localStorage.getItem("lastSpinTime") || 0
+        lastSpin: +localStorage.getItem("lastSpinTime") || 0,
+        ownedHeroes: JSON.parse(localStorage.getItem("characters")) || { default: true }
     };
-    
-    const COST = 100;
 
     const prizes = [
-        { name: "500 КРИСТАЛЛОВ", type: "crystals", val: 500 }, // Сектор 0
-        { name: "10.000 МОНЕТ", type: "coins", val: 10000 },    // Сектор 1
-        { name: "10 КРИСТАЛЛОВ", type: "crystals", val: 10 },    // Сектор 2
-        { name: "5.000 МОНЕТ", type: "coins", val: 5000 },     // Сектор 3
-        { name: "200 КРИСТАЛЛОВ", type: "crystals", val: 200 },  // Сектор 4
-        { name: "1.000 МОНЕТ", type: "coins", val: 1000 },     // Сектор 5
-        { name: "50 КРИСТАЛЛОВ", type: "crystals", val: 50 },    // Сектор 6
-        { name: "500 МОНЕТ", type: "coins", val: 500 }        // Сектор 7
+        { n: "💎 500", t: "cry", v: 500 }, { n: "🪙 10k", t: "coin", v: 10000 },
+        { n: "💎 10", t: "cry", v: 10 },   { n: "🪙 5k", t: "coin", v: 5000 },
+        { n: "💎 200", t: "cry", v: 200 }, { n: "🪙 1k", t: "coin", v: 1000 },
+        { n: "💎 50", t: "cry", v: 50 },   { n: "🪙 500", t: "coin", v: 500 }
     ];
+
+    // Отрисовка текста на колесе
+    const wheel = document.getElementById("wheel");
+    prizes.forEach((p, i) => {
+        const div = document.createElement("div");
+        div.className = "segment";
+        div.style.transform = `rotate(${i * 45 + 22.5}deg) rotate(-90deg)`;
+        div.innerHTML = p.n;
+        wheel.appendChild(div);
+    });
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals;
-        
-        const now = Date.now();
-        const diff = now - state.lastSpin;
-        const day = 24 * 60 * 60 * 1000;
-
+        const diff = Date.now() - state.lastSpin;
+        const day = 86400000;
         if (diff < day) {
-            document.getElementById("spinBtn").textContent = `ЗА ${COST} 💎`;
+            document.getElementById("spinBtn").textContent = `ЗА 100 💎`;
             const timeLeft = day - diff;
             const h = Math.floor(timeLeft / 3600000);
             const m = Math.floor((timeLeft % 3600000) / 60000);
             document.getElementById("timer").textContent = `Бесплатно через: ${h}ч ${m}м`;
         } else {
             document.getElementById("spinBtn").textContent = "БЕСПЛАТНО";
-            document.getElementById("timer").textContent = "Ежедневный бонус готов!";
+            document.getElementById("timer").textContent = "Удача ждет тебя!";
         }
     }
 
     let isSpinning = false;
     function spin() {
         if (isSpinning) return;
-
         const now = Date.now();
-        const isFree = (now - state.lastSpin) >= (24 * 60 * 60 * 1000);
+        const isFree = (now - state.lastSpin) >= 86400000;
 
         if (!isFree) {
-            if (state.crystals < COST) {
-                alert(`Недостаточно кристаллов! Нужно ${COST} 💎`);
-                return;
-            }
-            state.crystals -= COST;
+            if (state.crystals < 100) return alert("Мало 💎!");
+            state.crystals -= 100;
         } else {
             state.lastSpin = now;
             localStorage.setItem("lastSpinTime", state.lastSpin);
@@ -152,49 +184,44 @@
         isSpinning = true;
         document.getElementById("spinBtn").disabled = true;
 
-        // ВЫЧИСЛЕНИЕ ШАНСОВ
-        let targetSector;
+        // ШАНС 0.04% НА МАГНАТА (1 из 2500)
+        const magnatChance = Math.random() < 0.0004;
+        
+        // Обычный выбор сектора
+        let targetSector = Math.floor(Math.random() * 8);
         const roll = Math.random();
+        if (roll < 0.05) targetSector = 0; // 5% на джекпот 500💎
 
-        if (roll < 0.10) { 
-            targetSector = 0; // 10% шанс на 500 Кристаллов
-        } else if (roll < 0.40) { 
-            // 30% шанс на 200 Кристаллов или 10к Монет
-            targetSector = Math.random() < 0.5 ? 1 : 4; 
-        } else {
-            // Остальные 60% на обычные призы
-            const commonSectors = [2, 3, 5, 6, 7];
-            targetSector = commonSectors[Math.floor(Math.random() * commonSectors.length)];
-        }
-
-        const targetDeg = (360 - (targetSector * 45) - 22.5); 
-        const totalRotation = 3600 + targetDeg; 
-
-        const wheel = document.getElementById("wheel");
-        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        const totalRot = 3600 + (360 - (targetSector * 45));
+        wheel.style.transform = `rotate(${totalRot}deg)`;
 
         setTimeout(() => {
             isSpinning = false;
             document.getElementById("spinBtn").disabled = false;
             
-            const prize = prizes[targetSector];
-            if (prize.type === "coins") state.coins += prize.val;
-            else state.crystals += prize.val;
+            if (magnatChance) {
+                state.ownedHeroes["magnate"] = true;
+                localStorage.setItem("characters", JSON.stringify(state.ownedHeroes));
+                document.getElementById("jackpotBox").style.display = "block";
+            }
 
-            alert(`🎉 ПОБЕДА! Вы выиграли: ${prize.name}`);
-            
+            const prize = prizes[targetSector];
+            if (prize.t === "coin") state.coins += prize.v;
+            else state.crystals += prize.v;
+
             localStorage.setItem("coins", state.coins);
             localStorage.setItem("crystals", state.crystals);
             updateUI();
             
+            // Сброс позиции без анимации
             wheel.style.transition = "none";
-            wheel.style.transform = `rotate(${targetDeg}deg)`;
-            setTimeout(() => wheel.style.transition = "transform 4.5s cubic-bezier(0.15, 0, 0.15, 1)", 50);
-        }, 4600);
+            wheel.style.transform = `rotate(${totalRot % 360}deg)`;
+            setTimeout(() => wheel.style.transition = "transform 5s cubic-bezier(0.15, 0, 0.15, 1)", 50);
+        }, 5100);
     }
 
+    function closeJackpot() { document.getElementById("jackpotBox").style.display = "none"; }
     updateUI();
-    setInterval(updateUI, 60000);
 </script>
 </body>
 </html>
