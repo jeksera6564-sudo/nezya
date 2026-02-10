@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Колесо Фортуны — Nezya</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            width: 100vw; height: 100vh; 
+            background: radial-gradient(circle, #2c3e50, #000000); 
+            font-family: sans-serif; overflow: hidden; color: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .balance-top { position: absolute; top: 20px; display: flex; gap: 20px; font-weight: bold; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; border: 1px solid #ffd700; }
+
+        /* Колесо */
+        .wheel-container { position: relative; width: 320px; height: 320px; margin-bottom: 30px; }
+        .wheel {
+            width: 100%; height: 100%; border-radius: 50%; border: 10px solid #ffd700;
+            background: conic-gradient(
+                #e74c3c 0deg 45deg, #3498db 45deg 90deg, 
+                #f1c40f 90deg 135deg, #2ecc71 135deg 180deg,
+                #e74c3c 180deg 225deg, #3498db 225deg 270deg, 
+                #f1c40f 270deg 315deg, #2ecc71 315deg 360deg
+            );
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+            position: relative; box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+        }
+        /* Стрелка */
+        .pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #ffd700; z-index: 10;
+        }
+
+        .controls { text-align: center; }
+        .spin-btn {
+            background: #ffd700; color: #000; border: none; padding: 15px 40px;
+            border-radius: 25px; font-weight: 900; font-size: 18px; cursor: pointer;
+            box-shadow: 0 5px 0 #b8860b; transition: 0.1s;
+        }
+        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #b8860b; }
+        .spin-btn:disabled { background: #555; box-shadow: none; color: #888; transform: none; }
+
+        .timer { margin-top: 15px; font-size: 14px; color: #ffd700; }
+        .back { margin-top: 30px; color: white; text-decoration: none; font-size: 14px; opacity: 0.7; }
+        
+        /* Текст на секторах (упрощенно метками) */
+        .wheel-labels { position: absolute; inset: 0; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="balance-top">
+        <div>🪙 <span id="coins">0</span></div>
+        <div>💎 <span id="crystals">0</span></div>
+    </div>
+
+    <div class="wheel-container">
+        <div class="pointer"></div>
+        <div class="wheel" id="wheel"></div>
+    </div>
+
+    <div class="controls">
+        <button id="spinBtn" class="spin-btn" onclick="spin()">КРУТИТЬ БЕСПЛАТНО</button>
+        <div class="timer" id="timer"></div>
+    </div>
+
+    <a href="index.html" class="back">⬅ На главную</a>
+
+<script>
+    let coins = +localStorage.getItem("coins") || 0;
+    let crystals = +localStorage.getItem("crystals") || 0;
+    let lastSpin = +localStorage.getItem("lastSpinTime") || 0;
+    const SPIN_COST = 10; // Цена в кристаллах
+
+    const wheel = document.getElementById("wheel");
+    const spinBtn = document.getElementById("spinBtn");
+    const timerText = document.getElementById("timer");
+
+    const prizes = [
+        { name: "500 монет", type: "coins", val: 500 },
+        { name: "2 кристаллов", type: "crystals", val: 2 },
+        { name: "100 монет", type: "coins", val: 100 },
+        { name: "5 кристаллов", type: "crystals", val: 5 },
+        { name: "1000 монет", type: "coins", val: 1000 },
+        { name: "1 кристалл", type: "crystals", val: 1 },
+        { name: "2000 монет", type: "coins", val: 2000 },
+        { name: "ДЖЕКПОТ 50💎", type: "crystals", val: 50 }
+    ];
+
+    function updateUI() {
+        document.getElementById("coins").textContent = Math.floor(coins).toLocaleString();
+        document.getElementById("crystals").textContent = crystals;
+        
+        const now = Date.now();
+        const diff = now - lastSpin;
+        const day = 24 * 60 * 60 * 1000;
+
+        if (diff < day) {
+            spinBtn.textContent = `КРУТИТЬ ЗА ${SPIN_COST} 💎`;
+            const timeLeft = day - diff;
+            const h = Math.floor(timeLeft / 3600000);
+            const m = Math.floor((timeLeft % 3600000) / 60000);
+            timerText.textContent = `Бесплатно через: ${h}ч ${m}м`;
+        } else {
+            spinBtn.textContent = "КРУТИТЬ БЕСПЛАТНО";
+            timerText.textContent = "Ежедневный бонус готов!";
+        }
+    }
+
+    let isSpinning = false;
+    function spin() {
+        if (isSpinning) return;
+
+        const now = Date.now();
+        const isFree = (now - lastSpin) >= (24 * 60 * 60 * 1000);
+
+        if (!isFree) {
+            if (crystals < SPIN_COST) {
+                alert("Недостаточно кристаллов! Нужно 10 💎");
+                return;
+            }
+            crystals -= SPIN_COST;
+        } else {
+            lastSpin = now;
+            localStorage.setItem("lastSpinTime", lastSpin);
+        }
+
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        const randomDegree = Math.floor(Math.random() * 360) + 3600; // Минимум 10 оборотов
+        wheel.style.transform = `rotate(${randomDegree}deg)`;
+
+        setTimeout(() => {
+            isSpinning = false;
+            spinBtn.disabled = false;
+            
+            // Расчет приза
+            const actualDeg = randomDegree % 360;
+            const sector = Math.floor(((360 - actualDeg + 22.5) % 360) / 45);
+            const prize = prizes[sector];
+
+            if (prize.type === "coins") coins += prize.val;
+            if (prize.type === "crystals") crystals += prize.val;
+
+            alert(`🎉 Твой приз: ${prize.name}!`);
+            
+            localStorage.setItem("coins", coins);
+            localStorage.setItem("crystals", crystals);
+            updateUI();
+            
+            // Сбрасываем колесо для следующего раза (визуально незаметно)
+            wheel.style.transition = "none";
+            wheel.style.transform = `rotate(${actualDeg}deg)`;
+            setTimeout(() => wheel.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.15, 1)", 50);
+
+        }, 4100);
+    }
+
+    updateUI();
+    setInterval(updateUI, 60000); // Обновлять таймер раз в минуту
+</script>
+</body>
+</html>
