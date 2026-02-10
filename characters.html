@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Герои</title>
+    <title>Персонажи</title>
     <style>
-        body { background: #111; color: white; font-family: sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .card { background: #222; padding: 15px; border-radius: 20px; text-align: center; border: 2px solid transparent; }
-        .active { border-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
-        img { width: 100px; height: 100px; object-fit: contain; }
-        button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 10px; border: none; background: #fbbf24; font-weight: bold; }
-        .back { display: block; text-align: center; margin-top: 30px; color: gold; text-decoration: none; font-weight: bold; }
+        body { 
+            background: url('assets/characters-bg.jpg') center/cover no-repeat fixed; 
+            color: white; font-family: sans-serif; padding: 20px; margin: 0;
+        }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: -1; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+        .card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 25px; text-align: center; border: 2px solid transparent; transition: 0.3s; }
+        .card.active { border-color: #22c55e; background: rgba(34, 197, 94, 0.2); }
+        img { width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
+        button { width: 100%; padding: 12px; margin-top: 15px; border-radius: 15px; border: none; background: #ffd700; font-weight: bold; cursor: pointer; }
+        button:disabled { background: #444; color: #888; }
+        .back { display: block; text-align: center; margin: 40px auto; color: white; text-decoration: none; font-weight: bold; background: #ffd700; color: black; width: fit-content; padding: 12px 40px; border-radius: 25px; }
     </style>
 </head>
 <body>
-    <h2 style="text-align:center; margin-bottom:20px;">ВЫБЕРИ ГЕРОЯ</h2>
+    <div class="overlay"></div>
+    <h1 style="text-align:center; margin-bottom:30px; text-transform: uppercase;">Выберите Героя</h1>
     <div class="grid" id="heroList"></div>
 
     <script>
@@ -26,9 +32,11 @@
         };
 
         const heroes = [
-            { id: "default", name: "Новичок", price: 0 },
-            { id: "clicker", name: "Кликер", price: 5000 },
-            { id: "business", name: "Бизнесмен", price: 25000 }
+            { id: "default", name: "Новичок", price: 0, img: "assets/character_default.png" },
+            { id: "clicker", name: "Про-Кликер", price: 5000, img: "assets/character_clicker.png" },
+            { id: "business", name: "Бизнесмен", price: 25000, img: "assets/character_business.png" },
+            { id: "magnate", name: "Магнат", price: 100000, img: "assets/character_magnate.png" },
+            { id: "legendary", name: "Легенда", price: 500000, img: "assets/character_legendary.png" }
         ];
 
         function render() {
@@ -39,9 +47,9 @@
                 let isActive = state.active === h.id;
                 container.innerHTML += `
                     <div class="card ${isActive ? 'active' : ''}">
-                        <img src="assets/${h.id}.png" onerror="this.src='https://via.placeholder.com/100'">
+                        <img src="${h.img}">
                         <h3>${h.name}</h3>
-                        <p>${isOwned ? 'Куплено' : h.price + ' 🪙'}</p>
+                        <p>${isOwned ? 'В коллекции' : h.price.toLocaleString() + ' 🪙'}</p>
                         <button ${isActive ? 'disabled' : ''} onclick="handle('${h.id}', ${h.price})">
                             ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : 'КУПИТЬ')}
                         </button>
