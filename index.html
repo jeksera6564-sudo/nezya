@@ -277,7 +277,22 @@
         if(id === 'effModal') renderEffects();
     }
     function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display = "none"); }
+setInterval(() => {
+    let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+    let totalIncome = 0;
+    // Значения inc должны совпадать со значениями в shop.html
+    if(incomes.startup) totalIncome += incomes.startup * 2;
+    if(incomes.market) totalIncome += incomes.market * 15;
+    if(incomes.factory) totalIncome += incomes.factory * 120;
+    if(incomes.oil) totalIncome += incomes.oil * 1000;
+    if(incomes.bank) totalIncome += incomes.bank * 15000;
 
+    if (totalIncome > 0) {
+        state.coins += totalIncome;
+        localStorage.setItem("coins", state.coins);
+        updateUI(); // Твоя функция обновления цифр на экране
+    }
+}, 1000);
     updateUI();
 </script>
 </body>
