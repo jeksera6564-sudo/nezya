@@ -14,7 +14,14 @@ body{
   overflow:hidden;
   user-select:none;
 }
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45)}
+
+/* 🔥 FIX: overlay больше НЕ блокирует клики */
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  pointer-events:none;
+}
 
 .top-bar{
   position:absolute;top:12px;left:50%;
@@ -48,6 +55,7 @@ body{
 .level-bar{
   height:10px;background:gold;
   border-radius:8px;width:0%;
+  transition:width .2s linear;
 }
 .level-text{
   text-align:center;font-size:12px;
@@ -69,7 +77,8 @@ body{
 
 .character{
   width:280px;max-width:80vw;
-  cursor:pointer;transition:transform .12s ease;
+  cursor:pointer;
+  transition:transform .12s ease;
 }
 
 .aura{
@@ -134,7 +143,7 @@ if(!localStorage.getItem("nickname")){
 
 <div class="game">
   <div class="character-wrap" id="charWrap">
-    <img id="character" class="character">
+    <img id="character" class="character" draggable="false">
   </div>
 </div>
 
@@ -143,7 +152,6 @@ if(!localStorage.getItem("nickname")){
   <a href="characters.html" class="menu-btn">🧍 Персонажи</a>
 </div>
 
-<!-- 🔊 ЗВУК -->
 <audio id="clickSound" src="click.mp3" preload="auto"></audio>
 
 <script>
@@ -162,11 +170,10 @@ let active=localStorage.getItem("activeCharacter")||"default";
 let coins=+localStorage.getItem("coins")||0;
 let crystals=+localStorage.getItem("crystals")||0;
 let clicks=+localStorage.getItem("clicks")||0;
-let combo=1,lastClick=0;
-
-/* ПАССИВ */
 let passive=+localStorage.getItem("passive")||1;
 let expFloat=+localStorage.getItem("expFloat")||0;
+
+let combo=1,lastClick=0;
 
 const character=document.getElementById("character");
 const wrap=document.getElementById("charWrap");
@@ -184,7 +191,7 @@ function updateUI(){
   crystalsEl.textContent=crystals;
   const lvl=Math.floor(clicks/100)+1;
   levelEl.textContent=lvl;
-  levelBar.style.width=(clicks%100)+"%";
+  levelBar.style.width=((clicks%100))+"%";
   comboEl.textContent="Комбо x"+combo;
 }
 
@@ -217,23 +224,23 @@ character.onclick=()=>{
 
   coins+=gain;
   crystals+=ch.crystal;
-  clicks+=1;
+  clicks++;
 
   spawn("+"+gain,mult>=10?"#fb7185":mult>=5?"#a855f7":"gold",mult);
   save();updateUI();
 };
 
-/* ПАССИВНЫЙ ДОХОД */
+/* ПАССИВ */
 setInterval(()=>{
-  const gain=passive;
-  coins+=gain;
-  expFloat+=0.2;     // медленный рост уровня
-  clicks+=expFloat>=1?1:0;
-  if(expFloat>=1) expFloat=0;
+  coins+=passive;
+  expFloat+=0.2;
+  if(expFloat>=1){
+    clicks++;
+    expFloat=0;
+  }
   updateUI();
 },1000);
 
-/* FLOAT */
 function spawn(text,color,m){
   const e=document.createElement("div");
   e.className="float";
@@ -246,7 +253,6 @@ function spawn(text,color,m){
   setTimeout(()=>e.remove(),1800);
 }
 
-/* SAVE */
 function save(){
   localStorage.setItem("coins",coins);
   localStorage.setItem("crystals",crystals);
