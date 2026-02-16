@@ -2,156 +2,568 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Бизнес Империя — Магазин</title>
     <style>
+        :root {
+            --gold: #ffd700;
+            --neon-blue: #00d2ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #39ff14;
+            --neon-red: #ff4d4d;
+            --neon-pink: #ff00ff;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        
         body { 
             background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
-            color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0;
-            overflow-x: hidden;
+            color: white; font-family: 'Segoe UI', sans-serif; 
+            padding: 20px; min-height: 100vh; overflow-x: hidden;
         }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: -1; }
-        
-        .stats { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; position: sticky; top: 10px; z-index: 100; }
-        .balance { background: rgba(0,0,0,0.9); padding: 12px 25px; border-radius: 30px; border: 1px solid #ffd700; font-weight: bold; backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
-        
-        /* Карточки по редкости */
-        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 20px; border-radius: 20px; text-align: center; border: 2px solid; transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); }
-        
-        .rare-common { border-color: #4ae38d; box-shadow: 0 0 10px rgba(74, 227, 141, 0.2); } /* Зеленый */
-        .rare-rare { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }   /* Синий */
-        .rare-epic { border-color: #a020f0; box-shadow: 0 0 10px rgba(160, 32, 240, 0.2); }  /* Фиолетовый */
-        .rare-legend { border-color: #ff8c00; box-shadow: 0 0 15px rgba(255, 140, 0, 0.4); } /* Оранжевый */
-        .rare-mythic { border-color: #ff4d4d; box-shadow: 0 0 20px rgba(255, 77, 77, 0.5); }  /* Красный */
 
-        .card h3 { margin-bottom: 10px; font-size: 1.1em; }
-        .card p { font-size: 0.9em; color: #ccc; margin: 5px 0; }
-        .card b { color: #ffd700; font-size: 1.1em; }
+        /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
+        .stats { 
+            display: flex; justify-content: center; gap: 15px; 
+            margin-bottom: 20px; position: sticky; top: 10px; z-index: 100;
+            animation: slideDown 0.5s ease;
+        }
+        .balance { 
+            background: rgba(0,0,0,0.9); padding: 12px 25px; 
+            border-radius: 30px; border: 1px solid var(--gold); 
+            font-weight: 900; backdrop-filter: blur(10px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s;
+        }
+        .balance.changed { transform: scale(1.1); filter: brightness(1.5); }
+        .balance.crystals { border-color: var(--neon-blue); }
 
-        button { width: 100%; padding: 12px; margin-top: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-gold { background: #ffd700; color: #000; }
-        .btn-diamond { background: #00d2ff; color: #000; }
-        button:disabled { background: #333 !important; color: #777 !important; cursor: not-allowed; }
-        button:active { transform: scale(0.95); }
+        /* --- ЗАГОЛОВОК --- */
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { 
+            text-transform: uppercase; letter-spacing: 3px; 
+            font-size: 24px; background: linear-gradient(90deg, var(--gold), #ff8c00);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+        }
+        .income-display {
+            background: var(--glass); padding: 15px 30px; border-radius: 20px;
+            display: inline-flex; align-items: center; gap: 10px; margin-top: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .income-value { 
+            color: var(--neon-green); font-weight: 900; font-size: 20px;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
 
-        .back { display: block; text-align: center; margin: 40px auto; color: #fff; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.1); width: fit-content; padding: 12px 40px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.3); transition: 0.2s; }
-        .back:hover { background: #fff; color: #000; }
+        /* --- СКИДКА БАННЕР --- */
+        .sale-banner {
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-pink));
+            padding: 10px 20px; border-radius: 15px; text-align: center;
+            margin-bottom: 20px; font-weight: 900; display: none;
+            animation: pulse-sale 2s infinite; box-shadow: 0 0 20px rgba(255,77,77,0.4);
+        }
+        .sale-banner.active { display: block; }
+        @keyframes pulse-sale { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+        /* --- СЕТКА --- */
+        .grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; max-width: 1000px; margin: 0 auto;
+        }
+
+        /* --- КАРТОЧКИ --- */
+        .card { 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); 
+            padding: 20px; border-radius: 20px; text-align: center; 
+            border: 2px solid; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .card:hover { transform: translateY(-8px); }
+        .card.purchased { animation: purchasePulse 0.5s ease; }
+        
+        @keyframes purchasePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px currentColor; }
+            100% { transform: scale(1); }
+        }
+
+        /* Редкости */
+        .rare-common { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57,255,20,0.2); }
+        .rare-rare { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0,210,255,0.3); }
+        .rare-epic { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(160,32,240,0.3); }
+        .rare-legend { border-color: #ff8c00; box-shadow: 0 0 20px rgba(255,140,0,0.4); }
+        .rare-mythic { 
+            border-color: var(--neon-red); 
+            box-shadow: 0 0 30px rgba(255,77,77,0.5);
+            animation: mythicGlow 3s ease-in-out infinite;
+        }
+        @keyframes mythicGlow { 
+            0%, 100% { box-shadow: 0 0 30px rgba(255,77,77,0.5); }
+            50% { box-shadow: 0 0 50px rgba(255,77,77,0.8); }
+        }
+
+        .card-icon { font-size: 40px; margin-bottom: 10px; }
+        .card h3 { margin-bottom: 8px; font-size: 1.1em; color: #fff; }
+        .card-level { 
+            background: rgba(255,255,255,0.1); padding: 4px 12px; 
+            border-radius: 10px; font-size: 12px; display: inline-block; margin-bottom: 8px;
+        }
+        .card-income { 
+            color: var(--neon-green); font-weight: 900; font-size: 14px;
+            margin: 5px 0; text-shadow: 0 0 5px var(--neon-green);
+        }
+        .card-income-preview {
+            color: #666; font-size: 11px; margin-bottom: 10px;
+        }
+        .card-income-preview span { color: var(--neon-green); }
+
+        .price-tag {
+            background: rgba(0,0,0,0.5); padding: 8px 15px; border-radius: 10px;
+            margin: 10px 0; font-weight: 900;
+        }
+        .price-tag .old-price {
+            text-decoration: line-through; color: #666; font-size: 12px; margin-right: 5px;
+        }
+        .price-tag .sale-badge {
+            background: var(--neon-red); color: white; font-size: 10px;
+            padding: 2px 6px; border-radius: 5px; margin-left: 5px;
+        }
+
+        /* --- КНОПКИ --- */
+        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
+        button { 
+            flex: 1; padding: 12px; border-radius: 12px; border: none; 
+            font-weight: 900; cursor: pointer; transition: all 0.2s; font-size: 11px;
+            text-transform: uppercase;
+        }
+        button:hover:not(:disabled) { transform: scale(1.05); }
+        button:active:not(:disabled) { transform: scale(0.95); }
+        
+        .btn-buy { background: var(--gold); color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        .btn-buy:hover:not(:disabled) { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+        
+        .btn-buy-10 { background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink)); color: white; }
+        .btn-buy-10:hover:not(:disabled) { box-shadow: 0 0 20px rgba(157,0,255,0.5); }
+        
+        .btn-diamond { background: var(--neon-blue); color: #000; box-shadow: 0 0 10px rgba(0,210,255,0.3); }
+        .btn-diamond:hover:not(:disabled) { box-shadow: 0 0 20px rgba(0,210,255,0.5); }
+
+        button:disabled { 
+            background: #333 !important; color: #666 !important; 
+            cursor: not-allowed; transform: none !important;
+        }
+
+        /* --- МАКС УРОВЕНЬ --- */
+        .max-level {
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+            color: #000; padding: 10px; border-radius: 10px;
+            font-weight: 900; font-size: 12px; margin-top: 10px;
+        }
+
+        /* --- НАЗАД --- */
+        .back { 
+            display: block; text-align: center; margin: 40px auto; 
+            color: #fff; text-decoration: none; font-weight: 900; 
+            background: rgba(255,255,255,0.1); width: fit-content; 
+            padding: 15px 50px; border-radius: 30px; 
+            border: 1px solid rgba(255,255,255,0.3); transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .back:hover { 
+            background: #fff; color: #000; 
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+
+        /* --- ЧАСТИЦЫ --- */
+        .particle {
+            position: fixed; width: 8px; height: 8px; border-radius: 50%;
+            pointer-events: none; z-index: 1000;
+            animation: particleFly 1s ease-out forwards;
+        }
+        @keyframes particleFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* --- TOAST --- */
+        .toast-container {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: rgba(0,0,0,0.95); padding: 15px 25px; border-radius: 15px;
+            border: 1px solid; font-weight: 900; animation: slideDown 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .toast.success { border-color: var(--neon-green); color: var(--neon-green); }
+        .toast.error { border-color: var(--neon-red); color: var(--neon-red); }
+        .toast.info { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- ПРОГРЕСС БАР --- */
+        .progress-bar {
+            width: 100%; height: 4px; background: #333; border-radius: 2px;
+            margin-top: 10px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--gold), var(--neon-orange));
+            transition: width 0.5s ease;
+        }
+
+        /* --- АНИМАЦИИ --- */
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="overlay"></div>
+
     <div class="stats">
-        <div class="balance">🪙 <span id="coins">0</span></div>
-        <div class="balance">💎 <span id="crystals">0</span></div>
+        <div class="balance" id="bal-coins">🪙 <span id="coins">0</span></div>
+        <div class="balance crystals" id="bal-crystals">💎 <span id="crystals">0</span></div>
     </div>
 
-    <h2 style="text-align:center; margin-bottom:10px; text-transform: uppercase; letter-spacing: 2px;">Бизнес Империя</h2>
-    <p style="text-align:center; color: #888; margin-bottom: 30px;">Пассивный доход: <span id="totalIncome" style="color:#4ae38d; font-weight:bold;">0</span> 🪙/сек</p>
-    
+    <div class="header">
+        <h2>🏢 Бизнес Империя</h2>
+        <div class="income-display">
+            <span>Пассивный доход:</span>
+            <span class="income-value" id="totalIncome">0</span>
+            <span>🪙/сек</span>
+        </div>
+    </div>
+
+    <div class="sale-banner" id="saleBanner">
+        🔥 СКИДКА 20% НА ВСЁ! ОСТАЛОСЬ: <span id="saleTimer">30</span>с
+    </div>
+
     <div class="grid" id="incomeShop"></div>
 
-    <a href="index.html" class="back">⬅ НА ГЛАВНУЮ</a>
+    <a href="index.html" class="back">⬅ На главную</a>
 
-    <script>
-        // Данные о бизнесах
-        const list = {
-            startup: { name: "🚀 Стартап", base: 500, inc: 2, rare: "rare-common", cur: "gold" },
-            market:  { name: "🛒 Супермаркет", base: 5000, inc: 15, rare: "rare-rare", cur: "gold" },
-            factory: { name: "🏭 Технозавод", base: 50000, inc: 120, rare: "rare-epic", cur: "gold" },
-            oil:     { name: "🔥 Нефтяная Вышка", base: 100, inc: 1000, rare: "rare-legend", cur: "diamond" },
-            bank:    { name: "🪐 Галактический Банк", base: 1000, inc: 15000, rare: "rare-mythic", cur: "diamond" }
-        };
+    <div class="toast-container" id="toast-container"></div>
 
-        let state = {
-            coins: +localStorage.getItem("coins") || 0,
-            crystals: +localStorage.getItem("crystals") || 0,
-            incomes: JSON.parse(localStorage.getItem("incomes")) || {}
-        };
+<script>
+    // --- ДАННЫЕ ---
+    const list = {
+        startup: { 
+            name: "Стартап", icon: "🚀", base: 500, inc: 2, 
+            rare: "rare-common", cur: "gold", max: 100,
+            desc: "Начни свой путь к богатству"
+        },
+        market: { 
+            name: "Супермаркет", icon: "🛒", base: 5000, inc: 15, 
+            rare: "rare-rare", cur: "gold", max: 50,
+            desc: "Продаём всё и всем"
+        },
+        factory: { 
+            name: "Технозавод", icon: "🏭", base: 50000, inc: 120, 
+            rare: "rare-epic", cur: "gold", max: 25,
+            desc: "Производство высоких технологий"
+        },
+        oil: { 
+            name: "Нефтяная Вышка", icon: "🛢️", base: 100, inc: 1000, 
+            rare: "rare-legend", cur: "diamond", max: 10,
+            desc: "Чёрное золото"
+        },
+        bank: { 
+            name: "Галактический Банк", icon: "🏦", base: 1000, inc: 15000, 
+            rare: "rare-mythic", cur: "diamond", max: 5,
+            desc: "Контролируем всю галактику"
+        }
+    };
 
-        const getPrice = (base, lvl) => Math.floor(base * Math.pow(1.6, lvl || 0));
+    let state = {
+        coins: +localStorage.getItem("coins") || 0,
+        crystals: +localStorage.getItem("crystals") || 0,
+        incomes: JSON.parse(localStorage.getItem("incomes")) || {}
+    };
 
-        // Функция покупки
-        window.buy = (k) => {
+    let currentSale = 0; // 0 или 0.8 (20% скидка)
+    let saleTimer = null;
+
+    // --- ЦЕНА ---
+    const getPrice = (base, lvl) => Math.floor(base * Math.pow(1.6, lvl) * (1 - currentSale));
+
+    // --- ПОКУПКА ---
+    window.buy = (k, amount = 1) => {
+        const biz = list[k];
+        let lvl = state.incomes[k] || 0;
+        
+        if(lvl >= biz.max) {
+            showToast("Достигнут максимальный уровень!", "error");
+            return;
+        }
+
+        // Проверяем сколько можем купить
+        let canBuy = 0;
+        let totalCost = 0;
+        let tempLvl = lvl;
+        
+        for(let i = 0; i < amount; i++) {
+            if(tempLvl >= biz.max) break;
+            const price = getPrice(biz.base, tempLvl);
+            const currency = biz.cur === "gold" ? state.coins : state.crystals;
+            
+            if(totalCost + price <= currency) {
+                totalCost += price;
+                canBuy++;
+                tempLvl++;
+            } else break;
+        }
+
+        if(canBuy === 0) {
+            showToast(biz.cur === "gold" ? "Недостаточно монет!" : "Недостаточно кристаллов!", "error");
+            playSound('error');
+            return;
+        }
+
+        // Совершаем покупку
+        if(biz.cur === "gold") {
+            state.coins -= totalCost;
+        } else {
+            state.crystals -= totalCost;
+        }
+
+        state.incomes[k] = (state.incomes[k] || 0) + canBuy;
+        
+        // Эффекты
+        createParticles(event.clientX, event.clientY, biz.rare);
+        playSound('buy');
+        
+        const card = document.querySelector(`[data-key="${k}"]`);
+        if(card) {
+            card.classList.add('purchased');
+            setTimeout(() => card.classList.remove('purchased'), 500);
+        }
+
+        const btn = event.target;
+        showFloatText(btn.getBoundingClientRect().left + 50, btn.getBoundingClientRect().top, 
+            `+${canBuy} ур.!`, biz.cur === "gold" ? "var(--gold)" : "var(--neon-blue)");
+
+        showToast(`Куплено ${biz.name}: +${canBuy} уровень!`, "success");
+        
+        save();
+        render();
+        animateBalance(biz.cur);
+    };
+
+    // --- РЕНДЕР ---
+    function render() {
+        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
+        document.getElementById("crystals").textContent = state.crystals.toLocaleString();
+
+        const incomePerSec = calculateIncome();
+        document.getElementById("totalIncome").textContent = incomePerSec.toLocaleString();
+
+        const container = document.getElementById("incomeShop");
+        container.innerHTML = "";
+
+        for(let k in list) {
             const biz = list[k];
             const lvl = state.incomes[k] || 0;
             const price = getPrice(biz.base, lvl);
-
-            if (biz.cur === "gold") {
-                if (state.coins >= price) {
-                    state.coins -= price;
-                    state.incomes[k] = lvl + 1;
-                    completePurchase();
-                }
-            } else {
-                if (state.crystals >= price) {
-                    state.crystals -= price;
-                    state.incomes[k] = lvl + 1;
-                    completePurchase();
-                }
-            }
-        };
-
-        function completePurchase() {
-            localStorage.setItem("coins", state.coins);
-            localStorage.setItem("crystals", state.crystals);
-            localStorage.setItem("incomes", JSON.stringify(state.incomes));
-            render();
-        }
-
-        function calculateIncome() {
-            let total = 0;
-            for (let k in list) {
-                const lvl = state.incomes[k] || 0;
-                total += lvl * list[k].inc;
-            }
-            return total;
-        }
-
-        function render() {
-            document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-            document.getElementById("crystals").textContent = state.crystals.toLocaleString();
+            const price10 = calculateBulkPrice(k, 10);
+            const isMax = lvl >= biz.max;
             
-            const incomePerSec = calculateIncome();
-            document.getElementById("totalIncome").textContent = incomePerSec.toLocaleString();
-
-            const container = document.getElementById("incomeShop");
-            container.innerHTML = "";
+            const currency = biz.cur === "gold" ? state.coins : state.crystals;
+            const canBuy = !isMax && currency >= price;
+            const canBuy10 = !isMax && currency >= price10.total && price10.count > 0;
             
-            for (let k in list) {
-                const biz = list[k];
-                const lvl = state.incomes[k] || 0;
-                const price = getPrice(biz.base, lvl);
-                const canBuy = biz.cur === "gold" ? state.coins >= price : state.crystals >= price;
-                const icon = biz.cur === "gold" ? "🪙" : "💎";
-                const btnClass = biz.cur === "gold" ? "btn-gold" : "btn-diamond";
+            const icon = biz.cur === "gold" ? "🪙" : "💎";
+            
+            // Превью дохода
+            const currentIncome = lvl * biz.inc;
+            const nextIncome = (lvl + 1) * biz.inc;
+            const incomeDiff = nextIncome - currentIncome;
 
-                container.innerHTML += `
-                    <div class="card ${biz.rare}">
-                        <h3>${biz.name}</h3>
-                        <p>Уровень: <b>${lvl}</b></p>
-                        <p>Доход: +${(lvl * biz.inc).toLocaleString()} /с</p>
-                        <p>Цена: <b>${price.toLocaleString()} ${icon}</b></p>
-                        <button class="${btnClass}" ${!canBuy ? 'disabled' : ''} onclick="buy('${k}')">
-                            УЛУЧШИТЬ
+            let html = `
+                <div class="card ${biz.rare}" data-key="${k}">
+                    <div class="card-icon">${biz.icon}</div>
+                    <h3>${biz.name}</h3>
+                    <div class="card-level">Уровень ${lvl}/${biz.max}</div>
+                    <div class="card-income">+${currentIncome.toLocaleString()} 🪙/с</div>
+            `;
+
+            if(!isMax) {
+                html += `
+                    <div class="card-income-preview">После покупки: <span>+${nextIncome.toLocaleString()} (+${incomeDiff})</span></div>
+                    <div class="price-tag">
+                        ${currentSale > 0 ? `<span class="old-price">${Math.floor(price / 0.8).toLocaleString()}</span>` : ''}
+                        ${price.toLocaleString()} ${icon}
+                        ${currentSale > 0 ? '<span class="sale-badge">-20%</span>' : ''}
+                    </div>
+                    <div class="btn-group">
+                        <button class="${biz.cur === 'gold' ? 'btn-buy' : 'btn-diamond'}" 
+                            ${!canBuy ? 'disabled' : ''} onclick="buy('${k}', 1)">
+                            КУПИТЬ
                         </button>
-                    </div>`;
+                        <button class="btn-buy-10" 
+                            ${!canBuy10 ? 'disabled' : ''} onclick="buy('${k}', 10)">
+                            x${price10.count}
+                        </button>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(lvl/biz.max)*100}%"></div>
+                    </div>
+                `;
+            } else {
+                html += `<div class="max-level">⭐ МАКСИМАЛЬНЫЙ УРОВЕНЬ</div>`;
             }
-        }
 
-        // Система пассивного дохода
+            html += `</div>`;
+            container.innerHTML += html;
+        }
+    }
+
+    function calculateBulkPrice(k, maxAmount) {
+        const biz = list[k];
+        let lvl = state.incomes[k] || 0;
+        let total = 0;
+        let count = 0;
+        
+        for(let i = 0; i < maxAmount; i++) {
+            if(lvl >= biz.max) break;
+            total += getPrice(biz.base, lvl);
+            lvl++;
+            count++;
+        }
+        return { total, count };
+    }
+
+    function calculateIncome() {
+        let total = 0;
+        for(let k in list) {
+            total += (state.incomes[k] || 0) * list[k].inc;
+        }
+        return total;
+    }
+
+    // --- СКИДКИ ---
+    function startSaleTimer() {
+        // Шанс на скидку каждые 30 сек
         setInterval(() => {
-            const income = calculateIncome();
-            if (income > 0) {
-                state.coins += income;
-                localStorage.setItem("coins", state.coins);
+            if(Math.random() < 0.3 && currentSale === 0) { // 30% шанс
+                startSale();
+            }
+        }, 30000);
+    }
+
+    function startSale() {
+        currentSale = 0.2;
+        const banner = document.getElementById('saleBanner');
+        const timerEl = document.getElementById('saleTimer');
+        banner.classList.add('active');
+        
+        let timeLeft = 30;
+        timerEl.textContent = timeLeft;
+        
+        playSound('sale');
+        showToast("🔥 Началась распродажа! -20% на всё!", "info");
+        
+        saleTimer = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(saleTimer);
+                currentSale = 0;
+                banner.classList.remove('active');
                 render();
             }
         }, 1000);
-
+        
         render();
-    </script>
+    }
+
+    // --- ЭФФЕКТЫ ---
+    function createParticles(x, y, rareClass) {
+        const colors = {
+            'rare-common': ['#39ff14', '#4ae38d'],
+            'rare-rare': ['#00d2ff', '#0099cc'],
+            'rare-epic': ['#9d00ff', '#d500f9'],
+            'rare-legend': ['#ff8c00', '#ffd700'],
+            'rare-mythic': ['#ff4d4d', '#ff00ff', '#ffd700']
+        };
+        
+        const colorList = colors[rareClass] || ['#ffd700'];
+        
+        for(let i = 0; i < 12; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            p.style.background = colorList[Math.floor(Math.random() * colorList.length)];
+            
+            const angle = (Math.PI * 2 * i) / 12;
+            const velocity = 100 + Math.random() * 100;
+            p.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+            p.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+        }
+    }
+
+    function showFloatText(x, y, text, color) {
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;left:${x}px;top:${y}px;color:${color};font-weight:900;font-size:20px;pointer-events:none;z-index:1000;animation:slideDown 0.5s ease`;
+        t.textContent = text;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 1000);
+    }
+
+    function showToast(msg, type) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function animateBalance(type) {
+        const id = type === 'gold' ? 'bal-coins' : 'bal-crystals';
+        const el = document.getElementById(id);
+        el.classList.add('changed');
+        setTimeout(() => el.classList.remove('changed'), 300);
+    }
+
+    // --- СОХРАНЕНИЕ ---
+    function save() {
+        localStorage.setItem("coins", state.coins);
+        localStorage.setItem("crystals", state.crystals);
+        localStorage.setItem("incomes", JSON.stringify(state.incomes));
+    }
+
+    // --- СИНХРОНИЗАЦИЯ С INDEX ---
+    window.addEventListener('storage', (e) => {
+        if(e.key === 'coins' || e.key === 'crystals') {
+            state.coins = +localStorage.getItem("coins") || 0;
+            state.crystals = +localStorage.getItem("crystals") || 0;
+            render();
+        }
+    });
+
+    // --- ЗВУКИ (заглушки) ---
+    function playSound(type) {
+        // const audio = new Audio(`assets/sound_${type}.mp3`);
+        // audio.play().catch(e => {});
+    }
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    render();
+    startSaleTimer();
+    
+    // Пассивный доход визуализация (не начисляем, только показываем)
+    setInterval(() => {
+        const income = calculateIncome();
+        if(income > 0) {
+            // Синхронизируем с index.html
+            state.coins = +localStorage.getItem("coins") || state.coins;
+            state.crystals = +localStorage.getItem("crystals") || state.crystals;
+            render();
+        }
+    }, 1000);
+</script>
 </body>
 </html>
