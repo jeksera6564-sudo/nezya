@@ -32,8 +32,9 @@
         .bal { 
             background: #000; padding: 8px 15px; border-radius: 12px; 
             border: 1px solid var(--gold); font-weight: 900; min-width: 110px; 
-            text-align: center; font-size: 13px;
+            text-align: center; font-size: 13px; transition: all 0.3s;
         }
+        .bal.changed { transform: scale(1.1); filter: brightness(1.5); }
 
         /* --- НАВИГАЦИЯ --- */
         .game-nav { 
@@ -52,13 +53,14 @@
         /* --- КОНТЕНТ --- */
         .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.3s ease; }
         .game-section.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- КОЛЕСО (SVG) --- */
         .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
         .mode-tab { 
             padding: 8px 20px; border-radius: 20px; border: 2px solid #222; 
             background: #000; color: #444; cursor: pointer; font-size: 11px; font-weight: 900;
+            transition: all 0.3s;
         }
         .mode-tab.active-norm { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
         .mode-tab.active-vip { border-color: var(--neon-pink); color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
@@ -74,39 +76,79 @@
         .norm-glow { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(57, 255, 20, 0.2); }
         .vip-glow { border-color: var(--neon-pink); box-shadow: 0 0 20px rgba(255, 0, 255, 0.2); }
 
-        /* --- КРАШ РАБОЧИЙ --- */
+        /* --- КРАШ --- */
         .crash-area { 
             width: 90%; max-width: 400px; height: 220px; background: #000; 
             border: 2px solid #111; border-radius: 20px; position: relative; 
             overflow: hidden; margin-bottom: 20px; display: flex; 
             align-items: center; justify-content: center;
         }
-        #rocket { position: absolute; bottom: 10%; left: 10%; font-size: 35px; display: none; z-index: 5; transition: 0.1s linear; }
+        #rocket { position: absolute; bottom: 10%; left: 10%; font-size: 35px; display: none; z-index: 5; transition: 0.1s linear; filter: drop-shadow(0 0 10px var(--neon-blue)); }
         #multText { font-size: 55px; font-weight: 900; z-index: 10; color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue); }
         .crash-input { 
             background: #000; border: 2px solid #222; color: #fff; 
             padding: 15px; width: 280px; border-radius: 15px; 
             text-align: center; font-size: 18px; margin-bottom: 15px; outline: none;
+            transition: border-color 0.3s;
         }
+        .crash-input:focus { border-color: var(--neon-blue); }
 
         /* --- КНОПКИ --- */
-        .main-btn { width: 280px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; }
+        .main-btn { width: 280px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 16px; cursor: pointer; text-transform: uppercase; transition: all 0.3s; }
+        .main-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-spin { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); }
-        .btn-free { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+        .btn-spin:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 25px var(--neon-green); }
+        .btn-free { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); animation: pulse-gold 1s infinite; }
+        .btn-vip { background: var(--neon-pink); color: #fff; box-shadow: 0 0 15px var(--neon-pink); }
+        .btn-vip:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 25px var(--neon-pink); }
         .btn-crash { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
-        .btn-cashout { background: var(--neon-green); color: #000; animation: pulse 0.5s infinite; }
-        .timer-text { margin-top: 10px; font-size: 11px; color: #555; }
+        .btn-crash:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 25px var(--neon-blue); }
+        .btn-cashout { background: var(--neon-green); color: #000; animation: pulse 0.5s infinite; box-shadow: 0 0 20px var(--neon-green); }
+        
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        @keyframes pulse-gold { 0% { box-shadow: 0 0 20px var(--gold); } 50% { box-shadow: 0 0 40px var(--gold); } 100% { box-shadow: 0 0 20px var(--gold); } }
 
-        /* --- РУЛЕТКА ЗАГЛУШКА --- */
-        .dev-box { padding: 40px; text-align: center; background: #111; border-radius: 20px; border: 2px dashed #333; width: 90%; }
+        .timer-text { margin-top: 10px; font-size: 11px; color: #555; }
+        .timer-text.ready { color: var(--neon-green); font-weight: bold; }
+
+        /* --- РУЛЕТКА --- */
+        .dev-box { padding: 40px; text-align: center; background: linear-gradient(135deg, #111, #1a1a1a); border-radius: 20px; border: 2px dashed #333; width: 90%; }
+        .dev-box h2 { text-shadow: 0 0 20px var(--neon-purple); }
+
+        /* --- TOAST УВЕДОМЛЕНИЯ --- */
+        .toast-container { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { 
+            background: rgba(0,0,0,0.95); padding: 15px 25px; border-radius: 12px; 
+            border: 1px solid; font-weight: bold; animation: slideDown 0.3s ease; 
+            backdrop-filter: blur(10px);
+        }
+        .toast.success { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 20px rgba(57,255,20,0.3); }
+        .toast.error { border-color: var(--neon-red); color: var(--neon-red); box-shadow: 0 0 20px rgba(255,77,77,0.3); }
+        .toast.info { border-color: var(--neon-blue); color: var(--neon-blue); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- КОНФЕТТИ --- */
+        .confetti { position: fixed; width: 10px; height: 10px; animation: confetti-fall 3s ease-out forwards; z-index: 999; }
+        @keyframes confetti-fall { 
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; } 
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } 
+        }
+
+        /* --- СБРОС --- */
+        .reset-btn { position: fixed; bottom: 10px; right: 10px; background: #222; border: 1px solid #444; color: #666; padding: 5px 10px; border-radius: 5px; font-size: 10px; cursor: pointer; opacity: 0.5; }
+        .reset-btn:hover { opacity: 1; color: #fff; }
+
+        /* --- ГРАФИК КРАША --- */
+        .crash-graph { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; opacity: 0.3; }
+        .crash-line { stroke: var(--neon-blue); stroke-width: 2; fill: none; stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 2s ease forwards; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
     </style>
 </head>
 <body>
 
     <div class="balance-top">
-        <div class="bal" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
-        <div class="bal" style="border-color: var(--neon-blue);">💎 <span id="crys">0</span></div>
+        <div class="bal" id="bal-coins" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
+        <div class="bal" id="bal-crys" style="border-color: var(--neon-blue);">💎 <span id="crys">0</span></div>
     </div>
 
     <div class="game-nav">
@@ -132,28 +174,40 @@
 
     <div id="section-crash" class="game-section">
         <div class="crash-area">
+            <svg class="crash-graph" viewBox="0 0 400 220" preserveAspectRatio="none">
+                <path id="crash-path" class="crash-line" d="M 0 220 Q 100 200 200 150 T 400 50" style="display:none;"/>
+            </svg>
             <div id="rocket">🚀</div>
             <div id="multText">1.00x</div>
         </div>
-        <input type="number" id="betAmount" class="crash-input" value="1000">
+        <input type="number" id="betAmount" class="crash-input" value="1000" min="1">
         <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">ПОСТАВИТЬ</button>
     </div>
 
     <div id="section-roulette" class="game-section">
         <div class="dev-box">
-            <h2 style="color: var(--neon-purple)">РУЛЕТКА</h2>
-            <p style="color: #666; margin-top: 10px;">ДАННЫЙ РЕЖИМ В РАЗРАБОТКЕ</p>
+            <h2 style="color: var(--neon-purple)">🎡 РУЛЕТКА</h2>
+            <p style="color: #666; margin-top: 10px;">В РАЗРАБОТКЕ</p>
+            <p style="color: #444; margin-top: 5px; font-size: 12px;">Скоро будет доступно</p>
         </div>
     </div>
 
+    <div class="toast-container" id="toast-container"></div>
+    <button class="reset-btn" onclick="resetGame()" title="Сбросить прогресс">↺</button>
+
+    <audio id="sound-spin" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT" type="audio/wav">
+    </audio>
+
 <script>
+    // --- СОСТОЯНИЕ ---
     let state = {
         coins: +localStorage.getItem("coins") || 100000,
         crys: +localStorage.getItem("crystals") || 10,
         lastFreeSpin: +localStorage.getItem("lastFreeSpin") || 0
     };
 
-    let isSpinning = false, isFlying = false, wheelMode = 'norm', currentMult = 1.0, crashInt;
+    let isSpinning = false, isFlying = false, wheelMode = 'norm', currentMult = 1.0, crashInt, timerInt;
 
     const prizes = {
         norm: [
@@ -178,6 +232,10 @@
         ]
     };
 
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    renderWheel(); updateUI(); startTimer();
+
+    // --- КОЛЕСО ---
     function renderWheel() {
         const svg = document.getElementById("wheel-svg");
         svg.innerHTML = "";
@@ -207,13 +265,22 @@
         let isFree = (wheelMode === 'norm' && (Date.now() - state.lastFreeSpin >= 86400000));
         let cost = wheelMode === 'norm' ? (isFree ? 0 : 50000) : 100;
 
-        if(wheelMode === 'norm' && state.coins < cost) return alert("Мало монет!");
-        if(wheelMode === 'vip' && state.crys < cost) return alert("Мало кристаллов!");
+        if(wheelMode === 'norm' && state.coins < cost && !isFree) return showToast("Мало монет!", "error");
+        if(wheelMode === 'vip' && state.crys < cost) return showToast("Мало кристаллов!", "error");
 
-        if(cost === 0) { state.lastFreeSpin = Date.now(); localStorage.setItem("lastFreeSpin", state.lastFreeSpin); }
-        else { wheelMode === 'norm' ? state.coins -= cost : state.crys -= cost; }
+        playSound('spin');
+        if(cost === 0) { 
+            state.lastFreeSpin = Date.now(); 
+            localStorage.setItem("lastFreeSpin", state.lastFreeSpin);
+            showToast("🎁 Бесплатная прокрутка!", "success");
+        } else { 
+            wheelMode === 'norm' ? state.coins -= cost : state.crys -= cost; 
+        }
 
-        isSpinning = true; saveState(); updateUI();
+        isSpinning = true; 
+        document.getElementById('spinBtn').disabled = true;
+        saveState(); updateUI();
+        
         const svg = document.getElementById("wheel-svg");
         let rand = Math.random() * 100, sec = (rand < 3) ? 3 : (rand < 15 ? 1 : [0,2,4,5,6,7][Math.floor(Math.random()*6)]);
         const totalRot = 3600 + (sec * 45);
@@ -222,55 +289,18 @@
 
         setTimeout(() => {
             isSpinning = false;
+            document.getElementById('spinBtn').disabled = false;
             const p = prizes[wheelMode][sec];
             p.t === 'c' ? state.coins += p.v : state.crys += p.v;
-            alert("ВЫИГРЫШ: " + p.n);
+            
+            showToast(`🎉 ВЫИГРЫШ: ${p.n}!`, "success");
+            createConfetti();
+            playSound('win');
+            
             saveState(); updateUI();
-            svg.style.transition = "none"; svg.style.transform = `rotate(${(sec * 45) - 90}deg)`;
+            svg.style.transition = "none"; 
+            svg.style.transform = `rotate(${(sec * 45) - 90}deg)`;
         }, 6100);
-    }
-
-    function crashAction() {
-        const btn = document.getElementById("crashBtn"), r = document.getElementById("rocket"), d = document.getElementById("multText");
-        if(!isFlying) {
-            let bet = +document.getElementById("betAmount").value;
-            if(bet > state.coins || bet <= 0) return alert("Мало монет!");
-            state.coins -= bet; saveState(); updateUI();
-            isFlying = true; currentMult = 1.0;
-            btn.textContent = "ЗАБРАТЬ"; btn.className = "main-btn btn-cashout";
-            r.style.display = "block"; r.style.left = "10%"; r.style.bottom = "10%";
-            let boom = 1 + Math.random() * Math.random() * 10;
-            crashInt = setInterval(() => {
-                currentMult += 0.01 + (currentMult/200);
-                d.textContent = currentMult.toFixed(2) + "x";
-                r.style.left = Math.min(10 + (currentMult * 5), 80) + "%";
-                r.style.bottom = Math.min(10 + (currentMult * 7), 70) + "%";
-                if(currentMult >= boom) {
-                    clearInterval(crashInt); isFlying = false;
-                    d.textContent = "BOOM!"; r.textContent = "💥";
-                    setTimeout(() => { r.style.display="none"; r.textContent="🚀"; btn.textContent="ПОСТАВИТЬ"; btn.className="main-btn btn-crash"; d.textContent="1.00x"; }, 2000);
-                }
-            }, 100);
-        } else {
-            clearInterval(crashInt); isFlying = false;
-            state.coins += Math.floor(+document.getElementById("betAmount").value * currentMult);
-            saveState(); updateUI();
-            btn.textContent = "ПОСТАВИТЬ"; btn.className = "main-btn btn-crash"; r.style.display="none";
-        }
-    }
-
-    function updateUI() {
-        document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
-        document.getElementById("crys").textContent = state.crys.toLocaleString();
-        const btn = document.getElementById("spinBtn");
-        const isFree = (wheelMode === 'norm' && (Date.now() - state.lastFreeSpin >= 86400000));
-        if(wheelMode === 'norm') {
-            btn.textContent = isFree ? "🎁 БЕСПЛАТНО" : "КРУТИТЬ (50k 🪙)";
-            btn.className = isFree ? "main-btn btn-free" : "main-btn btn-spin";
-        } else {
-            btn.textContent = "КРУТИТЬ (100 💎)";
-            btn.className = "main-btn btn-vip";
-        }
     }
 
     function setWheelMode(m) { 
@@ -282,17 +312,169 @@
         updateUI(); renderWheel(); 
     }
 
+    // --- КРАШ ---
+    function crashAction() {
+        const btn = document.getElementById("crashBtn"), r = document.getElementById("rocket"), d = document.getElementById("multText");
+        const path = document.getElementById('crash-path');
+        
+        if(!isFlying) {
+            let bet = +document.getElementById("betAmount").value;
+            if(bet > state.coins || bet <= 0) return showToast("Некорректная ставка!", "error");
+            
+            state.coins -= bet; saveState(); updateUI();
+            isFlying = true; currentMult = 1.0;
+            btn.textContent = "ЗАБРАТЬ"; btn.className = "main-btn btn-cashout";
+            r.style.display = "block"; r.style.left = "10%"; r.style.bottom = "10%";
+            path.style.display = "block";
+            path.style.animation = 'none';
+            path.offsetHeight; // trigger reflow
+            path.style.animation = null;
+            
+            let boom = 1 + Math.random() * Math.random() * 10;
+            crashInt = setInterval(() => {
+                currentMult += 0.01 + (currentMult/200);
+                d.textContent = currentMult.toFixed(2) + "x";
+                r.style.left = Math.min(10 + (currentMult * 5), 80) + "%";
+                r.style.bottom = Math.min(10 + (currentMult * 7), 70) + "%";
+                
+                if(currentMult >= boom) {
+                    clearInterval(crashInt); isFlying = false;
+                    d.textContent = "💥 BOOM!"; 
+                    r.textContent = "💥";
+                    playSound('crash');
+                    showToast("💥 Ракета взорвалась!", "error");
+                    
+                    setTimeout(() => { 
+                        r.style.display="none"; 
+                        r.textContent="🚀"; 
+                        btn.textContent="ПОСТАВИТЬ"; 
+                        btn.className="main-btn btn-crash"; 
+                        d.textContent="1.00x";
+                        path.style.display = "none";
+                    }, 2000);
+                }
+            }, 100);
+            playSound('start');
+        } else {
+            clearInterval(crashInt); isFlying = false;
+            let win = Math.floor(+document.getElementById("betAmount").value * currentMult);
+            state.coins += win;
+            saveState(); updateUI();
+            showToast(`💰 Забрано: ${win.toLocaleString()} 🪙`, "success");
+            playSound('cashout');
+            btn.textContent = "ПОСТАВИТЬ"; btn.className = "main-btn btn-crash"; 
+            r.style.display="none";
+            path.style.display = "none";
+        }
+    }
+
+    // --- UI ---
+    function updateUI() {
+        const coinsEl = document.getElementById("coins"), crysEl = document.getElementById("crys");
+        const oldCoins = coinsEl.textContent, oldCrys = crysEl.textContent;
+        
+        coinsEl.textContent = Math.floor(state.coins).toLocaleString();
+        crysEl.textContent = state.crys.toLocaleString();
+        
+        if(oldCoins !== coinsEl.textContent) animateBalance('bal-coins');
+        if(oldCrys !== crysEl.textContent) animateBalance('bal-crys');
+        
+        const btn = document.getElementById("spinBtn");
+        const isFree = (wheelMode === 'norm' && (Date.now() - state.lastFreeSpin >= 86400000));
+        
+        if(wheelMode === 'norm') {
+            btn.textContent = isFree ? "🎁 БЕСПЛАТНО" : "КРУТИТЬ (50k 🪙)";
+            btn.className = isFree ? "main-btn btn-free" : "main-btn btn-spin";
+        } else {
+            btn.textContent = "КРУТИТЬ (100 💎)";
+            btn.className = "main-btn btn-vip";
+        }
+    }
+
+    function animateBalance(id) {
+        const el = document.getElementById(id);
+        el.classList.add('changed');
+        setTimeout(() => el.classList.remove('changed'), 300);
+    }
+
+    function startTimer() {
+        updateTimer();
+        timerInt = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+        const timerEl = document.getElementById('dailyTimer');
+        const timeLeft = 86400000 - (Date.now() - state.lastFreeSpin);
+        
+        if(timeLeft <= 0) {
+            timerEl.textContent = "🎁 Бесплатная прокрутка доступна!";
+            timerEl.classList.add('ready');
+        } else {
+            const hours = Math.floor(timeLeft / 3600000);
+            const mins = Math.floor((timeLeft % 3600000) / 60000);
+            const secs = Math.floor((timeLeft % 60000) / 1000);
+            timerEl.textContent = `⏱️ До бесплатной: ${hours}ч ${mins}м ${secs}с`;
+            timerEl.classList.remove('ready');
+        }
+    }
+
     function switchGame(g) {
-        if(isSpinning || isFlying) return;
+        if(isSpinning || isFlying) return showToast("Дождитесь окончания игры!", "error");
         document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('section-'+g).classList.add('active');
         document.getElementById('nav-'+g).classList.add('active');
     }
 
-    function saveState() { localStorage.setItem("coins", state.coins); localStorage.setItem("crystals", state.crys); }
+    // --- ВСПОМОГАТЕЛЬНЫЕ ---
+    function showToast(msg, type='info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
 
-    renderWheel(); updateUI();
+    function createConfetti() {
+        const colors = ['#ffd700', '#00d2ff', '#9d00ff', '#39ff14', '#ff00ff'];
+        for(let i=0; i<30; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = Math.random() * 0.5 + 's';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+        }
+    }
+
+    function playSound(type) {
+        // Заглушки для звуков - можно заменить на реальные файлы
+        const audio = new Audio();
+        const sounds = {
+            spin: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT',
+            win: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT',
+            crash: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT',
+            cashout: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT',
+            start: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUqXh8bllHAU2k9n1unEiBC13yO/eizEIHWq+8+OWT'
+        };
+        // В реальном проекте заменить на: audio.src = `assets/${type}.mp3`;
+    }
+
+    function saveState() { 
+        localStorage.setItem("coins", state.coins); 
+        localStorage.setItem("crystals", state.crys); 
+    }
+
+    function resetGame() {
+        if(confirm('Сбросить весь прогресс?')) {
+            localStorage.removeItem('coins');
+            localStorage.removeItem('crystals');
+            localStorage.removeItem('lastFreeSpin');
+            location.reload();
+        }
+    }
 </script>
 </body>
 </html>
