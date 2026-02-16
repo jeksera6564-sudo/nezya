@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Персонажи — Nezya Clicker</title>
+    <title>Персонажи — Nezya Clicker ULTRA</title>
     <style>
         :root {
             --common: #4ade80;
@@ -12,217 +12,589 @@
             --legendary: #ff8c00;
             --mythic: #ff4d4d;
             --gold: #ffd700;
+            --neon-blue: #00d2ff;
+            --neon-purple: #9d00ff;
+            --neon-pink: #ff00ff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body { 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a15 50%, #020205 100%);
             color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
             overflow-x: hidden; min-height: 100vh;
         }
 
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: -1; }
-        
+        /* --- ЗАГОЛОВОК --- */
         h1 { 
             text-align: center; margin: 20px 0 10px; text-transform: uppercase; 
-            letter-spacing: 5px; color: var(--gold); 
-            text-shadow: 0 0 20px rgba(255,214,0,0.4); 
+            letter-spacing: 5px; color: var(--gold); font-size: 28px;
+            text-shadow: 0 0 30px rgba(255,214,0,0.5); animation: titlePulse 3s ease-in-out infinite;
         }
+        @keyframes titlePulse { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 
+        /* --- БАЛАНС --- */
         .balance-display {
-            text-align: center; font-weight: 900; color: var(--gold); margin-bottom: 30px; 
-            font-size: 22px; text-shadow: 0 0 10px rgba(255,215,0,0.5);
+            text-align: center; font-weight: 900; margin-bottom: 20px; font-size: 20px;
+            display: flex; justify-content: center; gap: 20px;
         }
+        .balance-item {
+            background: rgba(0,0,0,0.8); padding: 10px 25px; border-radius: 20px;
+            border: 1px solid var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+        .balance-item.crystals { border-color: var(--neon-blue); color: var(--neon-blue); }
 
+        /* --- ПРЕВЬЮ ПЕРСОНАЖА --- */
+        .hero-preview {
+            background: rgba(0,0,0,0.6); border-radius: 30px; padding: 30px;
+            margin-bottom: 30px; text-align: center; border: 2px solid var(--gold);
+            box-shadow: 0 0 40px rgba(255,215,0,0.2), inset 0 0 30px rgba(255,215,0,0.05);
+            position: relative; overflow: hidden;
+        }
+        .preview-glow {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 300px; height: 300px; border-radius: 50%; filter: blur(60px);
+            opacity: 0.5; animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; } }
+        
+        .preview-img {
+            width: 200px; height: 200px; object-fit: contain;
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8));
+            animation: heroFloat 4s ease-in-out infinite; position: relative; z-index: 10;
+        }
+        @keyframes heroFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-20px) rotate(2deg); } }
+        
+        .preview-name { font-size: 32px; font-weight: 900; margin-top: 15px; text-shadow: 0 0 20px currentColor; }
+        .preview-stats {
+            display: flex; justify-content: center; gap: 30px; margin-top: 15px;
+            font-size: 18px; font-weight: 700;
+        }
+        .preview-stat { display: flex; align-items: center; gap: 8px; }
+        .preview-ability {
+            background: rgba(255,255,255,0.1); padding: 15px 25px; border-radius: 15px;
+            margin-top: 20px; font-size: 14px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .preview-ability b { color: var(--gold); display: block; margin-bottom: 5px; }
+
+        /* --- ПРОГРЕСС БАР --- */
+        .progress-container {
+            background: rgba(0,0,0,0.6); padding: 20px; border-radius: 20px;
+            margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .progress-title { font-size: 12px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        .progress-bar {
+            height: 10px; background: #222; border-radius: 5px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--gold), var(--neon-orange));
+            border-radius: 5px; transition: width 0.5s ease; box-shadow: 0 0 10px var(--gold);
+        }
+        .progress-text { text-align: center; margin-top: 10px; font-size: 14px; color: var(--gold); font-weight: 900; }
+
+        /* --- СЕТКА --- */
         .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-            gap: 20px; max-width: 1000px; margin: 0 auto; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 25px; max-width: 1000px; margin: 0 auto; 
         }
 
         .card { 
-            background: rgba(255,255,255,0.03); 
-            padding: 20px 15px; border-radius: 30px; 
-            text-align: center; border: 2px solid rgba(255,255,255,0.1); 
-            transition: 0.3s; backdrop-filter: blur(15px);
-            display: flex; flex-direction: column; align-items: center;
-            position: relative; overflow: hidden;
+            background: rgba(0,0,0,0.5); padding: 25px 20px; border-radius: 25px; 
+            text-align: center; border: 2px solid; transition: all 0.3s;
+            backdrop-filter: blur(15px); display: flex; flex-direction: column; align-items: center;
+            position: relative; overflow: hidden; cursor: pointer;
         }
+        .card:hover { transform: translateY(-10px) scale(1.02); }
+        .card:active { transform: scale(0.98); }
 
-        .rare-common { border-color: var(--common); }
-        .rare-rare { border-color: var(--rare); }
-        .rare-epic { border-color: var(--epic); }
-        .rare-legendary { border-color: var(--legendary); }
-        .rare-mythic { border-color: var(--mythic); }
+        /* Редкости с glow */
+        .rare-common { border-color: var(--common); box-shadow: 0 0 20px rgba(74,222,128,0.2); }
+        .rare-common:hover { box-shadow: 0 0 40px rgba(74,222,128,0.4); }
+        
+        .rare-rare { border-color: var(--rare); box-shadow: 0 0 20px rgba(0,210,255,0.2); }
+        .rare-rare:hover { box-shadow: 0 0 40px rgba(0,210,255,0.4); }
+        
+        .rare-epic { border-color: var(--epic); box-shadow: 0 0 20px rgba(160,32,240,0.2); }
+        .rare-epic:hover { box-shadow: 0 0 40px rgba(160,32,240,0.4); }
+        
+        .rare-legendary { border-color: var(--legendary); box-shadow: 0 0 25px rgba(255,140,0,0.3); }
+        .rare-legendary:hover { box-shadow: 0 0 50px rgba(255,140,0,0.5); }
+        
+        .rare-mythic { 
+            border-color: var(--mythic); 
+            box-shadow: 0 0 30px rgba(255,77,77,0.4);
+            animation: mythicPulse 2s ease-in-out infinite;
+        }
+        @keyframes mythicPulse { 0%, 100% { box-shadow: 0 0 30px rgba(255,77,77,0.4); } 50% { box-shadow: 0 0 50px rgba(255,77,77,0.7); } }
+
+        .card.locked { filter: grayscale(1); opacity: 0.6; }
+        .card.locked:hover { filter: grayscale(0.8); opacity: 0.8; }
 
         .card img { 
-            width: 120px; height: 120px; object-fit: contain; 
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
-            margin-bottom: 15px; animation: float 4s ease-in-out infinite;
+            width: 140px; height: 140px; object-fit: contain; 
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.6)); 
+            margin-bottom: 15px; transition: 0.3s;
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .card.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); transform: scale(1.03); }
-        .card.active::after { 
-            content: "ВЫБРАН"; position: absolute; top: 10px; right: -20px; 
-            background: var(--gold); color: #000; font-size: 8px; 
-            font-weight: 900; padding: 2px 20px; transform: rotate(45deg); 
-        }
+        .card:hover img { transform: scale(1.1); }
 
         .level-badge { 
-            position: absolute; top: 15px; left: 15px; background: #fff; 
-            color: #000; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 10px; 
+            position: absolute; top: 15px; left: 15px; 
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            color: #000; font-size: 11px; font-weight: 900; 
+            padding: 4px 10px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,215,0,0.3);
         }
 
-        .card h3 { font-size: 18px; margin-bottom: 5px; font-weight: 900; }
-        .card .stats { font-size: 12px; color: #4ade80; margin-bottom: 15px; font-weight: 700; }
+        .lock-icon {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 40px; opacity: 0.8; text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .card h3 { font-size: 20px; margin-bottom: 8px; font-weight: 900; text-shadow: 0 0 10px currentColor; }
+        
+        .card-stats { 
+            font-size: 13px; margin-bottom: 15px; line-height: 1.6;
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; width: 100%;
+        }
+        .card-stats .stat-row { display: flex; justify-content: space-between; margin: 3px 0; }
+        .card-stats .stat-label { color: #888; }
+        .card-stats .stat-value { color: var(--gold); font-weight: 700; }
+
+        .ability-tag {
+            background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 8px;
+            font-size: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.2);
+        }
 
         .actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
 
         button { 
-            width: 100%; padding: 12px; border-radius: 14px; border: none; 
-            color: #000; font-weight: 900; cursor: pointer; transition: 0.2s; 
-            text-transform: uppercase; font-size: 10px;
+            width: 100%; padding: 14px; border-radius: 15px; border: none; 
+            color: #000; font-weight: 900; cursor: pointer; transition: all 0.3s; 
+            text-transform: uppercase; font-size: 11px; letter-spacing: 1px;
         }
-
-        .btn-upgrade { background: #fff; border: 2px solid #fff; }
-        .btn-upgrade:disabled { background: rgba(255,255,255,0.05); color: #444; border-color: #222; }
+        button:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 5px 20px currentColor; }
 
         .btn-common { background: var(--common); }
         .btn-rare { background: var(--rare); }
         .btn-epic { background: var(--epic); color: #fff; }
         .btn-legendary { background: var(--legendary); color: #fff; }
-        .btn-mythic { background: var(--mythic); color: #fff; }
+        .btn-mythic { background: var(--mythic); color: #fff; box-shadow: 0 0 15px rgba(255,77,77,0.4); }
 
-        button:active { transform: scale(0.95); }
-        button:disabled:not(.btn-upgrade) { background: #222 !important; color: #555 !important; }
+        .btn-upgrade { 
+            background: rgba(255,255,255,0.1); color: #fff; border: 2px solid rgba(255,255,255,0.3);
+        }
+        .btn-upgrade:hover:not(:disabled) { background: rgba(255,255,255,0.2); border-color: #fff; }
+        .btn-upgrade:disabled { opacity: 0.3; cursor: not-allowed; }
 
+        .btn-active { 
+            background: linear-gradient(135deg, var(--gold), #ff8c00) !important; 
+            color: #000 !important; box-shadow: 0 0 20px rgba(255,215,0,0.5) !important;
+            animation: activePulse 2s infinite;
+        }
+        @keyframes activePulse { 0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.8); } }
+
+        button:disabled:not(.btn-upgrade) { background: #222 !important; color: #555 !important; box-shadow: none !important; }
+
+        /* --- СЕКРЕТНЫЙ ПЕРСОНАЖ --- */
+        .secret-card {
+            background: linear-gradient(135deg, rgba(255,0,255,0.1), rgba(0,210,255,0.1));
+            border: 2px dashed var(--neon-pink); animation: secretGlow 3s infinite;
+        }
+        @keyframes secretGlow { 0%, 100% { border-color: var(--neon-pink); } 50% { border-color: var(--neon-blue); } }
+        
+        .secret-lock {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.9);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20;
+        }
+        .secret-lock span { font-size: 40px; margin-bottom: 10px; }
+        .secret-lock p { font-size: 12px; color: #888; text-align: center; padding: 0 20px; }
+
+        /* --- ЧАСТИЦЫ --- */
+        .particle {
+            position: fixed; width: 10px; height: 10px; border-radius: 50%;
+            pointer-events: none; z-index: 1000; animation: particleFly 1s ease-out forwards;
+        }
+        @keyframes particleFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* --- TOAST --- */
+        .toast {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: rgba(0,0,0,0.95); padding: 15px 30px; border-radius: 15px;
+            border: 1px solid var(--gold); color: var(--gold); font-weight: 900;
+            z-index: 3000; transition: all 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* --- НАЗАД --- */
         .back-btn { 
             display: block; text-align: center; margin: 40px auto; 
             color: #000; text-decoration: none; font-weight: 900; 
-            background: var(--gold); width: fit-content; padding: 15px 50px; 
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            width: fit-content; padding: 18px 60px; 
             border-radius: 40px; text-transform: uppercase; 
-            box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+            box-shadow: 0 10px 30px rgba(255,215,0,0.4);
+            transition: all 0.3s; font-size: 14px;
         }
+        .back-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255,215,0,0.6); }
+
+        /* --- РЕДКОСТИ ЛЕГЕНДА --- */
+        .rarity-legend {
+            display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;
+        }
+        .rarity-item {
+            display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+            padding: 5px 10px; border-radius: 10px; background: rgba(0,0,0,0.5);
+        }
+        .rarity-dot { width: 10px; height: 10px; border-radius: 50%; }
     </style>
 </head>
 <body>
-    <div class="overlay"></div>
-    <h1>Персонажи</h1>
-    <div class="balance-display">🪙 <span id="balance">0</span></div>
+
+    <h1>⚔️ ПЕРСОНАЖИ</h1>
     
+    <div class="balance-display">
+        <div class="balance-item">🪙 <span id="balance">0</span></div>
+        <div class="balance-item crystals">💎 <span id="crystals">0</span></div>
+    </div>
+
+    <!-- ПРЕВЬЮ -->
+    <div class="hero-preview" id="heroPreview">
+        <div class="preview-glow" id="previewGlow" style="background: radial-gradient(circle, var(--common) 0%, transparent 70%);"></div>
+        <img src="assets/character_default.png" class="preview-img" id="previewImg" alt="Hero">
+        <div class="preview-name" id="previewName" style="color: var(--common);">Новичок</div>
+        <div class="preview-stats">
+            <div class="preview-stat">🔥 <span id="previewPower">1</span> УРОН</div>
+            <div class="preview-stat">💎 <span id="previewCry">0</span>% ШАНС</div>
+            <div class="preview-stat">⭐ LVL <span id="previewLvl">1</span></div>
+        </div>
+        <div class="preview-ability">
+            <b>🎯 Способность:</b>
+            <span id="previewAbility">Базовый кликер без особых способностей</span>
+        </div>
+    </div>
+
+    <!-- ПРОГРЕСС -->
+    <div class="progress-container">
+        <div class="progress-title">Коллекция персонажей</div>
+        <div class="progress-bar"><div class="progress-fill" id="collectionProgress" style="width: 20%;"></div></div>
+        <div class="progress-text">Разблокировано: <span id="unlockedCount">1</span> / <span id="totalCount">6</span></div>
+    </div>
+
+    <!-- ЛЕГЕНДА РЕДКОСТЕЙ -->
+    <div class="rarity-legend">
+        <div class="rarity-item"><div class="rarity-dot" style="background: var(--common);"></div>Common</div>
+        <div class="rarity-item"><div class="rarity-dot" style="background: var(--rare);"></div>Rare</div>
+        <div class="rarity-item"><div class="rarity-dot" style="background: var(--epic);"></div>Epic</div>
+        <div class="rarity-item"><div class="rarity-dot" style="background: var(--legendary);"></div>Legend</div>
+        <div class="rarity-item"><div class="rarity-dot" style="background: var(--mythic);"></div>Mythic</div>
+    </div>
+
+    <!-- СЕТКА -->
     <div class="grid" id="heroList"></div>
 
-    <a href="index.html" class="back-btn">⬅ В БОЙ</a>
+    <a href="index.html" class="back-btn">⚔️ В БОЙ</a>
 
-    <script>
-        // 1. ИСПРАВЛЕННЫЙ МАССИВ (ID строго соответствуют картинкам)
-        const heroes = [
-            { id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, rare: "rare-common", btn: "btn-common", img: "assets/character_default.png", upPrice: 500 },
-            { id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 0, rare: "rare-rare", btn: "btn-rare", img: "assets/character_clicker.png", upPrice: 3000 },
-            { id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 1, rare: "rare-epic", btn: "btn-epic", img: "assets/character_business.png", upPrice: 15000 },
-            { id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 3, rare: "rare-legendary", btn: "btn-legendary", img: "assets/character_magnate.png", upPrice: 80000 },
-            { id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 15, rare: "rare-mythic", btn: "btn-mythic", img: "assets/character_legendary.png", upPrice: 400000 }
-        ];
+    <div class="toast" id="toast"></div>
 
-        // 2. ЗАГРУЗКА СОСТОЯНИЯ
-        let state = {
-            active: localStorage.getItem("activeCharacter") || "default",
-            owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
-            levels: JSON.parse(localStorage.getItem("heroLevels")) || { default: 1, clicker: 1, business: 1, magnate: 1, legendary: 1 },
-            coins: +localStorage.getItem("coins") || 0
-        };
-
-        function updateBalance() {
-            document.getElementById("balance").textContent = Math.floor(state.coins).toLocaleString();
+<script>
+    // --- ДАННЫЕ ПЕРСОНАЖЕЙ ---
+    const heroes = [
+        { 
+            id: "default", name: "Новичок", price: 0, pwr: 1, cry: 0, 
+            rare: "rare-common", btn: "btn-common", color: "#4ade80",
+            img: "assets/character_default.png", upPrice: 500,
+            ability: "Базовый кликер. Хороший старт для начала пути.",
+            unlockReq: null
+        },
+        { 
+            id: "clicker", name: "Про-Кликер", price: 5000, pwr: 5, cry: 1, 
+            rare: "rare-rare", btn: "btn-rare", color: "#00d2ff",
+            img: "assets/character_clicker.png", upPrice: 3000,
+            ability: "Увеличенный шанс кристаллов. Идеален для фарма.",
+            unlockReq: null
+        },
+        { 
+            id: "business", name: "Бизнесмен", price: 25000, pwr: 25, cry: 2, 
+            rare: "rare-epic", btn: "btn-epic", color: "#a020f0",
+            img: "assets/character_business.png", upPrice: 15000,
+            ability: "Золотая лихорадка: +50% к монетам за клик.",
+            unlockReq: null
+        },
+        { 
+            id: "magnate", name: "Магнат", price: 150000, pwr: 120, cry: 5, 
+            rare: "rare-legendary", btn: "btn-legendary", color: "#ff8c00",
+            img: "assets/character_magnate.png", upPrice: 80000,
+            ability: "Пассивный доход: +10% к бизнесу.",
+            unlockReq: null
+        },
+        { 
+            id: "legendary", name: "Бессмертный", price: 750000, pwr: 600, cry: 10, 
+            rare: "rare-mythic", btn: "btn-mythic", color: "#ff4d4d",
+            img: "assets/character_legendary.png", upPrice: 400000,
+            ability: "Критический удар: 25% шанс на x3 урон.",
+            unlockReq: null
+        },
+        { 
+            id: "secret", name: "???", price: 0, pwr: 9999, cry: 50, 
+            rare: "rare-mythic", btn: "btn-mythic", color: "#ff00ff",
+            img: "assets/character_secret.png", upPrice: 1000000,
+            ability: "БОГ КЛИКЕРА: Все способности в одном!",
+            unlockReq: { type: 'level', value: 50, text: 'Достигните 50 уровня' },
+            secret: true
         }
+    ];
 
-        // 3. ОТРИСОВКА КАРТОЧЕК
-        function render() {
-            const container = document.getElementById("heroList");
-            container.innerHTML = "";
-            updateBalance();
+    // --- СОСТОЯНИЕ ---
+    let state = {
+        active: localStorage.getItem("activeCharacter") || "default",
+        owned: JSON.parse(localStorage.getItem("characters")) || { default: true },
+        levels: JSON.parse(localStorage.getItem("heroLevels")) || {},
+        coins: +localStorage.getItem("coins") || 0,
+        crystals: +localStorage.getItem("crystals") || 0,
+        level: +localStorage.getItem("level") || 1
+    };
 
-            heroes.forEach(h => {
-                const isOwned = state.owned[h.id];
-                const isActive = state.active === h.id;
-                const lvl = state.levels[h.id] || 1;
-                
-                // Прогрессивная цена: Базовая * (Уровень ^ 1.6)
-                const currentUpPrice = Math.floor(h.upPrice * Math.pow(lvl, 1.6));
-                const currentPwr = h.pwr * lvl;
+    // Инициализация уровней
+    heroes.forEach(h => {
+        if(!state.levels[h.id]) state.levels[h.id] = 1;
+    });
 
-                container.innerHTML += `
-                    <div class="card ${h.rare} ${isActive ? 'active' : ''}">
-                        <div class="level-badge">LVL ${lvl}</div>
-                        <img src="${h.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'">
-                        <h3>${h.name}</h3>
-                        <div class="stats">🔥 УРОН: +${currentPwr.toLocaleString()}<br>💎 ШАНС: +${h.cry}%</div>
-                        
-                        <div class="actions">
-                            <button class="${h.btn}" ${isActive ? 'disabled' : ''} onclick="handleAction('${h.id}', ${h.price})">
-                                ${isActive ? 'ВЫБРАН' : (isOwned ? 'ВЫБРАТЬ' : h.price.toLocaleString() + ' 🪙')}
-                            </button>
-                            
-                            <button class="btn-upgrade" ${!isOwned ? 'disabled' : ''} onclick="upgradeHero('${h.id}', ${currentUpPrice})">
-                                🆙 УЛУЧШИТЬ (${currentUpPrice.toLocaleString()})
-                            </button>
-                        </div>
-                    </div>`;
-            });
-        }
+    // --- ОБНОВЛЕНИЕ ---
+    function updateBalance() {
+        document.getElementById("balance").textContent = Math.floor(state.coins).toLocaleString();
+        document.getElementById("crystals").textContent = state.crystals.toLocaleString();
+    }
 
-        // 4. ВЫБОР / ПОКУПКА
-        window.handleAction = (id, price) => {
-            if (state.owned[id]) {
-                state.active = id;
-                save();
-            } else if (state.coins >= price) {
-                state.coins -= price;
-                state.owned[id] = true;
-                state.active = id;
-                save();
-            } else {
-                alert("Недостаточно монет! 🪙");
+    function updatePreview(hero) {
+        const lvl = state.levels[hero.id] || 1;
+        const currentPwr = hero.pwr * lvl;
+        
+        document.getElementById("previewImg").src = hero.img;
+        document.getElementById("previewName").textContent = hero.name;
+        document.getElementById("previewName").style.color = hero.color;
+        document.getElementById("previewPower").textContent = currentPwr.toLocaleString();
+        document.getElementById("previewCry").textContent = hero.cry;
+        document.getElementById("previewLvl").textContent = lvl;
+        document.getElementById("previewAbility").textContent = hero.ability;
+        document.getElementById("previewGlow").style.background = `radial-gradient(circle, ${hero.color} 0%, transparent 70%)`;
+    }
+
+    function updateProgress() {
+        const unlocked = Object.keys(state.owned).filter(k => state.owned[k]).length;
+        const total = heroes.length;
+        const percent = (unlocked / total) * 100;
+        
+        document.getElementById("collectionProgress").style.width = percent + "%";
+        document.getElementById("unlockedCount").textContent = unlocked;
+        document.getElementById("totalCount").textContent = total;
+    }
+
+    // --- РЕНДЕР ---
+    function render() {
+        const container = document.getElementById("heroList");
+        container.innerHTML = "";
+        updateBalance();
+        updateProgress();
+
+        // Обновить превью активного
+        const activeHero = heroes.find(h => h.id === state.active);
+        if(activeHero) updatePreview(activeHero);
+
+        heroes.forEach(h => {
+            const isOwned = state.owned[h.id];
+            const isActive = state.active === h.id;
+            const lvl = state.levels[h.id] || 1;
+            const currentUpPrice = Math.floor(h.upPrice * Math.pow(lvl, 1.6));
+            const currentPwr = h.pwr * lvl;
+
+            // Проверка секретного персонажа
+            let isLocked = false;
+            let lockText = "";
+            if(h.secret) {
+                if(state.level < h.unlockReq.value) {
+                    isLocked = true;
+                    lockText = h.unlockReq.text;
+                } else if(!state.owned[h.id]) {
+                    // Авторазблокировка
+                    state.owned[h.id] = true;
+                    showToast("🎉 Секретный персонаж разблокирован!", "success");
+                    createConfetti();
+                }
             }
-            render();
-        };
 
-        // 5. УЛУЧШЕНИЕ (X2, X3 и т.д.)
-        window.upgradeHero = (id, upPrice) => {
-            if (state.coins >= upPrice) {
-                state.coins -= upPrice;
-                state.levels[id] = (state.levels[id] || 1) + 1;
-                save();
-                render();
-            } else {
-                alert("Нужно больше монет для прокачки! 🪙");
+            const card = document.createElement('div');
+            card.className = `card ${h.rare} ${isLocked ? 'locked' : ''} ${h.secret ? 'secret-card' : ''}`;
+            
+            let html = '';
+            
+            if(isLocked) {
+                html += `
+                    <div class="secret-lock">
+                        <span>🔒</span>
+                        <p>${lockText}</p>
+                    </div>
+                `;
             }
-        };
 
-        // 6. СОХРАНЕНИЕ И СИНХРОНИЗАЦИЯ
-        function save() {
-            localStorage.setItem("coins", state.coins);
-            localStorage.setItem("characters", JSON.stringify(state.owned));
-            localStorage.setItem("activeCharacter", state.active);
-            localStorage.setItem("heroLevels", JSON.stringify(state.levels));
-            
-            // Расчет финальной силы для главного экрана
-            const activeHero = heroes.find(h => h.id === state.active);
-            const currentLevel = state.levels[state.active] || 1;
-            const finalPower = activeHero.pwr * currentLevel;
-            
-            // Ключ, который должен читать главный экран (index.html)
-            localStorage.setItem("clickPower", finalPower);
-            localStorage.setItem("crystalChance", activeHero.cry);
-        }
+            html += `
+                <div class="level-badge">LVL ${lvl}</div>
+                <img src="${h.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/149/149071.png'" onclick="previewHero('${h.id}')">
+                <h3 style="color: ${h.color}">${h.name}</h3>
+                <div class="ability-tag">${h.ability.substring(0, 30)}...</div>
+                <div class="card-stats">
+                    <div class="stat-row"><span class="stat-label">Урон:</span><span class="stat-value">+${currentPwr.toLocaleString()}</span></div>
+                    <div class="stat-row"><span class="stat-label">Кристаллы:</span><span class="stat-value">+${h.cry}%</span></div>
+                </div>
+                <div class="actions">
+            `;
 
+            if(isActive) {
+                html += `<button class="${h.btn} btn-active" disabled>✓ АКТИВЕН</button>`;
+            } else if(isOwned) {
+                html += `<button class="${h.btn}" onclick="selectHero('${h.id}', event)">ВЫБРАТЬ</button>`;
+            } else {
+                html += `<button class="${h.btn}" onclick="buyHero('${h.id}', ${h.price}, event)" ${state.coins < h.price ? 'disabled' : ''}>КУПИТЬ ${h.price.toLocaleString()} 🪙</button>`;
+            }
+
+            html += `
+                    <button class="btn-upgrade" onclick="upgradeHero('${h.id}', ${currentUpPrice}, event)" ${!isOwned || state.coins < currentUpPrice ? 'disabled' : ''}>
+                        ⬆ УЛУЧШИТЬ (${currentUpPrice.toLocaleString()})
+                    </button>
+                </div>
+            `;
+
+            card.innerHTML = html;
+            container.appendChild(card);
+        });
+    }
+
+    // --- ДЕЙСТВИЯ ---
+    window.previewHero = (id) => {
+        const hero = heroes.find(h => h.id === id);
+        if(hero) updatePreview(hero);
+    };
+
+    window.selectHero = (id, event) => {
+        state.active = id;
+        createParticles(event.clientX, event.clientY, heroes.find(h => h.id === id).color);
+        save();
         render();
-    </script>
+        showToast("Персонаж выбран!", "success");
+    };
+
+    window.buyHero = (id, price, event) => {
+        if(state.coins < price) {
+            showToast("Недостаточно монет!", "error");
+            return;
+        }
+        
+        state.coins -= price;
+        state.owned[id] = true;
+        state.active = id;
+        
+        createParticles(event.clientX, event.clientY, "#ffd700");
+        createConfetti();
+        save();
+        render();
+        showToast("Персонаж куплен!", "success");
+    };
+
+    window.upgradeHero = (id, price, event) => {
+        if(state.coins < price) {
+            showToast("Недостаточно монет!", "error");
+            return;
+        }
+        
+        state.coins -= price;
+        state.levels[id] = (state.levels[id] || 1) + 1;
+        
+        createParticles(event.clientX, event.clientY, "#00d2ff");
+        save();
+        render();
+        showToast("Уровень повышен!", "success");
+    };
+
+    // --- ЭФФЕКТЫ ---
+    function createParticles(x, y, color) {
+        for(let i = 0; i < 15; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            p.style.background = color;
+            
+            const angle = (Math.PI * 2 * i) / 15;
+            const velocity = 100 + Math.random() * 100;
+            p.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+            p.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+        }
+    }
+
+    function createConfetti() {
+        const colors = ['#ffd700', '#00d2ff', '#9d00ff', '#39ff14', '#ff00ff'];
+        for(let i = 0; i < 30; i++) {
+            const c = document.createElement('div');
+            c.style.cssText = `
+                position: fixed; width: 10px; height: 10px; background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}vw; top: -10px; border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                pointer-events: none; z-index: 1000;
+                animation: confettiFall ${2 + Math.random()}s ease-out forwards;
+            `;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+        }
+    }
+
+    // Добавить стиль для конфетти
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // --- TOAST ---
+    function showToast(msg, type) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.borderColor = type === 'error' ? '#ff4d4d' : type === 'success' ? '#39ff14' : '#ffd700';
+        toast.style.color = type === 'error' ? '#ff4d4d' : type === 'success' ? '#39ff14' : '#ffd700';
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 2000);
+    }
+
+    // --- СОХРАНЕНИЕ ---
+    function save() {
+        localStorage.setItem("coins", state.coins);
+        localStorage.setItem("crystals", state.crystals);
+        localStorage.setItem("characters", JSON.stringify(state.owned));
+        localStorage.setItem("activeCharacter", state.active);
+        localStorage.setItem("heroLevels", JSON.stringify(state.levels));
+        
+        const activeHero = heroes.find(h => h.id === state.active);
+        const lvl = state.levels[state.active] || 1;
+        localStorage.setItem("clickPower", activeHero.pwr * lvl);
+        localStorage.setItem("crystalChance", activeHero.cry);
+    }
+
+    // Синхронизация с index
+    window.addEventListener('storage', (e) => {
+        if(e.key === 'coins' || e.key === 'level') {
+            state.coins = +localStorage.getItem("coins") || 0;
+            state.level = +localStorage.getItem("level") || 1;
+            render();
+        }
+    });
+
+    render();
+</script>
 </body>
 </html>
