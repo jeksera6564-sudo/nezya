@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEON CASINO — VIP EDITION</title>
+    <title>CRASH — NEON EDITION</title>
     <style>
         :root {
             --gold: #ffd700;
@@ -11,249 +11,691 @@
             --neon-purple: #9d00ff;
             --neon-red: #ff3131;
             --neon-green: #39ff14;
+            --neon-pink: #ff00ff;
+            --neon-orange: #ff8c00;
             --bg: #020205;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
         
         body { 
-            background: var(--bg); color: white;
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-            overflow-x: hidden; padding-bottom: 50px;
+            background: radial-gradient(circle at center, #0a0a15 0%, var(--bg) 100%);
+            color: white; display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow-x: hidden; padding-bottom: 50px;
         }
 
         /* --- ВЕРХНЯЯ ПАНЕЛЬ --- */
-        .balance-top { position: sticky; top: 0; display: flex; gap: 10px; z-index: 100; background: rgba(0,0,0,0.8); padding: 15px; width: 100%; justify-content: center; backdrop-filter: blur(10px); border-bottom: 1px solid #333; }
-        .bal { background: #111; padding: 8px 15px; border-radius: 12px; border: 1px solid var(--gold); font-weight: 900; min-width: 100px; text-align: center; font-size: 14px; }
+        .balance-top { 
+            position: sticky; top: 0; display: flex; gap: 15px; z-index: 100; 
+            background: rgba(0,0,0,0.9); padding: 15px; width: 100%; justify-content: center; 
+            backdrop-filter: blur(10px); border-bottom: 1px solid #333;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .bal { 
+            background: #111; padding: 10px 20px; border-radius: 15px; 
+            border: 1px solid; font-weight: 900; min-width: 120px; 
+            text-align: center; font-size: 16px; transition: 0.3s;
+        }
+        .bal.coins { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+        .bal.crystals { border-color: var(--neon-purple); color: var(--neon-purple); box-shadow: 0 0 15px rgba(157,0,255,0.2); }
+        .bal.changed { transform: scale(1.1); filter: brightness(1.5); }
 
         /* --- НАВИГАЦИЯ --- */
-        .game-nav { display: flex; gap: 10px; margin: 20px 0; background: #111; padding: 5px; border-radius: 15px; border: 1px solid #333; }
-        .nav-btn { padding: 10px 20px; border-radius: 10px; border: none; background: transparent; color: #666; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .nav-btn.active { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px var(--neon-blue); }
+        .game-nav { 
+            display: flex; gap: 10px; margin: 20px 0; background: #111; 
+            padding: 5px; border-radius: 15px; border: 1px solid #333; 
+        }
+        .nav-btn { 
+            padding: 12px 25px; border-radius: 12px; border: none; 
+            background: transparent; color: #666; font-weight: 900; 
+            cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 12px;
+        }
+        .nav-btn:hover { color: #fff; }
+        .nav-btn.active { 
+            background: var(--neon-blue); color: #000; 
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
 
-        .game-section { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.4s ease; }
-        .game-section.active { display: flex; }
+        /* --- ИСТОРИЯ --- */
+        .history-bar {
+            display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;
+            max-width: 400px;
+        }
+        .history-item {
+            padding: 8px 12px; border-radius: 10px; font-weight: 900; font-size: 12px;
+            background: #111; border: 1px solid #333; min-width: 60px; text-align: center;
+        }
+        .history-item.win { border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+        .history-item.lose { border-color: var(--neon-red); color: var(--neon-red); opacity: 0.6; }
 
-        /* --- ИГРОВАЯ ЗОНА CRASH --- */
+        /* --- ИГРОВАЯ ЗОНА --- */
+        .crash-container {
+            width: 95%; max-width: 450px; position: relative; margin-bottom: 20px;
+        }
+        
         .crash-area {
-            width: 92%; max-width: 400px; height: 320px; 
-            background: radial-gradient(circle at bottom left, rgba(0, 210, 255, 0.15), transparent);
-            border: 2px solid rgba(0, 210, 255, 0.3); border-radius: 24px;
-            position: relative; overflow: hidden; margin-bottom: 20px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            height: 350px; background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(0, 210, 255, 0.3); border-radius: 25px;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 0 50px rgba(0,210,255,0.1), 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* SVG График */
+        .crash-graph {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+        }
+        .crash-line {
+            fill: none; stroke: var(--neon-blue); stroke-width: 4;
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            animation: drawLine 0.5s ease forwards;
+        }
+        @keyframes drawLine { to { stroke-dashoffset: 0; } }
+
+        .crash-fill {
+            fill: url(#gradient); opacity: 0.3;
+        }
+
+        /* Сетка */
+        .grid-line {
+            stroke: rgba(255,255,255,0.05); stroke-width: 1; stroke-dasharray: 5,5;
         }
 
         /* Ракета */
         #rocket {
-            position: absolute; bottom: 10%; left: 10%; font-size: 45px; z-index: 5;
-            display: none; filter: drop-shadow(0 0 15px var(--neon-blue));
-            transform-origin: center;
+            position: absolute; bottom: 10%; left: 10%; 
+            font-size: 40px; z-index: 10; display: none;
+            filter: drop-shadow(0 0 20px var(--neon-blue));
+            transform-origin: center center; transition: none;
+        }
+        .rocket-trail {
+            position: absolute; width: 4px; height: 4px; background: var(--neon-blue);
+            border-radius: 50%; pointer-events: none; opacity: 0.6;
+            animation: trailFade 1s ease-out forwards;
+        }
+        @keyframes trailFade { to { opacity: 0; transform: scale(0); } }
+
+        #multText { 
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            font-size: 72px; font-weight: 900; z-index: 20;
+            text-shadow: 0 0 30px currentColor; transition: 0.1s;
+            font-family: 'Courier New', monospace;
         }
 
-        #multText { font-size: 65px; font-weight: 900; z-index: 10; text-shadow: 0 0 25px var(--neon-blue); transition: 0.1s; pointer-events: none; }
+        /* Прогресс-бар */
+        .progress-container {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 80%; height: 6px; background: #222; border-radius: 3px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            width: 0%; transition: width 0.1s; box-shadow: 0 0 10px var(--neon-green);
+        }
 
-        /* --- МАГАЗИН БУСТОВ (MODAL) --- */
-        .shop-btn { background: var(--neon-purple); color: white; border: none; padding: 12px 20px; border-radius: 14px; margin-bottom: 15px; cursor: pointer; font-weight: 900; box-shadow: 0 0 10px var(--neon-purple); }
-        .shop-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
-        .shop-card { background: #0a0a0c; border: 2px solid var(--neon-purple); padding: 30px; border-radius: 25px; width: 85%; max-width: 380px; text-align: center; }
-        .boost-item { background: #151518; padding: 18px; border-radius: 15px; margin: 12px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
-        .boost-item.active { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.1); }
+        /* --- УПРАВЛЕНИЕ --- */
+        .controls {
+            background: rgba(0,0,0,0.6); padding: 25px; border-radius: 25px;
+            border: 1px solid #333; width: 95%; max-width: 450px;
+        }
 
-        /* --- КНОПКИ УПРАВЛЕНИЯ --- */
-        .main-btn { width: 260px; padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 20px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-crash { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
-        .btn-cashout { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); animation: pulse 1s infinite; }
+        .bet-row {
+            display: flex; gap: 10px; margin-bottom: 15px; align-items: center;
+        }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        input[type="number"] {
+            flex: 1; background: #111; border: 2px solid #333; color: white;
+            padding: 15px; border-radius: 15px; text-align: center;
+            font-size: 24px; font-weight: 900; outline: none; transition: 0.3s;
+        }
+        input[type="number"]:focus { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0,210,255,0.2); }
+
+        .quick-btns {
+            display: flex; gap: 8px;
+        }
+        .quick-btn {
+            background: #222; border: 1px solid #444; color: #888;
+            padding: 10px 15px; border-radius: 10px; cursor: pointer;
+            font-weight: 900; font-size: 12px; transition: 0.2s;
+        }
+        .quick-btn:hover { background: #333; color: #fff; border-color: #666; }
+
+        /* Авто-стоп */
+        .auto-stop {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 20px;
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px;
+        }
+        .auto-stop span { font-size: 14px; color: #888; }
+        .auto-stop input {
+            width: 80px; padding: 10px; font-size: 18px;
+        }
+
+        /* Главная кнопка */
+        .main-btn {
+            width: 100%; padding: 20px; border-radius: 20px; border: none;
+            font-weight: 900; font-size: 22px; cursor: pointer; transition: all 0.3s;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn-crash {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: #fff; box-shadow: 0 0 30px rgba(0,210,255,0.4);
+        }
+        .btn-crash:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,210,255,0.6); }
+        
+        .btn-cashout {
+            background: linear-gradient(135deg, var(--neon-green), #2ecc71);
+            color: #000; box-shadow: 0 0 30px rgba(57,255,20,0.5);
+            animation: pulseBtn 1s infinite;
+        }
+        @keyframes pulseBtn { 0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(57,255,20,0.5); } 50% { transform: scale(1.02); box-shadow: 0 0 50px rgba(57,255,20,0.8); } }
+
+        .main-btn:disabled {
+            background: #222 !important; color: #555 !important;
+            box-shadow: none !important; animation: none !important; cursor: not-allowed;
+        }
+
+        /* Статус */
+        .status-info {
+            text-align: center; margin-top: 15px; font-size: 14px;
+            min-height: 20px; font-weight: 700;
+        }
 
         /* --- ЭФФЕКТЫ --- */
-        .explosion { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-            40%, 60% { transform: translate3d(6px, 0, 0); }
+        .explosion {
+            animation: screenShake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
-        .boom { color: var(--neon-red) !important; text-shadow: 0 0 35px var(--neon-red) !important; }
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, 5px); }
+            30% { transform: translate(-8px, -8px); }
+            40% { transform: translate(8px, 8px); }
+            50% { transform: translate(-5px, 5px); }
+            60% { transform: translate(5px, -5px); }
+            70% { transform: translate(-3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+        }
 
-        input { background: #111; border: 2px solid #333; color: white; padding: 12px; border-radius: 12px; width: 200px; text-align: center; font-size: 22px; margin-bottom: 20px; outline: none; }
-        input:focus { border-color: var(--neon-blue); }
+        .boom-text {
+            color: var(--neon-red) !important;
+            text-shadow: 0 0 50px var(--neon-red), 0 0 100px var(--neon-red) !important;
+            animation: boomPulse 0.5s ease infinite;
+        }
+        @keyframes boomPulse { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.1); } }
+
+        /* Частицы взрыва */
+        .explosion-particle {
+            position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            pointer-events: none; z-index: 50;
+            animation: explode 1s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--ex), var(--ey)) scale(0); opacity: 0; }
+        }
+
+        /* --- БУСТЫ --- */
+        .shop-btn {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            color: white; border: none; padding: 12px 25px; border-radius: 15px;
+            margin-bottom: 20px; cursor: pointer; font-weight: 900;
+            box-shadow: 0 0 20px rgba(157,0,255,0.4); transition: 0.3s;
+        }
+        .shop-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(157,0,255,0.6); }
+
+        .shop-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000; display: none;
+            align-items: center; justify-content: center; backdrop-filter: blur(10px);
+        }
+        .shop-card {
+            background: linear-gradient(135deg, #0a0a0c, #151518);
+            border: 2px solid var(--neon-purple); padding: 30px;
+            border-radius: 30px; width: 90%; max-width: 400px;
+            box-shadow: 0 0 50px rgba(157,0,255,0.3);
+        }
+        .boost-item {
+            background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;
+            margin: 15px 0; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #333; transition: 0.3s;
+        }
+        .boost-item:hover { border-color: var(--neon-purple); background: rgba(157,0,255,0.1); }
+        .boost-item.active { border-color: var(--neon-green); background: rgba(57,255,20,0.1); }
+
+        /* --- НАЗАД --- */
+        .back-link {
+            margin-top: 30px; color: #666; text-decoration: none;
+            font-size: 14px; font-weight: 700; transition: 0.3s;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .back-link:hover { color: var(--gold); }
+
+        /* --- АНИМАЦИИ --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="shop-overlay" id="shop">
+    <!-- БУСТЫ -->
+    <div class="shop-overlay" id="shop" onclick="if(event.target===this)closeShop()">
         <div class="shop-card">
-            <h2 style="color: var(--neon-purple); margin-bottom: 20px;">УСИЛЕНИЯ</h2>
+            <h2 style="color: var(--neon-purple); margin-bottom: 10px; text-shadow: 0 0 20px var(--neon-purple);">🚀 УСИЛЕНИЯ</h2>
+            <p style="color: #666; font-size: 12px; margin-bottom: 20px;">Действуют на один раунд</p>
+            
             <div class="boost-item" id="boost-shield">
-                <div style="text-align: left;">🛡️ <b>Страховка</b><br><small style="color: #888;">Вернет 50% при взрыве</small></div>
-                <button onclick="buyBoost('shield', 500)" style="background:var(--neon-purple); color:white; border:none; padding:8px 15px; border-radius:10px; font-weight: bold; cursor:pointer;">500 💎</button>
+                <div>
+                    <b style="color: var(--neon-blue);">🛡️ Страховка</b><br>
+                    <small style="color: #888;">Возврат 50% при взрыве</small>
+                </div>
+                <button onclick="buyBoost('shield', 500)" style="background:var(--neon-purple); color:white; border:none; padding:10px 20px; border-radius:12px; font-weight: 900; cursor:pointer;">500 💎</button>
             </div>
-            <p style="font-size: 11px; color: #555; margin-bottom: 20px;">Буст действует только на один следующий раунд</p>
-            <button class="main-btn" style="background: #222; color: white; width: 100%; font-size: 16px;" onclick="document.getElementById('shop').style.display='none'">ЗАКРЫТЬ</button>
+            
+            <div class="boost-item" id="boost-x2">
+                <div>
+                    <b style="color: var(--neon-green);">⚡ Ускоритель</b><br>
+                    <small style="color: #888;">Начало с x2 вместо x1</small>
+                </div>
+                <button onclick="buyBoost('x2', 300)" style="background:var(--neon-purple); color:white; border:none; padding:10px 20px; border-radius:12px; font-weight: 900; cursor:pointer;">300 💎</button>
+            </div>
+            
+            <button class="main-btn" style="background: #222; color: white; margin-top: 20px;" onclick="closeShop()">ЗАКРЫТЬ</button>
         </div>
     </div>
 
+    <!-- БАЛАНС -->
     <div class="balance-top">
-        <div class="bal" style="border-color: var(--gold);">🪙 <span id="coins">0</span></div>
-        <div class="bal" style="border-color: var(--neon-purple);">💎 <span id="crys">0</span></div>
+        <div class="bal coins" id="bal-coins">🪙 <span id="coins">0</span></div>
+        <div class="bal crystals" id="bal-crys">💎 <span id="crys">0</span></div>
     </div>
 
+    <!-- НАВИГАЦИЯ -->
     <div class="game-nav">
-        <button id="nav-fortune" class="nav-btn" onclick="location.href='fortune.html'">КОЛЕСО</button>
-        <button id="nav-crash" class="nav-btn active">CRASH 🚀</button>
+        <button class="nav-btn" onclick="location.href='fortune.html'">🎡 КОЛЕСО</button>
+        <button class="nav-btn active">🚀 CRASH</button>
+        <button class="nav-btn" onclick="location.href='index.html'">🏠 БАЗА</button>
     </div>
 
-    <div id="section-crash" class="game-section active">
-        <button class="shop-btn" onclick="document.getElementById('shop').style.display='flex'">🛒 КУПИТЬ БУСТЫ</button>
+    <!-- ИСТОРИЯ -->
+    <div class="history-bar" id="historyBar"></div>
+
+    <!-- ИГРА -->
+    <div class="crash-container">
+        <button class="shop-btn" onclick="document.getElementById('shop').style.display='flex'">🛒 БУСТЫ</button>
         
-        <div class="crash-area" id="canvas">
+        <div class="crash-area" id="crashArea">
+            <svg class="crash-graph" viewBox="0 0 400 350" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#00d2ff;stop-opacity:0.5" />
+                        <stop offset="100%" style="stop-color:#00d2ff;stop-opacity:0" />
+                    </linearGradient>
+                </defs>
+                <!-- Сетка -->
+                <line class="grid-line" x1="0" y1="87.5" x2="400" y2="87.5" />
+                <line class="grid-line" x1="0" y1="175" x2="400" y2="175" />
+                <line class="grid-line" x1="0" y1="262.5" x2="400" y2="262.5" />
+                <line class="grid-line" x1="100" y1="0" x2="100" y2="350" />
+                <line class="grid-line" x1="200" y1="0" x2="200" y2="350" />
+                <line class="grid-line" x1="300" y1="0" x2="300" y2="350" />
+                <!-- График -->
+                <path id="graphFill" class="crash-fill" d="" />
+                <path id="graphLine" class="crash-line" d="" />
+            </svg>
+            
             <div id="rocket">🚀</div>
             <div id="multText">1.00x</div>
+            
+            <div class="progress-container">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
 
-        <input type="number" id="betAmount" value="1000" step="1000">
-        <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">ПОСТАВИТЬ</button>
-        
-        <div id="statusInfo" style="margin-top: 15px; font-weight: bold; min-height: 20px;"></div>
+        <div class="controls">
+            <div class="bet-row">
+                <input type="number" id="betAmount" value="1000" step="100" min="100">
+                <div class="quick-btns">
+                    <button class="quick-btn" onclick="changeBet(0.5)">/2</button>
+                    <button class="quick-btn" onclick="changeBet(2)">x2</button>
+                    <button class="quick-btn" onclick="maxBet()">MAX</button>
+                </div>
+            </div>
+            
+            <div class="auto-stop">
+                <span>🎯 Авто-забор на:</span>
+                <input type="number" id="autoStop" value="0" step="0.5" min="0" placeholder="OFF">
+                <span style="font-size: 12px; color: #666;">(0 = выкл)</span>
+            </div>
+            
+            <button id="crashBtn" class="main-btn btn-crash" onclick="crashAction()">🚀 СТАРТ</button>
+            
+            <div class="status-info" id="statusInfo"></div>
+        </div>
     </div>
 
-    <a href="index.html" style="margin-top: 25px; color: #444; text-decoration: none; font-size: 13px;">← НАЗАД В ИГРУ</a>
+    <a href="index.html" class="back-link">← НАЗАД В ИГРУ</a>
 
 <script>
-    // Загрузка состояния из твоего проекта
+    // --- СОСТОЯНИЕ ---
     let state = {
         coins: +localStorage.getItem("coins") || 0,
         crys: +localStorage.getItem("crystals") || 0,
-        boostShield: false
+        boostShield: false,
+        boostX2: false,
+        history: JSON.parse(localStorage.getItem("crashHistory")) || []
     };
 
     let isFlying = false;
     let crashInt;
     let currentMult = 1.0;
+    let graphPoints = [];
+    let startTime = 0;
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    updateUI();
+    renderHistory();
+
+    // Горячие клавиши
+    document.addEventListener('keydown', (e) => {
+        if(e.code === 'Space') {
+            e.preventDefault();
+            crashAction();
+        }
+    });
 
     function updateUI() {
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crys").textContent = state.crys.toLocaleString();
         
-        const status = document.getElementById("statusInfo");
-        if(state.boostShield) {
-            status.innerHTML = "<span style='color: var(--neon-green)'>🛡️ СТРАХОВКА АКТИВИРОВАНА</span>";
-        } else {
-            status.innerHTML = "";
-        }
+        const info = document.getElementById("statusInfo");
+        let text = "";
+        if(state.boostShield) text += "<span style='color: var(--neon-blue)'>🛡️ </span>";
+        if(state.boostX2) text += "<span style='color: var(--neon-green)'>⚡ </span>";
+        info.innerHTML = text || "Готов к взлёту 🚀";
     }
 
+    function renderHistory() {
+        const bar = document.getElementById("historyBar");
+        bar.innerHTML = state.history.slice(-10).map(h => 
+            `<div class="history-item ${h.win ? 'win' : 'lose'}">${h.mult.toFixed(2)}x</div>`
+        ).join('');
+    }
+
+    function addHistory(mult, win) {
+        state.history.push({ mult, win, time: Date.now() });
+        if(state.history.length > 20) state.history.shift();
+        localStorage.setItem("crashHistory", JSON.stringify(state.history));
+        renderHistory();
+    }
+
+    // --- УПРАВЛЕНИЕ СТАВКОЙ ---
+    function changeBet(multiplier) {
+        const input = document.getElementById("betAmount");
+        let val = +input.value * multiplier;
+        val = Math.max(100, Math.min(val, state.coins));
+        input.value = Math.floor(val);
+    }
+
+    function maxBet() {
+        document.getElementById("betAmount").value = Math.floor(state.coins);
+    }
+
+    // --- БУСТЫ ---
     function buyBoost(type, price) {
-        if(state.crys < price) return alert("Мало кристаллов!");
-        if(state.boostShield) return alert("Буст уже активен!");
+        if(state.crys < price) {
+            showStatus("Недостаточно кристаллов! 💎", "error");
+            return;
+        }
+        if((type === 'shield' && state.boostShield) || (type === 'x2' && state.boostX2)) {
+            showStatus("Буст уже активен!", "error");
+            return;
+        }
         
         state.crys -= price;
-        state.boostShield = true;
+        if(type === 'shield') state.boostShield = true;
+        if(type === 'x2') state.boostX2 = true;
+        
         localStorage.setItem("crystals", state.crys);
         updateUI();
+        updateBoostUI();
+        showStatus("Буст активирован! ✓", "success");
+    }
+
+    function updateBoostUI() {
+        document.getElementById('boost-shield').classList.toggle('active', state.boostShield);
+        document.getElementById('boost-x2').classList.toggle('active', state.boostX2);
+    }
+
+    function closeShop() {
         document.getElementById('shop').style.display = 'none';
     }
 
+    function showStatus(msg, type) {
+        const info = document.getElementById("statusInfo");
+        info.innerHTML = `<span style="color: ${type === 'error' ? '#ff4444' : '#39ff14'}">${msg}</span>`;
+        setTimeout(() => updateUI(), 2000);
+    }
+
+    // --- ИГРА ---
     function crashAction() {
         const btn = document.getElementById("crashBtn");
         const rocket = document.getElementById("rocket");
-        const canvas = document.getElementById("canvas");
+        const area = document.getElementById("crashArea");
         const text = document.getElementById("multText");
+        const autoStopVal = parseFloat(document.getElementById("autoStop").value) || 0;
 
         if(!isFlying) {
-            // СТАРТ ИГРЫ
+            // СТАРТ
             const bet = +document.getElementById("betAmount").value;
-            if(bet > state.coins || bet <= 0) return alert("Недостаточно монет!");
+            if(bet > state.coins || bet <= 0) {
+                showStatus("Недостаточно монет! 🪙", "error");
+                return;
+            }
             
             state.coins -= bet;
             localStorage.setItem("coins", state.coins);
             updateUI();
             
             isFlying = true;
-            currentMult = 1.0;
+            currentMult = state.boostX2 ? 2.0 : 1.0;
+            graphPoints = [[0, 350]];
+            startTime = Date.now();
             
-            btn.textContent = "ЗАБРАТЬ";
+            btn.textContent = "💰 ЗАБРАТЬ";
             btn.className = "main-btn btn-cashout";
-            text.classList.remove("boom");
-            canvas.classList.remove("explosion");
+            text.classList.remove("boom-text");
+            area.classList.remove("explosion");
             
             rocket.style.display = "block";
             rocket.textContent = "🚀";
-            rocket.style.transition = "none";
             
-            // Логика взрыва (шанс)
-            let boomPoint = 1.0 + (Math.random() * Math.random() * 10);
-            if(Math.random() < 0.05) boomPoint = 1.0; // Мгновенный краш 5%
-
+            // Сброс графика
+            updateGraph();
+            
+            // Точка взрыва (экспоненциальное распределение)
+            const rand = Math.random();
+            let boomPoint = 1.0;
+            if(rand > 0.05) {
+                boomPoint = 1.0 + (Math.pow(Math.random(), 2) * 15); // До 16x
+            }
+            if(rand > 0.9) boomPoint = 20 + Math.random() * 30; // Супер раунд до 50x
+            
             crashInt = setInterval(() => {
-                currentMult += 0.01 + (currentMult/100);
+                const elapsed = (Date.now() - startTime) / 1000;
+                currentMult = (state.boostX2 ? 2.0 : 1.0) * Math.pow(1.05 + (elapsed * 0.01), elapsed);
+                
                 text.textContent = currentMult.toFixed(2) + "x";
+                text.style.color = currentMult > 5 ? '#ff8c00' : currentMult > 2 ? '#00d2ff' : '#fff';
                 
-                // Двигаем ракету (вверх и вправо)
-                let x = Math.min(10 + (currentMult * 5), 85);
-                let y = Math.min(10 + (currentMult * 7), 75);
-                let rotate = 45 - (Math.sin(Date.now()/200) * 5); // Покачивание
+                // Обновление графика
+                const x = Math.min(elapsed * 20, 400);
+                const y = 350 - Math.min((currentMult - 1) * 20, 300);
+                graphPoints.push([x, y]);
+                updateGraph();
                 
-                rocket.style.left = x + "%";
-                rocket.style.bottom = y + "%";
-                rocket.style.transform = `rotate(${rotate}deg)`;
-
-                if(currentMult >= boomPoint) {
-                    // КРАШ (ПРОИГРЫШ)
-                    clearInterval(crashInt);
-                    isFlying = false;
-                    text.classList.add("boom");
-                    text.textContent = "BOOM!";
-                    canvas.classList.add("explosion");
-                    rocket.textContent = "💥";
-                    rocket.style.transform = "scale(2)";
-                    
-                    if(state.boostShield) {
-                        const refund = Math.floor(bet * 0.5);
-                        state.coins += refund;
-                        localStorage.setItem("coins", state.coins);
-                        alert("🛡️ Страховка спасла! Возвращено " + refund + " 🪙");
-                    }
-                    
-                    state.boostShield = false; // Сброс буста
-                    setTimeout(() => {
-                        rocket.style.display = "none";
-                        btn.textContent = "ПОСТАВИТЬ";
-                        btn.className = "main-btn btn-crash";
-                        updateUI();
-                    }, 1500);
+                // Прогресс-бар
+                const progress = Math.min((currentMult / 10) * 100, 100);
+                document.getElementById("progressFill").style.width = progress + "%";
+                
+                // Ракета
+                const rocketX = Math.min(10 + (elapsed * 3), 85);
+                const rocketY = Math.min(10 + (currentMult * 2), 80);
+                const wobble = Math.sin(elapsed * 10) * 3;
+                rocket.style.left = rocketX + "%";
+                rocket.style.bottom = rocketY + "%";
+                rocket.style.transform = `rotate(${45 + wobble}deg)`;
+                
+                // След
+                if(Math.random() > 0.7) createTrail(rocketX, rocketY);
+                
+                // Авто-стоп
+                if(autoStopVal > 0 && currentMult >= autoStopVal) {
+                    cashout();
+                    return;
                 }
-            }, 60);
+                
+                // Взрыв
+                if(currentMult >= boomPoint) {
+                    explode(bet);
+                }
+            }, 50);
 
         } else {
-            // ЗАБРАТЬ ВЫИГРЫШ
-            clearInterval(crashInt);
-            isFlying = false;
-            const bet = +document.getElementById("betAmount").value;
-            const win = Math.floor(bet * currentMult);
-            
-            state.coins += win;
-            localStorage.setItem("coins", state.coins);
-            state.boostShield = false; // Сброс буста
-            
-            // Эффект улета в космос
-            rocket.style.transition = "all 0.6s ease-in";
-            rocket.style.left = "150%"; rocket.style.bottom = "150%";
-            
-            updateUI();
-            
-            setTimeout(() => {
-                rocket.style.display = "none";
-                btn.textContent = "ПОСТАВИТЬ";
-                btn.className = "main-btn btn-crash";
-            }, 600);
+            // ЗАБОР
+            cashout();
         }
     }
 
-    // Инициализация
-    updateUI();
+    function updateGraph() {
+        if(graphPoints.length < 2) return;
+        
+        const line = document.getElementById("graphLine");
+        const fill = document.getElementById("graphFill");
+        
+        let d = `M ${graphPoints[0][0]} ${graphPoints[0][1]}`;
+        for(let i = 1; i < graphPoints.length; i++) {
+            d += ` L ${graphPoints[i][0]} ${graphPoints[i][1]}`;
+        }
+        
+        line.setAttribute("d", d);
+        fill.setAttribute("d", d + ` L ${graphPoints[graphPoints.length-1][0]} 350 L 0 350 Z`);
+    }
+
+    function createTrail(x, y) {
+        const trail = document.createElement('div');
+        trail.className = 'rocket-trail';
+        trail.style.left = x + "%";
+        trail.style.bottom = y + "%";
+        document.getElementById('crashArea').appendChild(trail);
+        setTimeout(() => trail.remove(), 1000);
+    }
+
+    function cashout() {
+        clearInterval(crashInt);
+        isFlying = false;
+        
+        const bet = +document.getElementById("betAmount").value;
+        const win = Math.floor(bet * currentMult);
+        
+        state.coins += win;
+        localStorage.setItem("coins", state.coins);
+        addHistory(currentMult, true);
+        
+        // Эффект
+        document.getElementById("multText").textContent = `+${(win - bet).toLocaleString()} 🪙`;
+        document.getElementById("multText").style.color = "#39ff14";
+        
+        const rocket = document.getElementById("rocket");
+        rocket.style.transition = "all 0.5s ease-in";
+        rocket.style.left = "120%";
+        rocket.style.bottom = "120%";
+        
+        resetBoosts();
+        setTimeout(resetGame, 1000);
+        updateUI();
+    }
+
+    function explode(bet) {
+        clearInterval(crashInt);
+        isFlying = false;
+        
+        const area = document.getElementById("crashArea");
+        const text = document.getElementById("multText");
+        const rocket = document.getElementById("rocket");
+        
+        text.textContent = "💥 BOOM!";
+        text.classList.add("boom-text");
+        area.classList.add("explosion");
+        
+        rocket.textContent = "💥";
+        rocket.style.transform = "scale(3)";
+        rocket.style.transition = "0.3s";
+        
+        // Частицы
+        for(let i = 0; i < 20; i++) {
+            const p = document.createElement('div');
+            p.className = 'explosion-particle';
+            p.style.left = "50%";
+            p.style.top = "50%";
+            p.style.background = ['#ff3131', '#ff8c00', '#ffd700'][Math.floor(Math.random() * 3)];
+            const angle = (Math.PI * 2 * i) / 20;
+            const dist = 100 + Math.random() * 100;
+            p.style.setProperty('--ex', Math.cos(angle) * dist + "px");
+            p.style.setProperty('--ey', Math.sin(angle) * dist + "px");
+            area.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
+        }
+        
+        addHistory(currentMult, false);
+        
+        // Страховка
+        if(state.boostShield) {
+            const refund = Math.floor(bet * 0.5);
+            state.coins += refund;
+            localStorage.setItem("coins", state.coins);
+            setTimeout(() => showStatus(`🛡️ Страховка: +${refund} 🪙`, "success"), 500);
+        }
+        
+        resetBoosts();
+        setTimeout(resetGame, 2000);
+        updateUI();
+    }
+
+    function resetGame() {
+        const btn = document.getElementById("crashBtn");
+        const rocket = document.getElementById("rocket");
+        const text = document.getElementById("multText");
+        
+        rocket.style.display = "none";
+        rocket.style.transition = "none";
+        rocket.style.transform = "none";
+        
+        text.textContent = "1.00x";
+        text.style.color = "#fff";
+        text.classList.remove("boom-text");
+        
+        document.getElementById("crashArea").classList.remove("explosion");
+        document.getElementById("progressFill").style.width = "0%";
+        
+        // Сброс графика
+        document.getElementById("graphLine").setAttribute("d", "");
+        document.getElementById("graphFill").setAttribute("d", "");
+        
+        btn.textContent = "🚀 СТАРТ";
+        btn.className = "main-btn btn-crash";
+    }
+
+    function resetBoosts() {
+        state.boostShield = false;
+        state.boostX2 = false;
+        updateBoostUI();
+    }
+
+    // Синхронизация
+    window.addEventListener('storage', (e) => {
+        if(e.key === 'coins') {
+            state.coins = +localStorage.getItem("coins") || 0;
+            updateUI();
+        }
+    });
 </script>
 </body>
 </html>
