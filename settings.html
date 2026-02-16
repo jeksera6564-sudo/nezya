@@ -8,196 +8,581 @@
         :root {
             --gold: #ffd700;
             --neon-blue: #00d2ff;
-            --purple: #a020f0;
-            --red: #ff4d4d;
+            --neon-purple: #9d00ff;
+            --neon-green: #39ff14;
+            --neon-red: #ff4d4d;
+            --neon-pink: #ff00ff;
             --glass: rgba(255, 255, 255, 0.07);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body { 
             width: 100vw; min-height: 100vh; 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a15 50%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; color: white; padding: 20px;
             display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
         }
 
-        .container { width: 100%; max-width: 400px; padding-bottom: 40px; }
+        .container { width: 100%; max-width: 450px; padding-bottom: 40px; animation: slideUp 0.5s ease; }
 
-        h1 { text-align: center; color: var(--gold); margin: 20px 0 30px; letter-spacing: 3px; text-shadow: 0 0 15px rgba(255,215,0,0.4); }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        h1 { 
+            text-align: center; color: var(--gold); margin: 20px 0 30px; 
+            letter-spacing: 4px; text-shadow: 0 0 30px rgba(255,215,0,0.5);
+            font-size: 28px; animation: titleGlow 3s ease-in-out infinite;
+        }
+        @keyframes titleGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 
         .section {
-            background: var(--glass); border-radius: 20px; padding: 20px;
+            background: var(--glass); border-radius: 25px; padding: 25px;
             border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 20px;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px); box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .section:hover { border-color: rgba(255,215,0,0.2); }
+
+        .section-title { 
+            font-size: 11px; color: var(--neon-blue); text-transform: uppercase; 
+            margin-bottom: 20px; letter-spacing: 3px; font-weight: 900;
+            text-shadow: 0 0 10px rgba(0,210,255,0.3);
         }
 
-        .section-title { font-size: 11px; color: var(--neon-blue); text-transform: uppercase; margin-bottom: 15px; letter-spacing: 2px; font-weight: 900; }
-
-        /* Профиль */
-        .profile-box { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        /* --- ПРОФИЛЬ --- */
+        .profile-box { 
+            display: flex; align-items: center; gap: 20px; margin-bottom: 15px;
+            background: rgba(0,0,0,0.3); padding: 20px; border-radius: 20px;
+            border: 1px solid rgba(255,215,0,0.1);
+        }
         .avatar-preview { 
-            width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold); 
-            background: #000; display: flex; align-items: center; justify-content: center; font-size: 24px;
+            width: 80px; height: 80px; border-radius: 50%; 
+            border: 3px solid var(--gold); background: #000;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; box-shadow: 0 0 30px rgba(255,215,0,0.3);
+            position: relative; overflow: hidden;
         }
+        .avatar-preview img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .avatar-level {
+            position: absolute; bottom: -5px; right: -5px;
+            background: var(--neon-purple); color: white;
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 900; border: 2px solid #000;
+        }
+        .profile-info { flex: 1; }
+        .profile-stats {
+            display: flex; gap: 15px; margin-top: 10px; font-size: 12px; color: #888;
+        }
+        .profile-stats span { color: var(--gold); font-weight: 900; }
+
         input[type="text"] {
-            flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,215,0,0.3);
-            padding: 12px; border-radius: 12px; color: white; font-weight: bold; outline: none; transition: 0.3s;
+            width: 100%; background: rgba(0,0,0,0.5); 
+            border: 2px solid rgba(255,215,0,0.3); border-radius: 15px;
+            padding: 15px; color: white; font-weight: bold; 
+            font-size: 16px; outline: none; transition: 0.3s;
+        }
+        input[type="text"]:focus { 
+            border-color: var(--gold); 
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
         }
 
-        /* Ряды и переключатели */
-        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        .row span { font-size: 15px; font-weight: 500; }
+        /* --- РЯДЫ --- */
+        .row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .row:last-child { border-bottom: none; margin-bottom: 0; }
+        .row span { font-size: 15px; font-weight: 600; }
+        .row-desc { font-size: 11px; color: #666; margin-top: 3px; }
 
-        /* Эффект мерцания для разработки */
-        .in-dev {
-            font-size: 10px;
-            background: linear-gradient(90deg, var(--neon-blue), var(--purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 900;
-            letter-spacing: 1px;
-            animation: neonPulse 2s infinite ease-in-out;
-            border: 1px solid rgba(160, 32, 240, 0.3);
-            padding: 4px 8px;
-            border-radius: 8px;
+        /* --- СЛАЙДЕР ГРОМКОСТИ --- */
+        .volume-slider {
+            width: 100%; margin-top: 10px;
+            -webkit-appearance: none; height: 6px; border-radius: 3px;
+            background: #333; outline: none;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--gold); cursor: pointer; box-shadow: 0 0 10px var(--gold);
+        }
+        .volume-value { 
+            text-align: center; margin-top: 5px; 
+            color: var(--gold); font-weight: 900; font-size: 14px;
         }
 
-        @keyframes neonPulse {
-            0%, 100% { opacity: 0.4; filter: blur(0.5px); }
-            50% { opacity: 1; filter: blur(0px); text-shadow: 0 0 8px var(--purple); }
+        /* --- ТЕМЫ --- */
+        .theme-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px;
         }
+        .theme-btn {
+            height: 50px; border-radius: 15px; border: 2px solid transparent;
+            cursor: pointer; transition: 0.3s; position: relative;
+        }
+        .theme-btn:hover { transform: scale(1.05); }
+        .theme-btn.active { border-color: #fff; box-shadow: 0 0 20px currentColor; }
+        .theme-btn.gold { background: linear-gradient(135deg, #ffd700, #ff8c00); }
+        .theme-btn.blue { background: linear-gradient(135deg, #00d2ff, #0099cc); }
+        .theme-btn.purple { background: linear-gradient(135deg, #9d00ff, #d500f9); }
+        .theme-btn.green { background: linear-gradient(135deg, #39ff14, #2ecc71); }
 
-        .switch { position: relative; width: 50px; height: 26px; }
+        /* --- ПЕРЕКЛЮЧАТЕЛИ --- */
+        .switch { position: relative; width: 55px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; inset: 0; background-color: #333;
             transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
         .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px;
-            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
+            position: absolute; content: ""; height: 22px; width: 22px;
+            left: 3px; bottom: 3px; background-color: white; 
+            transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        input:checked + .slider { background-color: var(--gold); }
-        input:checked + .slider:before { transform: translateX(24px); background-color: #000; }
+        input:checked + .slider { 
+            background-color: var(--gold); 
+            box-shadow: 0 0 15px rgba(255,215,0,0.3);
+        }
+        input:checked + .slider:before { 
+            transform: translateX(25px); background-color: #000; 
+        }
 
-        /* Кнопки */
+        /* --- СТАТИСТИКА СЕЙВА --- */
+        .save-stats {
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px;
+            font-size: 12px; color: #888; margin-top: 15px;
+        }
+        .save-stats b { color: var(--neon-blue); }
+
+        /* --- КНОПКИ --- */
         .btn {
-            width: 100%; padding: 16px; border-radius: 16px; border: none;
-            font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.2s;
-            margin-top: 10px; font-size: 13px;
+            width: 100%; padding: 18px; border-radius: 20px; border: none;
+            font-weight: 900; text-transform: uppercase; cursor: pointer; 
+            transition: 0.3s; margin-top: 15px; font-size: 14px; letter-spacing: 1px;
         }
-        .btn-save { background: var(--gold); color: #000; box-shadow: 0 5px 15px rgba(255,215,0,0.2); }
-        .btn-back { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-danger { background: rgba(255, 77, 77, 0.1); color: var(--red); border: 1px solid var(--red); margin-top: 30px; }
+        .btn-save { 
+            background: linear-gradient(135deg, var(--gold), #ff8c00); 
+            color: #000; box-shadow: 0 5px 20px rgba(255,215,0,0.3);
+        }
+        .btn-save:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,215,0,0.5); }
+        
+        .btn-back { 
+            background: rgba(255,255,255,0.1); color: #fff; 
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
 
-        .info-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-        .info-footer b { color: var(--gold); }
+        .btn-export { 
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white; margin-top: 10px;
+        }
+        .btn-export:hover { box-shadow: 0 5px 20px rgba(0,210,255,0.4); }
+
+        .btn-danger { 
+            background: rgba(255, 77, 77, 0.1); color: var(--neon-red); 
+            border: 2px solid var(--neon-red); margin-top: 30px;
+        }
+        .btn-danger:hover { background: rgba(255, 77, 77, 0.2); box-shadow: 0 0 20px rgba(255,77,77,0.3); }
+
+        /* --- ЧИТ-МЕНЮ --- */
+        .cheat-section {
+            display: none; margin-top: 20px; padding: 20px;
+            background: rgba(255,0,255,0.05); border: 1px dashed var(--neon-pink);
+            border-radius: 15px;
+        }
+        .cheat-section.show { display: block; animation: fadeIn 0.3s ease; }
+        .cheat-btn {
+            background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+            color: white; padding: 10px 20px; border: none; border-radius: 10px;
+            margin: 5px; cursor: pointer; font-weight: 900; font-size: 12px;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- В РАЗРАБОТКЕ --- */
+        .in-dev {
+            font-size: 10px; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 900; letter-spacing: 1px;
+            animation: neonPulse 2s infinite ease-in-out;
+            border: 1px solid rgba(157, 0, 255, 0.3); padding: 4px 10px; border-radius: 8px;
+        }
+        @keyframes neonPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; text-shadow: 0 0 10px var(--neon-purple); }
+        }
+
+        .info-footer { 
+            text-align: center; margin-top: 30px; font-size: 12px; color: #666;
+            padding: 20px; border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-footer b { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+
+        /* --- СЕКРЕТНАЯ КНОПКА --- */
+        .secret-trigger {
+            position: fixed; bottom: 10px; right: 10px; width: 30px; height: 30px;
+            opacity: 0; cursor: default;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>НАСТРОЙКИ</h1>
+        <h1>⚙️ НАСТРОЙКИ</h1>
 
+        <!-- ПРОФИЛЬ -->
         <div class="section">
-            <p class="section-title">Профиль игрока</p>
+            <p class="section-title">👤 Профиль игрока</p>
             <div class="profile-box">
-                <div class="avatar-preview" id="avatarIcon">👤</div>
-                <input type="text" id="userName" placeholder="Твой никнейм" maxlength="12">
+                <div class="avatar-preview" id="avatarIcon">
+                    <img src="assets/character_default.png" id="avatarImg" alt="Avatar">
+                    <div class="avatar-level" id="avatarLevel">1</div>
+                </div>
+                <div class="profile-info">
+                    <input type="text" id="userName" placeholder="Твой никнейм" maxlength="12">
+                    <div class="profile-stats">
+                        <span>🪙 <span id="statCoins">0</span></span>
+                        <span>💎 <span id="statCrystals">0</span></span>
+                        <span>LVL <span id="statLevel">1</span></span>
+                    </div>
+                </div>
             </div>
         </div>
 
+        <!-- ТЕМА -->
         <div class="section">
-            <p class="section-title">Система и Эффекты</p>
+            <p class="section-title">🎨 Тема оформления</p>
+            <div class="theme-grid">
+                <div class="theme-btn gold active" onclick="setTheme('gold')" title="Gold"></div>
+                <div class="theme-btn blue" onclick="setTheme('blue')" title="Neon Blue"></div>
+                <div class="theme-btn purple" onclick="setTheme('purple')" title="Purple"></div>
+                <div class="theme-btn green" onclick="setTheme('green')" title="Matrix"></div>
+            </div>
+        </div>
+
+        <!-- ЗВУК И ЭФФЕКТЫ -->
+        <div class="section">
+            <p class="section-title">🔊 Звук и эффекты</p>
+            
             <div class="row">
-                <span>Звуковые эффекты</span>
+                <div>
+                    <span>Звуковые эффекты</span>
+                    <div class="row-desc">Звуки кликов и достижений</div>
+                </div>
                 <label class="switch">
                     <input type="checkbox" id="setSound" checked>
                     <span class="slider"></span>
                 </label>
             </div>
+
+            <div class="row" style="flex-direction: column; align-items: stretch;">
+                <span>Громкость</span>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
+                <div class="volume-value" id="volumeValue">80%</div>
+            </div>
+
             <div class="row">
-                <span>Вибрация клика</span>
+                <div>
+                    <span>Вибрация клика</span>
+                    <div class="row-desc">Тактильная отдача</div>
+                </div>
                 <label class="switch">
                     <input type="checkbox" id="setVibrate" checked>
                     <span class="slider"></span>
                 </label>
             </div>
+
+            <div class="row">
+                <div>
+                    <span>Показывать частицы</span>
+                    <div class="row-desc">Эффекты при клике</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="setParticles" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
 
-        <div class="section" style="border-color: rgba(160, 32, 240, 0.2); background: rgba(160, 32, 240, 0.03);">
-            <p class="section-title" style="color: var(--purple);">Аудиосистема</p>
+        <!-- ДАННЫЕ -->
+        <div class="section">
+            <p class="section-title">💾 Данные игры</p>
+            
+            <div class="save-stats">
+                <div>💾 Размер сохранения: <b id="saveSize">0 KB</b></div>
+                <div>📅 Последнее сохранение: <b id="saveDate">-</b></div>
+                <div>⏱️ Время в игре: <b id="playTime">0м</b></div>
+            </div>
+
+            <button class="btn btn-export" onclick="exportSave()">📥 Экспорт сохранения</button>
+            <input type="file" id="importFile" style="display:none" accept=".json" onchange="importSave(this)">
+            <button class="btn btn-back" onclick="document.getElementById('importFile').click()">📤 Импорт сохранения</button>
+        </div>
+
+        <!-- В РАЗРАБОТКЕ -->
+        <div class="section" style="border-color: rgba(157, 0, 255, 0.2); background: rgba(157, 0, 255, 0.03);">
+            <p class="section-title" style="color: var(--neon-purple);">🔮 Скоро</p>
             
             <div class="row" style="opacity: 0.6;">
                 <span>Фоновая музыка</span>
                 <div class="in-dev">В РАЗРАБОТКЕ</div>
             </div>
 
-            <div class="row" style="opacity: 0.6; margin-top: 15px;">
-                <span>Голос Nezya</span>
+            <div class="row" style="opacity: 0.6;">
+                <span>Голосовые уведомления</span>
                 <div class="in-dev">В РАЗРАБОТКЕ</div>
             </div>
             
-            <div style="font-size: 10px; color: #555; text-align: center; margin-top: 10px;">
-                СЛЕДУЮЩЕЕ ОБНОВЛЕНИЕ 2.0
+            <div style="font-size: 10px; color: #555; text-align: center; margin-top: 10px; letter-spacing: 2px;">
+                ОБНОВЛЕНИЕ 2.0 • СКОРО
             </div>
         </div>
 
-        <button class="btn btn-save" onclick="saveAll()">Сохранить настройки</button>
-        <button class="btn btn-back" onclick="location.href='index.html'">Назад в игру</button>
+        <!-- ЧИТ-МЕНЮ (скрыто) -->
+        <div class="cheat-section" id="cheatMenu">
+            <p class="section-title" style="color: var(--neon-pink);">🎮 DEV MENU</p>
+            <button class="cheat-btn" onclick="cheat('coins')">+100k 🪙</button>
+            <button class="cheat-btn" onclick="cheat('crystals')">+100 💎</button>
+            <button class="cheat-btn" onclick="cheat('level')">+1 LVL</button>
+            <button class="cheat-btn" onclick="cheat('energy')">⚡ MAX</button>
+        </div>
+
+        <button class="btn btn-save" onclick="saveAll()">💾 Сохранить настройки</button>
+        <button class="btn btn-back" onclick="location.href='index.html'">🎮 Назад в игру</button>
         
-        <button class="btn btn-danger" onclick="resetData()">Сбросить прогресс</button>
+        <button class="btn btn-danger" onclick="resetData()">🗑️ Сбросить прогресс</button>
 
         <div class="info-footer">
-            Версия игры: <b>1.1.2</b><br>
-            Разработчик: <b>Nezya</b>
+            Версия: <b>1.2.0 ULTRA</b> | Разработчик: <b>Nezya</b><br>
+            <span style="font-size: 10px; opacity: 0.5;">Нажми 5 раз на версию для чит-меню</span>
         </div>
     </div>
 
+    <!-- Секретный триггер -->
+    <div class="secret-trigger" id="secretBtn"></div>
+
 <script>
+    let cheatClicks = 0;
+
     window.onload = function() {
+        loadSettings();
+        updateStats();
+        updateSaveInfo();
+        
+        // Секретное меню
+        document.querySelector('.info-footer b:last-child').addEventListener('click', () => {
+            cheatClicks++;
+            if(cheatClicks >= 5) {
+                document.getElementById('cheatMenu').classList.add('show');
+                cheatClicks = 0;
+            }
+        });
+    };
+
+    function loadSettings() {
+        // Загрузка данных
         document.getElementById("userName").value = localStorage.getItem("userName") || "Nezya Player";
         document.getElementById("setSound").checked = localStorage.getItem("set_sound") !== "false";
         document.getElementById("setVibrate").checked = localStorage.getItem("set_vibrate") !== "false";
-        updateAvatar();
-    };
+        document.getElementById("setParticles").checked = localStorage.getItem("set_particles") !== "false";
+        
+        const volume = localStorage.getItem("volume") || "80";
+        document.getElementById("volumeSlider").value = volume;
+        document.getElementById("volumeValue").textContent = volume + "%";
+        
+        // Тема
+        const theme = localStorage.getItem("theme") || "gold";
+        setTheme(theme, false);
+        
+        // Аватар
+        const hero = localStorage.getItem("activeCharacter") || "default";
+        document.getElementById("avatarImg").src = `assets/character_${hero}.png`;
+        document.getElementById("avatarLevel").textContent = localStorage.getItem("level") || "1";
+        
+        // Обновление при изменении имени
+        document.getElementById("userName").oninput = function() {
+            localStorage.setItem("userName", this.value.trim() || "Nezya Player");
+        };
+        
+        // Слайдер громкости
+        document.getElementById("volumeSlider").oninput = function() {
+            document.getElementById("volumeValue").textContent = this.value + "%";
+        };
+    }
 
-    document.getElementById("userName").oninput = updateAvatar;
-    function updateAvatar() {
-        const name = document.getElementById("userName").value;
-        const icon = document.getElementById("avatarIcon");
-        icon.textContent = name ? name.charAt(0).toUpperCase() : "👤";
+    function updateStats() {
+        document.getElementById("statCoins").textContent = Math.floor(+localStorage.getItem("coins") || 0).toLocaleString();
+        document.getElementById("statCrystals").textContent = (localStorage.getItem("crystals") || 0).toLocaleString();
+        document.getElementById("statLevel").textContent = localStorage.getItem("level") || "1";
+    }
+
+    function updateSaveInfo() {
+        // Размер данных
+        let totalSize = 0;
+        for(let key in localStorage) {
+            if(localStorage.hasOwnProperty(key)) {
+                totalSize += localStorage[key].length * 2; // UTF-16
+            }
+        }
+        document.getElementById("saveSize").textContent = (totalSize / 1024).toFixed(2) + " KB";
+        
+        // Дата
+        const lastSave = localStorage.getItem("lastEnergyUpdate");
+        if(lastSave) {
+            const date = new Date(+lastSave);
+            document.getElementById("saveDate").textContent = date.toLocaleString("ru-RU");
+        }
+        
+        // Время
+        const playTime = localStorage.getItem("playTime") || "0";
+        document.getElementById("playTime").textContent = Math.floor(+playTime / 60) + "м";
+    }
+
+    function setTheme(theme, save = true) {
+        // Убираем активные классы
+        document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.theme-btn.${theme}`).classList.add('active');
+        
+        // Применяем тему
+        const colors = {
+            gold: '#ffd700',
+            blue: '#00d2ff',
+            purple: '#9d00ff',
+            green: '#39ff14'
+        };
+        
+        document.documentElement.style.setProperty('--gold', colors[theme]);
+        
+        if(save) {
+            localStorage.setItem("theme", theme);
+            showToast("Тема применена!", "success");
+        }
     }
 
     function saveAll() {
         const name = document.getElementById("userName").value.trim() || "Nezya Player";
         const sound = document.getElementById("setSound").checked;
         const vibrate = document.getElementById("setVibrate").checked;
+        const particles = document.getElementById("setParticles").checked;
+        const volume = document.getElementById("volumeSlider").value;
 
         localStorage.setItem("userName", name);
         localStorage.setItem("set_sound", sound);
         localStorage.setItem("set_vibrate", vibrate);
+        localStorage.setItem("set_particles", particles);
+        localStorage.setItem("volume", volume);
 
         const btn = document.querySelector(".btn-save");
-        btn.textContent = "СОХРАНЕНО! ✓";
-        btn.style.background = "#4ae38d";
+        const originalText = btn.textContent;
+        btn.innerHTML = "✅ СОХРАНЕНО!";
+        btn.style.background = "linear-gradient(135deg, #39ff14, #2ecc71)";
+        
+        showToast("Настройки сохранены!", "success");
+        
         setTimeout(() => {
-            btn.textContent = "Сохранить настройки";
-            btn.style.background = "var(--gold)";
-        }, 1500);
+            btn.textContent = originalText;
+            btn.style.background = "";
+        }, 2000);
     }
 
-    function resetData() {
-        const check1 = confirm("Ты уверен, что хочешь СБРОСИТЬ всё? Монеты, герои и кристаллы исчезнут!");
-        if (check1) {
-            const check2 = prompt("Напиши слово 'УДАЛИТЬ' для подтверждения:");
-            if (check2?.toUpperCase() === "УДАЛИТЬ") {
-                localStorage.clear();
-                alert("Данные успешно удалены.");
-                location.href = "index.html";
+    // --- ЭКСПОРТ/ИМПОРТ ---
+    function exportSave() {
+        const data = {};
+        for(let key in localStorage) {
+            if(localStorage.hasOwnProperty(key)) {
+                data[key] = localStorage[key];
             }
         }
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nezya_save_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showToast("Сохранение экспортировано!", "success");
+    }
+
+    function importSave(input) {
+        const file = input.files[0];
+        if(!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                // Подтверждение
+                if(!confirm("Это заменит текущий прогресс. Продолжить?")) return;
+                
+                // Очищаем и загружаем
+                localStorage.clear();
+                for(let key in data) {
+                    localStorage.setItem(key, data[key]);
+                }
+                
+                showToast("Сохранение загружено! Перезагрузка...", "success");
+                setTimeout(() => location.reload(), 1500);
+                
+            } catch(err) {
+                showToast("Ошибка загрузки файла!", "error");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- СБРОС ---
+    function resetData() {
+        const check1 = confirm("⚠️ Ты уверен? ВСЕ данные будут удалены безвозвратно!");
+        if(!check1) return;
+        
+        const check2 = prompt("Введи 'УДАЛИТЬ' для подтверждения:");
+        if(check2?.toUpperCase() !== "УДАЛИТЬ") {
+            showToast("Сброс отменен", "info");
+            return;
+        }
+        
+        localStorage.clear();
+        showToast("Прогресс сброшен! Перезагрузка...", "success");
+        setTimeout(() => location.href = "index.html", 1500);
+    }
+
+    // --- ЧИТЫ ---
+    function cheat(type) {
+        switch(type) {
+            case 'coins':
+                localStorage.setItem("coins", (+localStorage.getItem("coins") || 0) + 100000);
+                break;
+            case 'crystals':
+                localStorage.setItem("crystals", (+localStorage.getItem("crystals") || 0) + 100);
+                break;
+            case 'level':
+                localStorage.setItem("level", (+localStorage.getItem("level") || 1) + 1);
+                break;
+            case 'energy':
+                localStorage.setItem("energy", 100);
+                break;
+        }
+        updateStats();
+        showToast("Чит применен!", "success");
+    }
+
+    // --- TOAST ---
+    function showToast(msg, type) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            background: ${type === 'success' ? 'rgba(57,255,20,0.9)' : type === 'error' ? 'rgba(255,77,77,0.9)' : 'rgba(0,210,255,0.9)'};
+            color: #000; padding: 15px 30px; border-radius: 15px; font-weight: 900;
+            z-index: 3000; animation: slideDown 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        `;
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
 </script>
 </body>
