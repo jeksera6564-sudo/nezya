@@ -13,6 +13,7 @@
             --neon-green: #39ff14;
             --neon-red: #ff4d4d;
             --neon-pink: #ff00ff;
+            --neon-orange: #ff8c00;
             --glass: rgba(255, 255, 255, 0.1);
             --mythic: #ff4d4d;
         }
@@ -21,7 +22,7 @@
         
         body { 
             width: 100vw; height: 100vh; 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a15 50%, #020205 100%);
             font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; 
         }
 
@@ -32,58 +33,72 @@
             z-index: 100; pointer-events: none; gap: 10px;
         }
         .balance-container { 
-            display: flex; gap: 15px; background: rgba(0,0,0,0.85); 
+            display: flex; gap: 15px; background: rgba(0,0,0,0.9); 
             padding: 12px 25px; border-radius: 30px; border: 1px solid var(--gold);
             pointer-events: auto; backdrop-filter: blur(10px); 
-            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+            box-shadow: 0 0 30px rgba(255,215,0,0.3), inset 0 0 20px rgba(255,215,0,0.1);
             animation: slideDown 0.5s ease;
         }
-        .bal-item { font-weight: 900; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .bal-item { font-weight: 900; font-size: 18px; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 10px currentColor; }
         .bal-item.changed { animation: pulse-gold 0.3s ease; }
 
         /* Уровень и XP */
         .level-bar {
-            background: rgba(0,0,0,0.8); padding: 8px 20px; border-radius: 20px;
+            background: rgba(0,0,0,0.9); padding: 8px 20px; border-radius: 20px;
             border: 1px solid var(--neon-blue); display: flex; align-items: center; gap: 10px;
             pointer-events: auto; backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0,210,255,0.2), inset 0 0 10px rgba(0,210,255,0.1);
         }
-        .level-text { font-weight: 900; color: var(--neon-blue); font-size: 14px; }
+        .level-text { font-weight: 900; color: var(--neon-blue); font-size: 14px; text-shadow: 0 0 10px var(--neon-blue); }
         .xp-bar {
-            width: 100px; height: 8px; background: #333; border-radius: 4px; overflow: hidden;
+            width: 100px; height: 8px; background: #222; border-radius: 4px; overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
         }
         .xp-fill {
             height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
             transition: width 0.3s ease; box-shadow: 0 0 10px var(--neon-blue);
+            animation: xpGlow 2s ease-in-out infinite;
         }
+        @keyframes xpGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 
         /* --- ЭНЕРГИЯ --- */
         .energy-container {
             position: absolute; top: 100px; right: 15px;
-            background: rgba(0,0,0,0.8); padding: 10px 15px; border-radius: 15px;
+            background: rgba(0,0,0,0.9); padding: 10px 15px; border-radius: 15px;
             border: 1px solid var(--neon-red); pointer-events: auto;
             display: flex; flex-direction: column; align-items: center; gap: 5px;
+            box-shadow: 0 0 20px rgba(255,77,77,0.2), inset 0 0 10px rgba(255,77,77,0.1);
         }
-        .energy-text { font-size: 11px; font-weight: 900; color: var(--neon-red); }
+        .energy-text { font-size: 11px; font-weight: 900; color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
         .energy-bar {
-            width: 60px; height: 6px; background: #333; border-radius: 3px; overflow: hidden;
+            width: 60px; height: 6px; background: #222; border-radius: 3px; overflow: hidden;
         }
         .energy-fill {
-            height: 100%; background: var(--neon-red); transition: width 0.3s ease;
-            box-shadow: 0 0 10px var(--neon-red);
+            height: 100%; background: linear-gradient(90deg, var(--neon-red), var(--neon-orange));
+            transition: width 0.3s ease; box-shadow: 0 0 10px var(--neon-red);
         }
 
         /* --- ЕЖЕДНЕВНЫЙ БОНУС --- */
         .daily-bonus {
             position: absolute; top: 100px; left: 15px;
-            background: linear-gradient(135deg, var(--gold), #ff8c00);
-            padding: 10px 15px; border-radius: 15px; cursor: pointer;
+            background: linear-gradient(135deg, var(--gold), var(--neon-orange));
+            padding: 12px 20px; border-radius: 15px; cursor: pointer;
             font-weight: 900; font-size: 12px; color: #000;
-            box-shadow: 0 0 20px rgba(255,215,0,0.4);
-            animation: pulse-gold 2s infinite; pointer-events: auto;
-            display: none;
+            box-shadow: 0 0 30px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,255,255,0.3);
+            animation: bonusPulse 1.5s ease-in-out infinite; 
+            pointer-events: auto; display: none; border: 2px solid #fff;
+            text-transform: uppercase; letter-spacing: 1px;
         }
         .daily-bonus.ready { display: block; }
-        .daily-bonus.claimed { background: #333; color: #666; animation: none; }
+        .daily-bonus.claimed { 
+            background: linear-gradient(135deg, #333, #222); 
+            color: #666; animation: none; border-color: #444;
+            box-shadow: none; cursor: default;
+        }
+        @keyframes bonusPulse { 
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,215,0,0.5); } 
+            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255,215,0,0.8); } 
+        }
 
         /* --- ИГРОВАЯ ЗОНА --- */
         .game { 
@@ -94,51 +109,54 @@
         
         /* Комбо счётчик */
         .combo-display {
-            position: absolute; top: 30%; font-size: 60px; font-weight: 900;
-            color: var(--neon-pink); text-shadow: 0 0 30px var(--neon-pink);
+            position: absolute; top: 25%; font-size: 70px; font-weight: 900;
+            color: var(--neon-pink); text-shadow: 0 0 30px var(--neon-pink), 0 0 60px var(--neon-pink);
             opacity: 0; transform: scale(0.5); transition: all 0.3s ease;
             pointer-events: none; z-index: 60;
         }
-        .combo-display.active { opacity: 1; transform: scale(1); }
-        .combo-multiplier { font-size: 24px; color: var(--gold); }
+        .combo-display.active { opacity: 1; transform: scale(1); animation: comboPop 0.3s ease; }
+        @keyframes comboPop { 0% { transform: scale(0.5); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .combo-multiplier { font-size: 24px; color: var(--gold); text-align: center; }
 
         .char-container { position: relative; display: flex; align-items: center; justify-content: center; pointer-events: none; }
         
         .character { 
             width: 280px; max-width: 80vw; cursor: pointer; 
             z-index: 50; position: relative; pointer-events: auto;
-            filter: drop-shadow(0 0 25px rgba(0,0,0,0.8));
+            filter: drop-shadow(0 0 30px rgba(0,0,0,0.8));
             transition: transform 0.05s cubic-bezier(0, 0, 0.2, 1);
             animation: idleBreath 3s ease-in-out infinite;
         }
 
         @keyframes idleBreath {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-15px) scale(1.02); }
+            0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 20px rgba(255,215,0,0.3)); }
+            50% { transform: translateY(-15px) scale(1.02); filter: drop-shadow(0 0 40px rgba(255,215,0,0.5)); }
         }
 
         .char-active { 
             transform: scale(0.85) !important;
-            filter: drop-shadow(0 0 40px var(--gold)) brightness(1.1) !important;
+            filter: drop-shadow(0 0 50px var(--gold)) brightness(1.2) !important;
             animation-play-state: paused;
         }
 
         .char-critical {
             animation: criticalShake 0.5s ease !important;
-            filter: drop-shadow(0 0 60px var(--neon-red)) brightness(1.3) !important;
+            filter: drop-shadow(0 0 80px var(--neon-red)) brightness(1.4) !important;
         }
 
         @keyframes criticalShake {
             0%, 100% { transform: scale(0.9) rotate(0deg); }
-            25% { transform: scale(0.9) rotate(-5deg); }
-            75% { transform: scale(0.9) rotate(5deg); }
+            25% { transform: scale(0.9) rotate(-8deg); }
+            75% { transform: scale(0.9) rotate(8deg); }
         }
 
         #displayNickname { 
             margin-top: 20px; font-weight: 900; letter-spacing: 3px; 
-            color: var(--gold); text-transform: uppercase; font-size: 18px;
-            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+            color: var(--gold); text-transform: uppercase; font-size: 20px;
+            text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4);
+            animation: nameGlow 3s ease-in-out infinite;
         }
+        @keyframes nameGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
 
         /* --- МЕНЮ --- */
         .side-menu { 
@@ -146,31 +164,45 @@
             display: flex; flex-direction: column; gap: 18px; z-index: 200; 
         }
         .side-btn { 
-            width: 55px; height: 55px; background: rgba(0,0,0,0.8); 
+            width: 55px; height: 55px; background: rgba(0,0,0,0.9); 
             border: 2px solid var(--neon-blue); border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 24px; cursor: pointer; transition: 0.2s; 
+            font-size: 24px; cursor: pointer; transition: 0.3s; 
             color: white; text-decoration: none; position: relative;
+            box-shadow: 0 0 15px rgba(0,210,255,0.2), inset 0 0 10px rgba(0,210,255,0.1);
         }
-        .side-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--neon-blue); }
+        .side-btn:hover { 
+            transform: scale(1.15); 
+            box-shadow: 0 0 30px rgba(0,210,255,0.6), inset 0 0 15px rgba(0,210,255,0.2);
+            border-color: var(--neon-purple);
+        }
         .side-btn .badge {
             position: absolute; top: -5px; right: -5px;
             background: var(--neon-red); color: white; font-size: 10px;
             padding: 2px 6px; border-radius: 10px; font-weight: 900;
+            box-shadow: 0 0 10px var(--neon-red);
+            animation: badgePulse 1s infinite;
         }
+        @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
         .bottom-menu { 
             position: absolute; bottom: 25px; width: 100%; 
-            display: flex; justify-content: center; gap: 12px; padding: 0 20px; z-index: 200; 
+            display: flex; justify-content: center; gap: 15px; padding: 0 20px; z-index: 200; 
         }
         .bottom-btn { 
-            flex: 1; max-width: 110px; height: 65px; background: rgba(0,0,0,0.9); 
+            flex: 1; max-width: 120px; height: 70px; background: rgba(0,0,0,0.9); 
             border: 2px solid var(--gold); border-radius: 20px; display: flex; 
             flex-direction: column; align-items: center; justify-content: center; 
-            color: white; text-decoration: none; font-size: 11px; 
+            color: white; text-decoration: none; font-size: 12px; 
             font-weight: 900; text-transform: uppercase; transition: 0.3s;
+            box-shadow: 0 0 15px rgba(255,215,0,0.2), inset 0 0 10px rgba(255,215,0,0.1);
         }
-        .bottom-btn:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255,215,0,0.3); }
+        .bottom-btn:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 15px 40px rgba(255,215,0,0.4), inset 0 0 20px rgba(255,215,0,0.2);
+            border-color: var(--neon-orange);
+        }
+        .bottom-btn b { font-size: 24px; margin-bottom: 5px; filter: drop-shadow(0 0 5px currentColor); }
 
         /* --- МОДАЛКИ --- */
         .modal { 
@@ -185,41 +217,46 @@
             border-radius: 22px; margin-bottom: 15px; display: flex; 
             justify-content: space-between; align-items: center; 
             border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
-        .card:hover { border-color: var(--gold); transform: translateX(5px); }
+        .card:hover { border-color: var(--gold); transform: translateX(5px); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
         .card.locked { opacity: 0.5; filter: grayscale(1); }
-        .card.completed { border-color: var(--neon-green); background: rgba(57,255,20,0.1); }
+        .card.completed { border-color: var(--neon-green); background: rgba(57,255,20,0.1); box-shadow: 0 0 20px rgba(57,255,20,0.3); }
         
         .close-btn { 
-            padding: 15px 70px; background: #fff; color: #000; 
+            padding: 15px 70px; background: linear-gradient(135deg, #fff, #ddd); color: #000; 
             border-radius: 40px; font-weight: 900; cursor: pointer; 
             margin-top: 10px; text-transform: uppercase; transition: 0.3s;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
         }
-        .close-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,255,255,0.5); }
+        .close-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(255,255,255,0.5); }
         
         .buy-btn { 
-            padding: 10px 15px; background: var(--gold); border: none; 
-            border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 10px;
-            transition: 0.3s;
+            padding: 10px 15px; background: linear-gradient(135deg, var(--gold), var(--neon-orange)); 
+            border: none; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 10px;
+            transition: 0.3s; color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.3);
         }
-        .buy-btn:hover { transform: scale(1.05); }
-        .buy-btn.active-eff { background: var(--neon-green); color: white; }
+        .buy-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+        .buy-btn.active-eff { background: linear-gradient(135deg, var(--neon-green), #2ecc71); color: white; }
 
         /* --- АУРЫ --- */
         .aura { 
-            position: absolute; width: 350px; height: 350px; border-radius: 50%; 
-            filter: blur(50px); opacity: 0; transition: 0.5s; pointer-events: none; z-index: 1; 
+            position: absolute; width: 400px; height: 400px; border-radius: 50%; 
+            filter: blur(60px); opacity: 0; transition: 0.5s; pointer-events: none; z-index: 1; 
         }
-        .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); }
-        .aura-blue { background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%); }
-        .aura-red { background: radial-gradient(circle, var(--mythic) 0%, transparent 70%); }
-        .aura-purple { background: radial-gradient(circle, var(--neon-purple) 0%, transparent 70%); }
+        .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); animation: auraRotate 10s linear infinite; }
+        .aura-blue { background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%); animation: auraRotate 10s linear infinite reverse; }
+        .aura-red { background: radial-gradient(circle, var(--mythic) 0%, transparent 70%); animation: auraPulse 3s ease-in-out infinite; }
+        .aura-purple { background: radial-gradient(circle, var(--neon-purple) 0%, transparent 70%); animation: auraRotate 15s linear infinite; }
+        
+        @keyframes auraRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes auraPulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 0.9; } }
 
         /* --- ВСПЛЫВАЮЩИЕ ЦИФРЫ --- */
         .float-text { 
             position: absolute; pointer-events: none; font-weight: 900; 
             font-size: 40px; animation: floatUp 0.8s ease-out forwards; z-index: 500;
-            text-shadow: 0 0 20px currentColor;
+            text-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
         }
         .float-text.critical { font-size: 60px; animation: floatUpCritical 1s ease-out forwards; }
         
@@ -235,8 +272,9 @@
 
         /* --- ЧАСТИЦЫ --- */
         .particle {
-            position: absolute; width: 6px; height: 6px; border-radius: 50%;
-            pointer-events: none; z-index: 40; animation: particleFly 0.6s ease-out forwards;
+            position: absolute; width: 8px; height: 8px; border-radius: 50%;
+            pointer-events: none; z-index: 40; animation: particleFly 0.8s ease-out forwards;
+            box-shadow: 0 0 10px currentColor;
         }
         @keyframes particleFly {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
@@ -246,44 +284,83 @@
         /* --- ДОСТИЖЕНИЯ --- */
         .achievement-popup {
             position: fixed; top: 100px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            background: linear-gradient(135deg, var(--gold), var(--neon-orange));
             padding: 20px 30px; border-radius: 20px; z-index: 2000;
             display: flex; align-items: center; gap: 15px; opacity: 0;
             transition: all 0.5s ease; pointer-events: none;
-            box-shadow: 0 10px 40px rgba(255,215,0,0.4);
+            box-shadow: 0 10px 40px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,255,255,0.3);
+            border: 2px solid #fff;
         }
         .achievement-popup.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .achievement-icon { font-size: 40px; }
+        .achievement-icon { font-size: 40px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.3)); }
         .achievement-text { color: #000; }
-        .achievement-text h3 { margin: 0; font-size: 16px; }
-        .achievement-text p { margin: 0; font-size: 12px; opacity: 0.8; }
+        .achievement-text h3 { margin: 0; font-size: 16px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .achievement-text p { margin: 0; font-size: 12px; opacity: 0.8; font-weight: bold; }
 
-        /* --- ОНЛАЙН --- */
-        .online-status { text-align: center; }
-        .online-title { font-size: 32px; color: var(--neon-purple); margin-bottom: 10px; letter-spacing: 4px; }
-        .loader { 
-            width: 50px; height: 50px; border: 5px solid #333; 
-            border-top-color: var(--neon-purple); border-radius: 50%; 
-            animation: spin 1s linear infinite; margin-bottom: 20px; 
+        /* --- ОНЛАЙН В РАЗРАБОТКЕ --- */
+        .dev-status {
+            background: linear-gradient(135deg, rgba(157,0,255,0.2), rgba(0,210,255,0.2));
+            border: 2px solid var(--neon-purple);
+            border-radius: 20px; padding: 30px; text-align: center;
+            box-shadow: 0 0 30px rgba(157,0,255,0.3), inset 0 0 20px rgba(157,0,255,0.1);
+            animation: devGlow 3s ease-in-out infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes devGlow { 
+            0%, 100% { box-shadow: 0 0 30px rgba(157,0,255,0.3); } 
+            50% { box-shadow: 0 0 50px rgba(157,0,255,0.6); } 
+        }
+        .dev-icon { font-size: 60px; margin-bottom: 15px; animation: devBounce 2s ease-in-out infinite; }
+        @keyframes devBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .dev-title { 
+            font-size: 28px; font-weight: 900; color: var(--neon-purple); 
+            text-shadow: 0 0 20px var(--neon-purple); margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+        .dev-text { color: #aaa; font-size: 14px; margin-bottom: 20px; }
+        .dev-progress {
+            width: 200px; height: 6px; background: #333; border-radius: 3px;
+            margin: 0 auto 20px; overflow: hidden;
+        }
+        .dev-progress-bar {
+            height: 100%; width: 65%; background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+            border-radius: 3px; animation: devProgress 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--neon-purple);
+        }
+        @keyframes devProgress { 
+            0% { width: 60%; } 
+            50% { width: 70%; } 
+            100% { width: 60%; } 
+        }
 
         /* --- АНИМАЦИИ --- */
         @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes pulse-gold { 
-            0%, 100% { box-shadow: 0 0 20px rgba(255,215,0,0.2); } 
-            50% { box-shadow: 0 0 40px rgba(255,215,0,0.6); } 
+            0%, 100% { transform: scale(1); filter: brightness(1); } 
+            50% { transform: scale(1.1); filter: brightness(1.5); } 
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- ПАССИВНЫЙ ДОХОД ИНДИКАТОР --- */
+        /* --- ПАССИВНЫЙ ДОХОД --- */
         .income-indicator {
             position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); padding: 8px 20px; border-radius: 20px;
-            border: 1px solid var(--neon-green); font-size: 12px; color: var(--neon-green);
-            opacity: 0; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.9); padding: 10px 25px; border-radius: 20px;
+            border: 1px solid var(--neon-green); font-size: 14px; color: var(--neon-green);
+            opacity: 0; transition: opacity 0.3s; font-weight: 900;
+            box-shadow: 0 0 20px rgba(57,255,20,0.3), inset 0 0 10px rgba(57,255,20,0.1);
+            text-shadow: 0 0 10px var(--neon-green);
         }
-        .income-indicator.show { opacity: 1; }
+        .income-indicator.show { opacity: 1; animation: incomePulse 0.5s ease; }
+        @keyframes incomePulse { 0% { transform: translateX(-50%) scale(0.8); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
+
+        /* --- КОНФЕТТИ --- */
+        .confetti {
+            position: fixed; width: 12px; height: 12px; pointer-events: none; z-index: 3000;
+            animation: confettiFall 3s ease-out forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -358,22 +435,22 @@
 
     <!-- МОДАЛКА ЭФФЕКТОВ -->
     <div id="effModal" class="modal">
-        <h2 style="color:var(--neon-blue)">ЭФФЕКТЫ (АУРЫ)</h2>
+        <h2 style="color:var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue); margin-bottom: 20px;">ЭФФЕКТЫ (АУРЫ)</h2>
         <div class="modal-body">
             <div class="card">
-                <div><b>Золотое сияние</b><br><small>Цена: 50 💎</small></div>
+                <div><b style="color: var(--gold)">Золотое сияние</b><br><small>Цена: 50 💎</small></div>
                 <button id="btn-eff-gold" class="buy-btn" onclick="toggleEffect('gold', 50)">50 💎</button>
             </div>
             <div class="card">
-                <div><b>Неоновый лед</b><br><small>Цена: 150 💎</small></div>
+                <div><b style="color: var(--neon-blue)">Неоновый лед</b><br><small>Цена: 150 💎</small></div>
                 <button id="btn-eff-blue" class="buy-btn" onclick="toggleEffect('blue', 150)">150 💎</button>
             </div>
             <div class="card">
-                <div><b>Ярость Магната</b><br><small>Цена: 500 💎</small></div>
+                <div><b style="color: var(--neon-red)">Ярость Магната</b><br><small>Цена: 500 💎</small></div>
                 <button id="btn-eff-red" class="buy-btn" onclick="toggleEffect('red', 500)">500 💎</button>
             </div>
             <div class="card">
-                <div><b>Космическая Пурпурность</b><br><small>Цена: 1000 💎<br>Требуется: Уровень 10</small></div>
+                <div><b style="color: var(--neon-purple)">Космическая Пурпурность</b><br><small>Цена: 1000 💎<br>Требуется: Уровень 10</small></div>
                 <button id="btn-eff-purple" class="buy-btn" onclick="toggleEffect('purple', 1000)">1000 💎</button>
             </div>
         </div>
@@ -382,7 +459,7 @@
 
     <!-- МОДАЛКА СТАТИСТИКИ -->
     <div id="statModal" class="modal">
-        <h2 style="color:var(--gold)">СТАТИСТИКА</h2>
+        <h2 style="color:var(--gold); text-shadow: 0 0 20px var(--gold); margin-bottom: 20px;">СТАТИСТИКА</h2>
         <div class="modal-body">
             <div class="card"><span>🏆 Уровень</span><b id="s-level">1</b></div>
             <div class="card"><span>👆 Всего кликов</span><b id="s-clicks">0</b></div>
@@ -397,25 +474,21 @@
 
     <!-- МОДАЛКА ДОСТИЖЕНИЙ -->
     <div id="achModal" class="modal">
-        <h2 style="color:var(--neon-purple)">ДОСТИЖЕНИЯ</h2>
-        <div class="modal-body" id="ach-list">
-            <!-- Генерируется JS -->
-        </div>
+        <h2 style="color:var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple); margin-bottom: 20px;">ДОСТИЖЕНИЯ</h2>
+        <div class="modal-body" id="ach-list"></div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
 
-    <!-- МОДАЛКА ОНЛАЙН -->
+    <!-- МОДАЛКА ОНЛАЙН - В РАЗРАБОТКЕ -->
     <div id="onlineModal" class="modal">
-        <div class="online-status">
-            <center><div class="loader"></div></center>
-            <h2 class="online-title">ONLINE</h2>
-            <p style="color: #aaa; margin-bottom: 20px;">Сетевая игра скоро будет доступна!</p>
-            <div style="background: var(--glass); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-                <p style="color: var(--neon-blue); font-weight: 900;">👥 Онлайн: <span id="online-count">1,337</span></p>
-                <p style="color: var(--gold); font-size: 12px; margin-top: 5px;">🏆 Топ игрок: <span id="top-player">Nezya King</span></p>
-            </div>
-            <div class="close-btn" onclick="closeModal()">НАЗАД</div>
+        <div class="dev-status">
+            <div class="dev-icon">🚧</div>
+            <h2 class="dev-title">В РАЗРАБОТКЕ</h2>
+            <p class="dev-text">Сетевая игра скоро будет доступна!<br>Мы усердно работаем над этим.</p>
+            <div class="dev-progress"><div class="dev-progress-bar"></div></div>
+            <p style="color: var(--neon-blue); font-size: 12px; font-weight: 900;">Готовность: ~65%</p>
         </div>
+        <div class="close-btn" onclick="closeModal()" style="margin-top: 30px;">НАЗАД</div>
     </div>
 
     <!-- ПОПАП ДОСТИЖЕНИЯ -->
@@ -440,7 +513,6 @@
         unlockedEffects: JSON.parse(localStorage.getItem("unlockedEffects")) || {},
         activeEffect: localStorage.getItem("currentEffect") || "none",
         
-        // Новые поля
         level: +localStorage.getItem("level") || 1,
         xp: +localStorage.getItem("xp") || 0,
         energy: +localStorage.getItem("energy") || 100,
@@ -452,21 +524,19 @@
         achievements: JSON.parse(localStorage.getItem("achievements")) || []
     };
 
-    // --- КОНФИГ ---
     const CONFIG = {
         xpPerClick: 1,
         xpPerLevel: 100,
         maxEnergy: 100,
-        energyRegen: 1, // в секунду
+        energyRegen: 1,
         energyCost: 1,
-        comboWindow: 2000, // мс
+        comboWindow: 2000,
         critChance: 0.05,
         critMultiplier: 10,
         dailyBonusCoins: 50000,
         dailyBonusCrystals: 5
     };
 
-    // --- ДОСТИЖЕНИЯ ---
     const ACHIEVEMENTS = [
         { id: 'first_click', name: 'Первый шаг', desc: 'Сделайте первый клик', check: () => state.clicks >= 1, reward: { coins: 1000 } },
         { id: 'click_100', name: 'Начинающий', desc: '100 кликов', check: () => state.clicks >= 100, reward: { coins: 10000 } },
@@ -478,10 +548,7 @@
         { id: 'crit_10', name: 'Критический удар', desc: '10 критических ударов', check: () => state.crits >= 10, reward: { coins: 25000 } }
     ];
 
-    // --- КОМБО СИСТЕМА ---
-    let combo = 0;
-    let comboTimer = null;
-    let lastClickTime = 0;
+    let combo = 0, comboTimer = null, lastClickTime = 0;
 
     // --- ИНИЦИАЛИЗАЦИЯ ---
     init();
@@ -489,7 +556,6 @@
     setInterval(save, 5000);
 
     function init() {
-        // Восстановление энергии оффлайн
         const offlineTime = Date.now() - state.lastEnergyUpdate;
         const energyToAdd = Math.floor(offlineTime / 1000) * CONFIG.energyRegen;
         state.energy = Math.min(CONFIG.maxEnergy, state.energy + energyToAdd);
@@ -498,23 +564,17 @@
         renderAchievements();
         checkDailyBonus();
         checkAchievements();
-        
-        // Случайное число онлайна для красоты
-        document.getElementById('online-count').textContent = (1337 + Math.floor(Math.random() * 500)).toLocaleString();
     }
 
     function gameLoop() {
-        // Реген энергии
         if(state.energy < CONFIG.maxEnergy) {
             state.energy = Math.min(CONFIG.maxEnergy, state.energy + CONFIG.energyRegen);
             updateEnergyUI();
         }
         
-        // Время в игре
         state.playTime++;
         document.getElementById('s-time').textContent = Math.floor(state.playTime / 60) + 'м';
         
-        // Пассивный доход
         let income = calculateIncome();
         if(income > 0) {
             state.coins += income;
@@ -528,7 +588,6 @@
     // --- КЛИК ---
     const charImg = document.getElementById("charImg");
     charImg.addEventListener("pointerdown", (e) => {
-        // Проверка энергии
         if(state.energy < CONFIG.energyCost) {
             showFloatText(e.clientX, e.clientY, "⚡ Нет энергии!", "#ff4444");
             if(navigator.vibrate) navigator.vibrate(200);
@@ -537,7 +596,6 @@
         
         state.energy -= CONFIG.energyCost;
         
-        // Комбо система
         const now = Date.now();
         if(now - lastClickTime < CONFIG.comboWindow) {
             combo++;
@@ -547,23 +605,19 @@
         }
         lastClickTime = now;
         
-        // Сброс комбо таймера
         clearTimeout(comboTimer);
         comboTimer = setTimeout(() => {
             combo = 0;
             updateComboUI();
         }, CONFIG.comboWindow);
         
-        // Расчет награды
         const pwr = +localStorage.getItem("clickPower") || 1;
         let multiplier = 1;
         
-        // Комбо множитель
         if(combo >= 50) multiplier = 5;
         else if(combo >= 25) multiplier = 3;
         else if(combo >= 10) multiplier = 2;
         
-        // Крит
         let isCrit = Math.random() < (CONFIG.critChance + ((+localStorage.getItem("critChance") || 0) / 100));
         let finalPower = pwr * multiplier;
         
@@ -572,25 +626,20 @@
             state.crits++;
             charImg.classList.add("char-critical");
             setTimeout(() => charImg.classList.remove("char-critical"), 500);
-            playSound('crit');
             createParticles(e.clientX, e.clientY, 'crit');
         } else {
             charImg.classList.add("char-active");
             setTimeout(() => charImg.classList.remove("char-active"), 80);
-            playSound('click');
             createParticles(e.clientX, e.clientY, 'normal');
         }
         
-        // Награды
         state.coins += finalPower;
         state.earned += finalPower;
         state.clicks++;
         state.xp += CONFIG.xpPerClick * (isCrit ? 2 : 1);
         
-        // Проверка уровня
         checkLevelUp();
         
-        // Кристаллы
         let gotCrystal = Math.random() < (0.05 + ((+localStorage.getItem("crystalChance") || 0) / 100));
         if(gotCrystal) {
             state.crystals += 1;
@@ -598,7 +647,6 @@
             showFloatText(e.clientX + 30, e.clientY - 30, "+1 💎", "var(--neon-blue)");
         }
         
-        // Визуал
         let displayText = `+${finalPower.toLocaleString()}`;
         if(multiplier > 1) displayText += ` (x${multiplier})`;
         if(isCrit) displayText = `💥 ${displayText}`;
@@ -617,24 +665,20 @@
         if(state.xp >= needed) {
             state.level++;
             state.xp -= needed;
-            playSound('levelup');
             showFloatText(window.innerWidth/2, window.innerHeight/2, `LEVEL UP! ${state.level}`, "var(--neon-purple)", true);
             
-            // Бонус за уровень
             const bonus = state.level * 1000;
             state.coins += bonus;
             showFloatText(window.innerWidth/2, window.innerHeight/2 - 50, `+${bonus} 🪙`, "var(--gold)");
         }
     }
 
-    // --- UI ОБНОВЛЕНИЕ ---
+    // --- UI ---
     function updateUI() {
-        // Баланс
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals.toLocaleString();
         document.getElementById("displayNickname").textContent = state.name;
         
-        // Статистика
         document.getElementById("s-level").textContent = state.level;
         document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
         document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
@@ -642,7 +686,6 @@
         document.getElementById("s-maxcombo").textContent = state.maxCombo;
         document.getElementById("s-crits").textContent = state.crits;
         
-        // Уровень
         document.getElementById("level").textContent = state.level;
         const xpNeeded = state.level * CONFIG.xpPerLevel;
         const xpPercent = (state.xp / xpNeeded) * 100;
@@ -650,23 +693,19 @@
         document.getElementById("xp-current").textContent = state.xp;
         document.getElementById("xp-needed").textContent = xpNeeded;
         
-        // Персонаж
         const currentActive = localStorage.getItem("activeCharacter") || "default";
         document.getElementById("charImg").src = `assets/character_${currentActive}.png`;
         
-        // Ауры
         document.querySelectorAll('.aura').forEach(a => a.style.opacity = "0");
         if(state.activeEffect !== "none") {
             const auraId = "aura" + state.activeEffect.charAt(0).toUpperCase() + state.activeEffect.slice(1);
             if(document.getElementById(auraId)) document.getElementById(auraId).style.opacity = "0.7";
         }
         
-        // Кнопки эффектов
         ['gold', 'blue', 'red', 'purple'].forEach(eff => {
             const btn = document.getElementById(`btn-eff-${eff}`);
             if(!btn) return;
             
-            // Проверка уровня для фиолетовой
             if(eff === 'purple' && state.level < 10) {
                 btn.textContent = "ТРЕБУЕТСЯ LVL 10";
                 btn.disabled = true;
@@ -695,7 +734,6 @@
             comboEl.classList.add("active");
             countEl.textContent = "x" + combo;
             
-            // Цвет в зависимости от комбо
             if(combo >= 50) comboEl.style.color = "var(--neon-red)";
             else if(combo >= 25) comboEl.style.color = "var(--neon-pink)";
             else if(combo >= 10) comboEl.style.color = "var(--gold)";
@@ -705,30 +743,29 @@
         }
     }
 
-    // --- ЧАСТИЦЫ ---
+    // --- ЭФФЕКТЫ ---
     function createParticles(x, y, type) {
         const colors = type === 'crit' 
-            ? ['#ff4d4d', '#ff8c00', '#ffd700'] 
-            : ['#ffd700', '#ffec8b', '#fff'];
+            ? ['#ff4d4d', '#ff8c00', '#ffd700', '#ff00ff'] 
+            : ['#ffd700', '#ffec8b', '#fff', '#ff8c00'];
         
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 12; i++) {
             const p = document.createElement('div');
             p.className = 'particle';
             p.style.left = x + 'px';
             p.style.top = y + 'px';
             p.style.background = colors[Math.floor(Math.random() * colors.length)];
             
-            const angle = (Math.PI * 2 * i) / 8;
-            const velocity = 50 + Math.random() * 50;
+            const angle = (Math.PI * 2 * i) / 12;
+            const velocity = 80 + Math.random() * 80;
             p.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
             p.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
             
             document.body.appendChild(p);
-            setTimeout(() => p.remove(), 600);
+            setTimeout(() => p.remove(), 800);
         }
     }
 
-    // --- ВСПЛЫВАЮЩИЙ ТЕКСТ ---
     function showFloatText(x, y, text, color, isCritical = false) {
         const t = document.createElement("div");
         t.className = isCritical ? "float-text critical" : "float-text";
@@ -740,7 +777,6 @@
         setTimeout(() => t.remove(), isCritical ? 1000 : 800);
     }
 
-    // --- ИНДИКАТОР ДОХОДА ---
     function showIncomeIndicator(amount) {
         const ind = document.getElementById('income-indicator');
         ind.textContent = `+${amount.toLocaleString()} 🪙/сек`;
@@ -759,40 +795,79 @@
         return total;
     }
 
-    // --- ЕЖЕДНЕВНЫЙ БОНУС ---
+    // --- ЕЖЕДНЕВНЫЙ БОНУС (ИСПРАВЛЕНО) ---
     function checkDailyBonus() {
         const bonusEl = document.getElementById('daily-bonus');
-        const timeSinceLast = Date.now() - state.lastDailyBonus;
+        const now = Date.now();
+        const timeSinceLast = now - state.lastDailyBonus;
         
-        if(timeSinceLast >= 86400000) {
+        // Проверяем прошло ли 24 часа (86400000 мс)
+        if(timeSinceLast >= 86400000 || state.lastDailyBonus === 0) {
             bonusEl.classList.add('ready');
             bonusEl.classList.remove('claimed');
-            bonusEl.textContent = '🎁 ЗАБРАТЬ БОНУС!';
+            bonusEl.style.display = 'block';
+            bonusEl.innerHTML = '🎁 ЗАБРАТЬ БОНУС!';
         } else {
             bonusEl.classList.remove('ready');
             bonusEl.classList.add('claimed');
-            const hoursLeft = Math.ceil((86400000 - timeSinceLast) / 3600000);
-            bonusEl.textContent = `⏱️ Через ${hoursLeft}ч`;
+            bonusEl.style.display = 'block';
+            
+            // Показываем оставшееся время
+            const hoursLeft = Math.floor((86400000 - timeSinceLast) / 3600000);
+            const minsLeft = Math.floor(((86400000 - timeSinceLast) % 3600000) / 60000);
+            bonusEl.innerHTML = `⏱️ ${hoursLeft}ч ${minsLeft}м`;
         }
     }
 
     function claimDailyBonus() {
-        const timeSinceLast = Date.now() - state.lastDailyBonus;
-        if(timeSinceLast < 86400000) return;
+        const now = Date.now();
+        const timeSinceLast = now - state.lastDailyBonus;
         
+        // Проверяем можно ли забрать
+        if(timeSinceLast < 86400000 && state.lastDailyBonus !== 0) {
+            return; // Еще нельзя
+        }
+        
+        // Выдаем награду
         state.coins += CONFIG.dailyBonusCoins;
         state.crystals += CONFIG.dailyBonusCrystals;
-        state.lastDailyBonus = Date.now();
+        state.lastDailyBonus = now;
         
-        playSound('win');
-        showFloatText(window.innerWidth/2, window.innerHeight/2, `+${CONFIG.dailyBonusCoins.toLocaleString()} 🪙`, "var(--gold)", true);
+        // Конфетти эффект
+        createConfetti();
+        
+        // Показываем текст
+        showFloatText(window.innerWidth/2, window.innerHeight/2 - 100, `+${CONFIG.dailyBonusCoins.toLocaleString()} 🪙`, "var(--gold)", true);
         setTimeout(() => {
-            showFloatText(window.innerWidth/2 + 50, window.innerHeight/2 - 50, `+${CONFIG.dailyBonusCrystals} 💎`, "var(--neon-blue)", true);
-        }, 200);
+            showFloatText(window.innerWidth/2 + 50, window.innerHeight/2 - 150, `+${CONFIG.dailyBonusCrystals} 💎`, "var(--neon-blue)", true);
+        }, 300);
         
+        // Обновляем UI
         checkDailyBonus();
         save();
         updateUI();
+        
+        // Анимация кнопки баланса
+        document.getElementById('bal-coins').classList.add('changed');
+        document.getElementById('bal-crys').classList.add('changed');
+        setTimeout(() => {
+            document.getElementById('bal-coins').classList.remove('changed');
+            document.getElementById('bal-crys').classList.remove('changed');
+        }, 300);
+    }
+
+    function createConfetti() {
+        const colors = ['#ffd700', '#00d2ff', '#9d00ff', '#39ff14', '#ff00ff', '#ff4d4d'];
+        for(let i = 0; i < 50; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = Math.random() * 0.5 + 's';
+            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+        }
     }
 
     // --- ДОСТИЖЕНИЯ ---
@@ -806,7 +881,7 @@
             card.className = `card ${isCompleted ? 'completed' : ''}`;
             card.innerHTML = `
                 <div>
-                    <b>${ach.name}</b><br>
+                    <b style="color: ${isCompleted ? 'var(--neon-green)' : '#fff'}">${ach.name}</b><br>
                     <small>${ach.desc}</small><br>
                     <small style="color: ${isCompleted ? 'var(--neon-green)' : 'var(--gold)'}">
                         Награда: ${ach.reward.coins ? ach.reward.coins.toLocaleString() + ' 🪙' : ''} 
@@ -818,7 +893,6 @@
             list.appendChild(card);
         });
         
-        // Показать бейдж если есть неполученные
         const unclaimed = ACHIEVEMENTS.filter(a => !state.achievements.includes(a.id) && a.check()).length;
         document.getElementById('ach-badge').style.display = unclaimed > 0 ? 'block' : 'none';
     }
@@ -830,7 +904,6 @@
             if(!state.achievements.includes(ach.id) && ach.check()) {
                 state.achievements.push(ach.id);
                 
-                // Выдать награду
                 if(ach.reward.coins) state.coins += ach.reward.coins;
                 if(ach.reward.crystals) state.crystals += ach.reward.crystals;
                 
@@ -850,7 +923,6 @@
         const popup = document.getElementById('ach-popup');
         document.getElementById('ach-text').textContent = name;
         popup.classList.add('show');
-        playSound('achievement');
         
         setTimeout(() => popup.classList.remove('show'), 3000);
     }
@@ -866,7 +938,6 @@
                 state.crystals -= price;
                 state.unlockedEffects[id] = true;
                 state.activeEffect = id;
-                playSound('buy');
             } else {
                 showFloatText(window.innerWidth/2, window.innerHeight/2, "Недостаточно 💎", "#ff4444");
             }
@@ -901,13 +972,6 @@
         localStorage.setItem("crits", state.crits);
         localStorage.setItem("playTime", state.playTime);
         localStorage.setItem("achievements", JSON.stringify(state.achievements));
-    }
-
-    // --- ЗВУКИ (заглушки) ---
-    function playSound(type) {
-        // Здесь можно добавить реальные звуки из assets/
-        // const audio = new Audio(`assets/sound_${type}.mp3`);
-        // audio.play().catch(e => {});
     }
 </script>
 </body>
