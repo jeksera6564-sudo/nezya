@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Clicker Gold Edition - ULTRA</title>
+    <title>Clicker Gold Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -15,7 +15,6 @@
             --neon-pink: #ff00ff;
             --neon-orange: #ff8c00;
             --glass: rgba(255, 255, 255, 0.1);
-            --mythic: #ff4d4d;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -60,45 +59,6 @@
             animation: xpGlow 2s ease-in-out infinite;
         }
         @keyframes xpGlow { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.3); } }
-
-        /* --- ЭНЕРГИЯ --- */
-        .energy-container {
-            position: absolute; top: 100px; right: 15px;
-            background: rgba(0,0,0,0.9); padding: 10px 15px; border-radius: 15px;
-            border: 1px solid var(--neon-red); pointer-events: auto;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            box-shadow: 0 0 20px rgba(255,77,77,0.2), inset 0 0 10px rgba(255,77,77,0.1);
-        }
-        .energy-text { font-size: 11px; font-weight: 900; color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
-        .energy-bar {
-            width: 60px; height: 6px; background: #222; border-radius: 3px; overflow: hidden;
-        }
-        .energy-fill {
-            height: 100%; background: linear-gradient(90deg, var(--neon-red), var(--neon-orange));
-            transition: width 0.3s ease; box-shadow: 0 0 10px var(--neon-red);
-        }
-
-        /* --- ЕЖЕДНЕВНЫЙ БОНУС --- */
-        .daily-bonus {
-            position: absolute; top: 100px; left: 15px;
-            background: linear-gradient(135deg, var(--gold), var(--neon-orange));
-            padding: 12px 20px; border-radius: 15px; cursor: pointer;
-            font-weight: 900; font-size: 12px; color: #000;
-            box-shadow: 0 0 30px rgba(255,215,0,0.5), inset 0 0 10px rgba(255,255,255,0.3);
-            animation: bonusPulse 1.5s ease-in-out infinite; 
-            pointer-events: auto; display: none; border: 2px solid #fff;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .daily-bonus.ready { display: block; }
-        .daily-bonus.claimed { 
-            background: linear-gradient(135deg, #333, #222); 
-            color: #666; animation: none; border-color: #444;
-            box-shadow: none; cursor: default;
-        }
-        @keyframes bonusPulse { 
-            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,215,0,0.5); } 
-            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(255,215,0,0.8); } 
-        }
 
         /* --- ИГРОВАЯ ЗОНА --- */
         .game { 
@@ -220,7 +180,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
         .card:hover { border-color: var(--gold); transform: translateX(5px); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        .card.locked { opacity: 0.5; filter: grayscale(1); }
         .card.completed { border-color: var(--neon-green); background: rgba(57,255,20,0.1); box-shadow: 0 0 20px rgba(57,255,20,0.3); }
         
         .close-btn { 
@@ -246,7 +205,7 @@
         }
         .aura-gold { background: radial-gradient(circle, var(--gold) 0%, transparent 70%); animation: auraRotate 10s linear infinite; }
         .aura-blue { background: radial-gradient(circle, var(--neon-blue) 0%, transparent 70%); animation: auraRotate 10s linear infinite reverse; }
-        .aura-red { background: radial-gradient(circle, var(--mythic) 0%, transparent 70%); animation: auraPulse 3s ease-in-out infinite; }
+        .aura-red { background: radial-gradient(circle, var(--neon-red) 0%, transparent 70%); animation: auraPulse 3s ease-in-out infinite; }
         .aura-purple { background: radial-gradient(circle, var(--neon-purple) 0%, transparent 70%); animation: auraRotate 15s linear infinite; }
         
         @keyframes auraRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -365,13 +324,10 @@
 </head>
 <body>
 
-    <!-- Telegram WebApp -->
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
-        tg.setHeaderColor('#000000');
-        tg.enableClosingConfirmation();
     </script>
 
     <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
@@ -385,18 +341,6 @@
             <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width: 0%"></div></div>
             <span style="font-size: 10px; color: #666"><span id="xp-current">0</span>/<span id="xp-needed">100</span></span>
         </div>
-    </div>
-
-    <!-- ЭНЕРГИЯ -->
-    <div class="energy-container">
-        <span class="energy-text">⚡ ЭНЕРГИЯ</span>
-        <div class="energy-bar"><div class="energy-fill" id="energy-fill" style="width: 100%"></div></div>
-        <span style="font-size: 10px; color: #888"><span id="energy-current">100</span>/100</span>
-    </div>
-
-    <!-- ЕЖЕДНЕВНЫЙ БОНУС -->
-    <div class="daily-bonus" id="daily-bonus" onclick="claimDailyBonus()">
-        🎁 ЗАБРАТЬ БОНУС!
     </div>
 
     <!-- КОМБО -->
@@ -422,7 +366,7 @@
             <div id="auraPurple" class="aura aura-purple"></div>
             <img id="charImg" class="character" src="assets/character_default.png" alt="Hero">
         </div>
-        <div id="displayNickname">ЗАГРУЗКА...</div>
+        <div id="displayNickname">Игрок</div>
     </div>
 
     <div class="income-indicator" id="income-indicator">+0 🪙/сек</div>
@@ -467,7 +411,6 @@
             <div class="card"><span>💎 Кристаллов найдено</span><b id="s-crystals">0</b></div>
             <div class="card"><span>🔥 Макс. комбо</span><b id="s-maxcombo">0</b></div>
             <div class="card"><span>⚡ Критических ударов</span><b id="s-crits">0</b></div>
-            <div class="card"><span>⏱️ Время в игре</span><b id="s-time">0м</b></div>
         </div>
         <div class="close-btn" onclick="closeModal()">ЗАКРЫТЬ</div>
     </div>
@@ -508,33 +451,22 @@
         clicks: +localStorage.getItem("stat_clicks") || 0,
         earned: +localStorage.getItem("stat_earned") || 0,
         crystalsFound: +localStorage.getItem("stat_crystals_found") || 0,
-        activeHero: localStorage.getItem("activeCharacter") || "default",
-        name: localStorage.getItem("userName") || "Nezya Player",
+        name: localStorage.getItem("userName") || "Игрок",
         unlockedEffects: JSON.parse(localStorage.getItem("unlockedEffects")) || {},
         activeEffect: localStorage.getItem("currentEffect") || "none",
-        
         level: +localStorage.getItem("level") || 1,
         xp: +localStorage.getItem("xp") || 0,
-        energy: +localStorage.getItem("energy") || 100,
-        lastEnergyUpdate: +localStorage.getItem("lastEnergyUpdate") || Date.now(),
-        lastDailyBonus: +localStorage.getItem("lastDailyBonus") || 0,
         maxCombo: +localStorage.getItem("maxCombo") || 0,
         crits: +localStorage.getItem("crits") || 0,
-        playTime: +localStorage.getItem("playTime") || 0,
         achievements: JSON.parse(localStorage.getItem("achievements")) || []
     };
 
     const CONFIG = {
         xpPerClick: 1,
         xpPerLevel: 100,
-        maxEnergy: 100,
-        energyRegen: 1,
-        energyCost: 1,
         comboWindow: 2000,
         critChance: 0.05,
-        critMultiplier: 10,
-        dailyBonusCoins: 50000,
-        dailyBonusCrystals: 5
+        critMultiplier: 10
     };
 
     const ACHIEVEMENTS = [
@@ -556,46 +488,24 @@
     setInterval(save, 5000);
 
     function init() {
-        const offlineTime = Date.now() - state.lastEnergyUpdate;
-        const energyToAdd = Math.floor(offlineTime / 1000) * CONFIG.energyRegen;
-        state.energy = Math.min(CONFIG.maxEnergy, state.energy + energyToAdd);
-        
         updateUI();
         renderAchievements();
-        checkDailyBonus();
         checkAchievements();
     }
 
     function gameLoop() {
-        if(state.energy < CONFIG.maxEnergy) {
-            state.energy = Math.min(CONFIG.maxEnergy, state.energy + CONFIG.energyRegen);
-            updateEnergyUI();
-        }
-        
-        state.playTime++;
-        document.getElementById('s-time').textContent = Math.floor(state.playTime / 60) + 'м';
-        
         let income = calculateIncome();
         if(income > 0) {
             state.coins += income;
             state.earned += income;
             showIncomeIndicator(income);
         }
-        
         updateUI();
     }
 
     // --- КЛИК ---
     const charImg = document.getElementById("charImg");
     charImg.addEventListener("pointerdown", (e) => {
-        if(state.energy < CONFIG.energyCost) {
-            showFloatText(e.clientX, e.clientY, "⚡ Нет энергии!", "#ff4444");
-            if(navigator.vibrate) navigator.vibrate(200);
-            return;
-        }
-        
-        state.energy -= CONFIG.energyCost;
-        
         const now = Date.now();
         if(now - lastClickTime < CONFIG.comboWindow) {
             combo++;
@@ -612,13 +522,9 @@
         }, CONFIG.comboWindow);
         
         const pwr = +localStorage.getItem("clickPower") || 1;
-        let multiplier = 1;
+        let multiplier = combo >= 50 ? 5 : combo >= 25 ? 3 : combo >= 10 ? 2 : 1;
         
-        if(combo >= 50) multiplier = 5;
-        else if(combo >= 25) multiplier = 3;
-        else if(combo >= 10) multiplier = 2;
-        
-        let isCrit = Math.random() < (CONFIG.critChance + ((+localStorage.getItem("critChance") || 0) / 100));
+        let isCrit = Math.random() < CONFIG.critChance;
         let finalPower = pwr * multiplier;
         
         if(isCrit) {
@@ -640,9 +546,8 @@
         
         checkLevelUp();
         
-        let gotCrystal = Math.random() < (0.05 + ((+localStorage.getItem("crystalChance") || 0) / 100));
-        if(gotCrystal) {
-            state.crystals += 1;
+        if(Math.random() < 0.05) {
+            state.crystals++;
             state.crystalsFound++;
             showFloatText(e.clientX + 30, e.clientY - 30, "+1 💎", "var(--neon-blue)");
         }
@@ -652,8 +557,6 @@
         if(isCrit) displayText = `💥 ${displayText}`;
         
         showFloatText(e.clientX, e.clientY, displayText, isCrit ? "var(--neon-red)" : "var(--gold)", isCrit);
-        
-        if(navigator.vibrate) navigator.vibrate(isCrit ? 50 : 10);
         
         updateUI();
         updateComboUI();
@@ -666,7 +569,6 @@
             state.level++;
             state.xp -= needed;
             showFloatText(window.innerWidth/2, window.innerHeight/2, `LEVEL UP! ${state.level}`, "var(--neon-purple)", true);
-            
             const bonus = state.level * 1000;
             state.coins += bonus;
             showFloatText(window.innerWidth/2, window.innerHeight/2 - 50, `+${bonus} 🪙`, "var(--gold)");
@@ -678,23 +580,22 @@
         document.getElementById("coins").textContent = Math.floor(state.coins).toLocaleString();
         document.getElementById("crystals").textContent = state.crystals.toLocaleString();
         document.getElementById("displayNickname").textContent = state.name;
-        
         document.getElementById("s-level").textContent = state.level;
         document.getElementById("s-clicks").textContent = state.clicks.toLocaleString();
         document.getElementById("s-total").textContent = Math.floor(state.earned).toLocaleString();
         document.getElementById("s-crystals").textContent = state.crystalsFound;
         document.getElementById("s-maxcombo").textContent = state.maxCombo;
         document.getElementById("s-crits").textContent = state.crits;
-        
         document.getElementById("level").textContent = state.level;
+        
         const xpNeeded = state.level * CONFIG.xpPerLevel;
         const xpPercent = (state.xp / xpNeeded) * 100;
         document.getElementById("xp-fill").style.width = xpPercent + "%";
         document.getElementById("xp-current").textContent = state.xp;
         document.getElementById("xp-needed").textContent = xpNeeded;
         
-        const currentActive = localStorage.getItem("activeCharacter") || "default";
-        document.getElementById("charImg").src = `assets/character_${currentActive}.png`;
+        const hero = localStorage.getItem("activeCharacter") || "default";
+        document.getElementById("charImg").src = `assets/character_${hero}.png`;
         
         document.querySelectorAll('.aura').forEach(a => a.style.opacity = "0");
         if(state.activeEffect !== "none") {
@@ -705,25 +606,16 @@
         ['gold', 'blue', 'red', 'purple'].forEach(eff => {
             const btn = document.getElementById(`btn-eff-${eff}`);
             if(!btn) return;
-            
             if(eff === 'purple' && state.level < 10) {
                 btn.textContent = "ТРЕБУЕТСЯ LVL 10";
                 btn.disabled = true;
                 return;
             }
-            
             if(state.unlockedEffects[eff]) {
                 btn.textContent = (state.activeEffect === eff) ? "АКТИВНО" : "ВЫБРАТЬ";
                 btn.className = (state.activeEffect === eff) ? "buy-btn active-eff" : "buy-btn";
             }
         });
-        
-        updateEnergyUI();
-    }
-
-    function updateEnergyUI() {
-        document.getElementById("energy-current").textContent = Math.floor(state.energy);
-        document.getElementById("energy-fill").style.width = (state.energy / CONFIG.maxEnergy * 100) + "%";
     }
 
     function updateComboUI() {
@@ -733,7 +625,6 @@
         if(combo > 1) {
             comboEl.classList.add("active");
             countEl.textContent = "x" + combo;
-            
             if(combo >= 50) comboEl.style.color = "var(--neon-red)";
             else if(combo >= 25) comboEl.style.color = "var(--neon-pink)";
             else if(combo >= 10) comboEl.style.color = "var(--gold)";
@@ -795,81 +686,6 @@
         return total;
     }
 
-    // --- ЕЖЕДНЕВНЫЙ БОНУС (ИСПРАВЛЕНО) ---
-    function checkDailyBonus() {
-        const bonusEl = document.getElementById('daily-bonus');
-        const now = Date.now();
-        const timeSinceLast = now - state.lastDailyBonus;
-        
-        // Проверяем прошло ли 24 часа (86400000 мс)
-        if(timeSinceLast >= 86400000 || state.lastDailyBonus === 0) {
-            bonusEl.classList.add('ready');
-            bonusEl.classList.remove('claimed');
-            bonusEl.style.display = 'block';
-            bonusEl.innerHTML = '🎁 ЗАБРАТЬ БОНУС!';
-        } else {
-            bonusEl.classList.remove('ready');
-            bonusEl.classList.add('claimed');
-            bonusEl.style.display = 'block';
-            
-            // Показываем оставшееся время
-            const hoursLeft = Math.floor((86400000 - timeSinceLast) / 3600000);
-            const minsLeft = Math.floor(((86400000 - timeSinceLast) % 3600000) / 60000);
-            bonusEl.innerHTML = `⏱️ ${hoursLeft}ч ${minsLeft}м`;
-        }
-    }
-
-    function claimDailyBonus() {
-        const now = Date.now();
-        const timeSinceLast = now - state.lastDailyBonus;
-        
-        // Проверяем можно ли забрать
-        if(timeSinceLast < 86400000 && state.lastDailyBonus !== 0) {
-            return; // Еще нельзя
-        }
-        
-        // Выдаем награду
-        state.coins += CONFIG.dailyBonusCoins;
-        state.crystals += CONFIG.dailyBonusCrystals;
-        state.lastDailyBonus = now;
-        
-        // Конфетти эффект
-        createConfetti();
-        
-        // Показываем текст
-        showFloatText(window.innerWidth/2, window.innerHeight/2 - 100, `+${CONFIG.dailyBonusCoins.toLocaleString()} 🪙`, "var(--gold)", true);
-        setTimeout(() => {
-            showFloatText(window.innerWidth/2 + 50, window.innerHeight/2 - 150, `+${CONFIG.dailyBonusCrystals} 💎`, "var(--neon-blue)", true);
-        }, 300);
-        
-        // Обновляем UI
-        checkDailyBonus();
-        save();
-        updateUI();
-        
-        // Анимация кнопки баланса
-        document.getElementById('bal-coins').classList.add('changed');
-        document.getElementById('bal-crys').classList.add('changed');
-        setTimeout(() => {
-            document.getElementById('bal-coins').classList.remove('changed');
-            document.getElementById('bal-crys').classList.remove('changed');
-        }, 300);
-    }
-
-    function createConfetti() {
-        const colors = ['#ffd700', '#00d2ff', '#9d00ff', '#39ff14', '#ff00ff', '#ff4d4d'];
-        for(let i = 0; i < 50; i++) {
-            const c = document.createElement('div');
-            c.className = 'confetti';
-            c.style.left = Math.random() * 100 + 'vw';
-            c.style.background = colors[Math.floor(Math.random() * colors.length)];
-            c.style.animationDelay = Math.random() * 0.5 + 's';
-            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-            document.body.appendChild(c);
-            setTimeout(() => c.remove(), 3000);
-        }
-    }
-
     // --- ДОСТИЖЕНИЯ ---
     function renderAchievements() {
         const list = document.getElementById('ach-list');
@@ -923,7 +739,6 @@
         const popup = document.getElementById('ach-popup');
         document.getElementById('ach-text').textContent = name;
         popup.classList.add('show');
-        
         setTimeout(() => popup.classList.remove('show'), 3000);
     }
 
@@ -965,12 +780,8 @@
         localStorage.setItem("currentEffect", state.activeEffect);
         localStorage.setItem("level", state.level);
         localStorage.setItem("xp", state.xp);
-        localStorage.setItem("energy", state.energy);
-        localStorage.setItem("lastEnergyUpdate", Date.now());
-        localStorage.setItem("lastDailyBonus", state.lastDailyBonus);
         localStorage.setItem("maxCombo", state.maxCombo);
         localStorage.setItem("crits", state.crits);
-        localStorage.setItem("playTime", state.playTime);
         localStorage.setItem("achievements", JSON.stringify(state.achievements));
     }
 </script>
