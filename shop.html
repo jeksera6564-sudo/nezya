@@ -18,7 +18,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body { 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #020205 100%);
+            background: radial-gradient(circle at center, #0a0a15 0%, #020205 100%);
             color: white; font-family: 'Segoe UI', sans-serif; 
             padding: 20px; min-height: 100vh; overflow-x: hidden;
         }
@@ -56,6 +56,18 @@
             color: var(--neon-green); font-weight: 900; font-size: 20px;
             text-shadow: 0 0 10px var(--neon-green);
         }
+
+        /* --- ПАССИВНЫЙ ДОХОД ИНДИКАТОР --- */
+        .income-indicator {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); padding: 10px 25px; border-radius: 20px;
+            border: 1px solid var(--neon-green); font-size: 14px; color: var(--neon-green);
+            opacity: 0; transition: opacity 0.3s; font-weight: 900;
+            box-shadow: 0 0 20px rgba(57,255,20,0.3);
+            z-index: 100;
+        }
+        .income-indicator.show { opacity: 1; animation: incomePulse 0.5s ease; }
+        @keyframes incomePulse { 0% { transform: translateX(-50%) scale(0.8); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
 
         /* --- СКИДКА БАННЕР --- */
         .sale-banner {
@@ -242,6 +254,7 @@
     <a href="index.html" class="back">⬅ На главную</a>
 
     <div class="toast-container" id="toast-container"></div>
+    <div class="income-indicator" id="income-indicator">+0 🪙/сек</div>
 
 <script>
     // --- ДАННЫЕ ---
@@ -279,8 +292,46 @@
         incomes: JSON.parse(localStorage.getItem("incomes")) || {}
     };
 
-    let currentSale = 0; // 0 или 0.8 (20% скидка)
+    let currentSale = 0;
     let saleTimer = null;
+    let lastIncomeTime = Date.now();
+
+    // --- ПАССИВНЫЙ ДОХОД (РАБОЧИЙ) ---
+    function calculateIncome() {
+        let total = 0;
+        for(let k in list) {
+            total += (state.incomes[k] || 0) * list[k].inc;
+        }
+        return total;
+    }
+
+    function gameLoop() {
+        const now = Date.now();
+        const deltaTime = (now - lastIncomeTime) / 1000;
+        lastIncomeTime = now;
+        
+        const incomePerSec = calculateIncome();
+        
+        if(incomePerSec > 0) {
+            const earned = Math.floor(incomePerSec * deltaTime);
+            if(earned > 0) {
+                state.coins += earned;
+                showIncomeIndicator(incomePerSec);
+                save();
+                render();
+            }
+        }
+    }
+
+    function showIncomeIndicator(amount) {
+        const ind = document.getElementById('income-indicator');
+        ind.textContent = `+${amount.toLocaleString()} 🪙/сек`;
+        ind.classList.add('show');
+        setTimeout(() => ind.classList.remove('show'), 2000);
+    }
+
+    // Запускаем игровой цикл
+    setInterval(gameLoop, 1000);
 
     // --- ЦЕНА ---
     const getPrice = (base, lvl) => Math.floor(base * Math.pow(1.6, lvl) * (1 - currentSale));
@@ -295,7 +346,6 @@
             return;
         }
 
-        // Проверяем сколько можем купить
         let canBuy = 0;
         let totalCost = 0;
         let tempLvl = lvl;
@@ -314,11 +364,9 @@
 
         if(canBuy === 0) {
             showToast(biz.cur === "gold" ? "Недостаточно монет!" : "Недостаточно кристаллов!", "error");
-            playSound('error');
             return;
         }
 
-        // Совершаем покупку
         if(biz.cur === "gold") {
             state.coins -= totalCost;
         } else {
@@ -327,9 +375,7 @@
 
         state.incomes[k] = (state.incomes[k] || 0) + canBuy;
         
-        // Эффекты
         createParticles(event.clientX, event.clientY, biz.rare);
-        playSound('buy');
         
         const card = document.querySelector(`[data-key="${k}"]`);
         if(card) {
@@ -372,7 +418,6 @@
             
             const icon = biz.cur === "gold" ? "🪙" : "💎";
             
-            // Превью дохода
             const currentIncome = lvl * biz.inc;
             const nextIncome = (lvl + 1) * biz.inc;
             const incomeDiff = nextIncome - currentIncome;
@@ -431,19 +476,10 @@
         return { total, count };
     }
 
-    function calculateIncome() {
-        let total = 0;
-        for(let k in list) {
-            total += (state.incomes[k] || 0) * list[k].inc;
-        }
-        return total;
-    }
-
     // --- СКИДКИ ---
     function startSaleTimer() {
-        // Шанс на скидку каждые 30 сек
         setInterval(() => {
-            if(Math.random() < 0.3 && currentSale === 0) { // 30% шанс
+            if(Math.random() < 0.3 && currentSale === 0) {
                 startSale();
             }
         }, 30000);
@@ -458,7 +494,6 @@
         let timeLeft = 30;
         timerEl.textContent = timeLeft;
         
-        playSound('sale');
         showToast("🔥 Началась распродажа! -20% на всё!", "info");
         
         saleTimer = setInterval(() => {
@@ -535,7 +570,7 @@
         localStorage.setItem("incomes", JSON.stringify(state.incomes));
     }
 
-    // --- СИНХРОНИЗАЦИЯ С INDEX ---
+    // --- СИНХРОНИЗАЦИЯ ---
     window.addEventListener('storage', (e) => {
         if(e.key === 'coins' || e.key === 'crystals') {
             state.coins = +localStorage.getItem("coins") || 0;
@@ -544,26 +579,15 @@
         }
     });
 
-    // --- ЗВУКИ (заглушки) ---
-    function playSound(type) {
-        // const audio = new Audio(`assets/sound_${type}.mp3`);
-        // audio.play().catch(e => {});
-    }
+    window.addEventListener('focus', () => {
+        state.coins = +localStorage.getItem("coins") || state.coins;
+        state.crystals = +localStorage.getItem("crystals") || state.crystals;
+        render();
+    });
 
     // --- ИНИЦИАЛИЗАЦИЯ ---
     render();
     startSaleTimer();
-    
-    // Пассивный доход визуализация (не начисляем, только показываем)
-    setInterval(() => {
-        const income = calculateIncome();
-        if(income > 0) {
-            // Синхронизируем с index.html
-            state.coins = +localStorage.getItem("coins") || state.coins;
-            state.crystals = +localStorage.getItem("crystals") || state.crystals;
-            render();
-        }
-    }, 1000);
 </script>
 </body>
 </html>
