@@ -20,7 +20,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body { 
-            background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a15 50%, #020205 100%);
+            background: radial-gradient(circle at center, #0a0a15 0%, #020205 100%);
             color: white; font-family: 'Segoe UI', sans-serif; padding: 20px;
             overflow-x: hidden; min-height: 100vh;
         }
@@ -249,6 +249,18 @@
             padding: 5px 10px; border-radius: 10px; background: rgba(0,0,0,0.5);
         }
         .rarity-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        /* --- ПАССИВНЫЙ ДОХОД ИНДИКАТОР --- */
+        .income-indicator {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.9); padding: 10px 25px; border-radius: 20px;
+            border: 1px solid var(--neon-green); font-size: 14px; color: var(--neon-green);
+            opacity: 0; transition: opacity 0.3s; font-weight: 900;
+            box-shadow: 0 0 20px rgba(57,255,20,0.3);
+            z-index: 100;
+        }
+        .income-indicator.show { opacity: 1; animation: incomePulse 0.5s ease; }
+        @keyframes incomePulse { 0% { transform: translateX(-50%) scale(0.8); } 50% { transform: translateX(-50%) scale(1.1); } 100% { transform: translateX(-50%) scale(1); } }
     </style>
 </head>
 <body>
@@ -298,6 +310,7 @@
     <a href="index.html" class="back-btn">⚔️ В БОЙ</a>
 
     <div class="toast" id="toast"></div>
+    <div class="income-indicator" id="income-indicator">+0 🪙/сек</div>
 
 <script>
     // --- ДАННЫЕ ПЕРСОНАЖЕЙ ---
@@ -361,6 +374,59 @@
     heroes.forEach(h => {
         if(!state.levels[h.id]) state.levels[h.id] = 1;
     });
+
+    // --- ПАССИВНЫЙ ДОХОД (ИСПРАВЛЕННЫЙ) ---
+    let lastIncomeTime = Date.now();
+    
+    function calculateIncome() {
+        // Читаем бизнесы из localStorage (которые куплены в shop.html)
+        let incomes = JSON.parse(localStorage.getItem("incomes")) || {};
+        let total = 0;
+        
+        // Базовые значения дохода
+        if(incomes.startup) total += incomes.startup * 2;
+        if(incomes.market) total += incomes.market * 15;
+        if(incomes.factory) total += incomes.factory * 120;
+        if(incomes.oil) total += incomes.oil * 1000;
+        if(incomes.bank) total += incomes.bank * 15000;
+        
+        // Бонус от персонажа Магнат
+        const magnateLvl = state.levels['magnate'] || 0;
+        if(magnateLvl > 0) {
+            total = Math.floor(total * (1 + magnateLvl * 0.1)); // +10% за уровень Магната
+        }
+        
+        return total;
+    }
+
+    function gameLoop() {
+        const now = Date.now();
+        const deltaTime = (now - lastIncomeTime) / 1000; // секунды с прошлого обновления
+        lastIncomeTime = now;
+        
+        const incomePerSec = calculateIncome();
+        
+        if(incomePerSec > 0) {
+            // Начисляем пропорционально прошедшему времени
+            const earned = Math.floor(incomePerSec * deltaTime);
+            if(earned > 0) {
+                state.coins += earned;
+                showIncomeIndicator(incomePerSec);
+                updateBalance();
+                save();
+            }
+        }
+    }
+
+    function showIncomeIndicator(amount) {
+        const ind = document.getElementById('income-indicator');
+        ind.textContent = `+${amount.toLocaleString()} 🪙/сек`;
+        ind.classList.add('show');
+        setTimeout(() => ind.classList.remove('show'), 2000);
+    }
+
+    // Запускаем игровой цикл каждую секунду
+    setInterval(gameLoop, 1000);
 
     // --- ОБНОВЛЕНИЕ ---
     function updateBalance() {
@@ -592,6 +658,13 @@
             state.level = +localStorage.getItem("level") || 1;
             render();
         }
+    });
+
+    // Синхронизация при возвращении на страницу
+    window.addEventListener('focus', () => {
+        state.coins = +localStorage.getItem("coins") || 0;
+        state.level = +localStorage.getItem("level") || 1;
+        updateBalance();
     });
 
     render();
