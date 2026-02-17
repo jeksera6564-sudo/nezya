@@ -21,7 +21,7 @@
         body {
             background: radial-gradient(circle at center, #0a0a15 0%, #020205 100%);
             color: white; font-family: 'Segoe UI', sans-serif;
-            min-height: 100vh; overflow-x: hidden;
+            min-height: 100vh; overflow-x: hidden; padding-bottom: 180px;
         }
 
         /* --- БАЛАНС --- */
@@ -34,154 +34,235 @@
         .balance-item {
             background: #111; padding: 12px 25px; border-radius: 15px;
             border: 2px solid; font-weight: 900; font-size: 16px;
-            min-width: 140px; text-align: center;
+            min-width: 140px; text-align: center; cursor: pointer;
+            transition: 0.2s;
         }
         .balance-item.coins { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.2); }
         .balance-item.crystals { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 20px rgba(0,210,255,0.2); }
+        .balance-item:hover { transform: scale(1.05); }
 
         /* --- КОЛЕСО --- */
+        .wheel-section { position: relative; margin: 20px 0; }
+        
         .wheel-container {
-            position: relative; height: 350px; display: flex;
-            justify-content: center; align-items: center; margin: 20px 0;
+            position: relative; height: 320px; display: flex;
+            justify-content: center; align-items: center;
         }
         
         .wheel {
-            width: 300px; height: 300px; border-radius: 50%;
+            width: 280px; height: 280px; border-radius: 50%;
             position: relative; transform: rotate(0deg);
             transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
             box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.5);
+            border: 8px solid #333;
         }
         
         .wheel-number {
-            position: absolute; width: 40px; height: 40px;
+            position: absolute; width: 36px; height: 36px;
             border-radius: 50%; display: flex; align-items: center;
-            justify-content: center; font-weight: 900; font-size: 14px;
-            left: 50%; top: 50%; margin: -20px; transform-origin: center;
+            justify-content: center; font-weight: 900; font-size: 12px;
+            left: 50%; top: 50%; margin: -18px; transform-origin: center;
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255,255,255,0.2);
         }
         
         .wheel-center {
-            position: absolute; width: 80px; height: 80px;
-            background: radial-gradient(circle, #333 0%, #000 100%);
+            position: absolute; width: 60px; height: 60px;
+            background: radial-gradient(circle, #444 0%, #000 100%);
             border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%);
             z-index: 10; border: 3px solid var(--gold);
             box-shadow: 0 0 30px rgba(255,215,0,0.3);
         }
         
+        .ball-track {
+            position: absolute; width: 240px; height: 240px;
+            border-radius: 50%; border: 2px solid rgba(255,255,255,0.1);
+            left: 50%; top: 50%; transform: translate(-50%, -50%);
+            z-index: 5;
+        }
+        
         .ball {
-            position: absolute; width: 15px; height: 15px;
-            background: radial-gradient(circle at 30% 30%, #fff, #aaa);
+            position: absolute; width: 14px; height: 14px;
+            background: radial-gradient(circle at 30% 30%, #fff, #silver);
             border-radius: 50%; left: 50%; top: 50%;
-            transform: translate(-50%, -50%); z-index: 15;
-            box-shadow: 0 0 10px rgba(255,255,255,0.8);
-            transition: all 3s ease-out;
+            margin: -7px; z-index: 15;
+            box-shadow: 0 0 15px rgba(255,255,255,0.9);
+            transform-origin: center;
         }
         
         .pointer {
-            position: absolute; top: 10px; left: 50%;
+            position: absolute; top: 0; left: 50%;
             transform: translateX(-50%); width: 0; height: 0;
-            border-left: 15px solid transparent; border-right: 15px solid transparent;
-            border-top: 30px solid var(--gold); z-index: 20;
+            border-left: 12px solid transparent; border-right: 12px solid transparent;
+            border-top: 25px solid var(--gold); z-index: 20;
             filter: drop-shadow(0 0 10px var(--gold));
         }
 
-        /* --- СТАТИСТИКА --- */
+        /* --- СТАТИСТИКА И ТРЕКИ --- */
+        .stats-section { padding: 0 10px; margin-bottom: 15px; }
+        
         .stats-bar {
-            display: flex; gap: 10px; padding: 15px; overflow-x: auto;
-            background: rgba(0,0,0,0.5); margin: 0 10px 20px; border-radius: 15px;
+            display: flex; gap: 8px; padding: 12px; overflow-x: auto;
+            background: rgba(0,0,0,0.6); border-radius: 15px;
+            margin-bottom: 10px; scrollbar-width: none;
         }
+        .stats-bar::-webkit-scrollbar { display: none; }
+        
         .stat-number {
-            min-width: 45px; height: 45px; border-radius: 50%;
+            min-width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 16px; border: 2px solid;
+            font-weight: 900; font-size: 14px; border: 2px solid;
+            animation: statPop 0.3s ease;
         }
+        @keyframes statPop { from { transform: scale(0); } to { transform: scale(1); } }
+        
         .stat-red { background: var(--neon-red); border-color: #ff6666; }
         .stat-black { background: var(--neon-black); border-color: #444; }
         .stat-green { background: var(--neon-green); border-color: #66ffaa; }
+
+        .hot-cold {
+            display: flex; gap: 10px; margin-bottom: 10px;
+        }
+        .hot-cold-section {
+            flex: 1; background: rgba(0,0,0,0.5); padding: 10px;
+            border-radius: 10px; border: 1px solid #333;
+        }
+        .hot-cold-title {
+            font-size: 11px; color: #888; text-transform: uppercase;
+            margin-bottom: 5px; text-align: center;
+        }
+        .hot-numbers { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+        .hot-num {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 900; border: 1px solid;
+        }
+
+        /* --- ТРЕКИ (СОСЕДИ) --- */
+        .tracks-toggle {
+            text-align: center; margin: 10px 0;
+        }
+        .tracks-btn {
+            background: linear-gradient(135deg, var(--neon-purple), #7b00cc);
+            border: none; padding: 10px 25px; border-radius: 20px;
+            color: white; font-weight: 900; cursor: pointer;
+            box-shadow: 0 0 20px rgba(157,0,255,0.3);
+        }
+        
+        .tracks-panel {
+            display: none; background: rgba(0,0,0,0.9);
+            padding: 15px; border-radius: 15px; margin: 10px;
+            border: 2px solid var(--neon-purple);
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } }
+        
+        .track-row {
+            display: flex; gap: 8px; margin-bottom: 8px;
+            align-items: center;
+        }
+        .track-label {
+            width: 80px; font-size: 12px; color: var(--neon-purple);
+            font-weight: 700;
+        }
+        .track-numbers {
+            display: flex; gap: 5px; flex: 1;
+        }
+        .track-num {
+            width: 35px; height: 35px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 900; cursor: pointer;
+            border: 2px solid; transition: 0.2s;
+        }
+        .track-num:hover { transform: scale(1.1); box-shadow: 0 0 15px currentColor; }
 
         /* --- СТОЛ --- */
         .table-container { padding: 0 10px 20px; }
         
         .roulette-table {
             background: var(--table-green); border-radius: 20px;
-            padding: 20px; border: 3px solid rgba(255,255,255,0.1);
+            padding: 15px; border: 3px solid rgba(255,255,255,0.1);
             box-shadow: 0 0 40px rgba(0,255,136,0.1), inset 0 0 60px rgba(0,0,0,0.3);
         }
 
-        /* Нулевка */
         .zero-row { display: flex; margin-bottom: 5px; }
         .zero-cell {
-            flex: 1; height: 80px; background: var(--neon-green);
+            flex: 1; height: 70px; background: var(--neon-green);
             border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 36px; font-weight: 900;
+            justify-content: center; font-size: 32px; font-weight: 900;
             border: 3px solid #66ffaa; cursor: pointer; transition: 0.2s;
-            box-shadow: 0 0 20px rgba(0,255,136,0.3);
+            box-shadow: 0 0 20px rgba(0,255,136,0.3); position: relative;
         }
         .zero-cell:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(0,255,136,0.5); }
 
-        /* Числа */
         .numbers-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; margin-bottom: 10px; }
         .number-cell {
             aspect-ratio: 1; display: flex; align-items: center;
-            justify-content: center; font-weight: 900; font-size: 14px;
-            border-radius: 8px; cursor: pointer; transition: 0.2s; position: relative;
+            justify-content: center; font-weight: 900; font-size: 13px;
+            border-radius: 6px; cursor: pointer; transition: 0.2s; position: relative;
             border: 2px solid rgba(255,255,255,0.1);
         }
-        .number-cell:hover { transform: scale(1.1); z-index: 10; box-shadow: 0 0 20px currentColor; }
+        .number-cell:hover { transform: scale(1.15); z-index: 10; box-shadow: 0 0 20px currentColor; }
         .number-cell.red { background: linear-gradient(135deg, #cc0000, #ff4444); color: white; }
         .number-cell.black { background: linear-gradient(135deg, #111, #333); color: white; }
         .number-cell.selected { animation: selectedPulse 1s infinite; border-color: var(--gold); }
         
         @keyframes selectedPulse { 0%, 100% { box-shadow: 0 0 10px var(--gold); } 50% { box-shadow: 0 0 25px var(--gold); } }
 
-        /* Фишка на числе */
         .chip {
-            position: absolute; width: 25px; height: 25px;
+            position: absolute; width: 22px; height: 22px;
             background: var(--gold); border-radius: 50%;
-            border: 3px solid #fff; display: flex; align-items: center;
-            justify-content: center; font-size: 10px; font-weight: 900;
+            border: 2px solid #fff; display: flex; align-items: center;
+            justify-content: center; font-size: 9px; font-weight: 900;
             color: #000; box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            animation: chipDrop 0.3s ease;
+            animation: chipDrop 0.3s ease; z-index: 20;
         }
         @keyframes chipDrop { from { transform: scale(0); } to { transform: scale(1); } }
 
-        /* Внешние ставки */
-        .outside-bets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 10px; }
+        .outside-bets { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 8px; }
         .outside-cell {
-            padding: 15px 5px; text-align: center; font-weight: 900;
-            font-size: 12px; background: rgba(255,255,255,0.1);
-            border-radius: 10px; cursor: pointer; transition: 0.2s;
+            padding: 12px 3px; text-align: center; font-weight: 900;
+            font-size: 10px; background: rgba(255,255,255,0.1);
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
             border: 2px solid rgba(255,255,255,0.1); text-transform: uppercase;
+            position: relative; overflow: hidden;
         }
         .outside-cell:hover { background: rgba(255,255,255,0.2); border-color: var(--gold); }
+        .outside-cell .chip { width: 18px; height: 18px; font-size: 8px; }
 
-        /* Дюжины/колонки */
-        .dozens-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 10px; }
+        .dozens-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 8px; }
         .dozen-cell {
-            padding: 20px; text-align: center; font-weight: 900;
-            background: rgba(0,0,0,0.3); border-radius: 10px;
+            padding: 15px; text-align: center; font-weight: 900;
+            background: rgba(0,0,0,0.3); border-radius: 8px;
             cursor: pointer; border: 2px solid rgba(255,255,255,0.1);
+            font-size: 14px; position: relative;
         }
         .dozen-cell:hover { border-color: var(--neon-blue); background: rgba(0,210,255,0.1); }
 
         /* --- УПРАВЛЕНИЕ --- */
         .controls {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(0,0,0,0.98); padding: 20px;
+            background: rgba(0,0,0,0.98); padding: 15px;
             border-top: 2px solid #333; backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+        
+        .last-win {
+            text-align: center; color: var(--neon-green); font-weight: 900;
+            margin-bottom: 10px; font-size: 14px; min-height: 20px;
         }
         
         .bet-controls {
-            display: flex; gap: 10px; margin-bottom: 15px; align-items: center;
+            display: flex; gap: 10px; margin-bottom: 10px; align-items: center;
         }
         
         .chip-selector {
-            display: flex; gap: 10px;
+            display: flex; gap: 8px;
         }
         .chip-value {
-            width: 55px; height: 55px; border-radius: 50%;
+            width: 50px; height: 50px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 14px; cursor: pointer;
+            font-weight: 900; font-size: 12px; cursor: pointer;
             border: 3px solid; transition: 0.2s;
         }
         .chip-value.active { transform: scale(1.15); box-shadow: 0 0 20px currentColor; }
@@ -192,21 +273,38 @@
         .chip-1k { background: var(--gold); border-color: #FFE082; color: #000; }
 
         .total-bet {
-            flex: 1; text-align: center; font-size: 14px;
+            flex: 1; text-align: center; font-size: 12px;
         }
-        .total-bet b { display: block; font-size: 24px; color: var(--gold); }
+        .total-bet b { display: block; font-size: 20px; color: var(--gold); }
 
-        .action-buttons { display: flex; gap: 10px; }
+        .quick-actions {
+            display: flex; gap: 5px; margin-bottom: 10px;
+        }
+        .quick-btn {
+            flex: 1; padding: 8px; background: #222;
+            border: 1px solid #444; color: #fff;
+            border-radius: 8px; font-size: 11px; font-weight: 700;
+            cursor: pointer; transition: 0.2s;
+        }
+        .quick-btn:hover { border-color: var(--gold); background: #333; }
+        .quick-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .action-buttons { display: flex; gap: 8px; }
         .action-btn {
-            flex: 1; padding: 18px; border-radius: 15px; border: none;
-            font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.2s;
+            flex: 1; padding: 15px; border-radius: 12px; border: none;
+            font-weight: 900; font-size: 14px; cursor: pointer; transition: 0.2s;
             text-transform: uppercase;
         }
         .btn-clear { background: #333; color: #fff; }
+        .btn-undo { background: #444; color: #fff; }
         .btn-spin { 
             flex: 2; background: linear-gradient(135deg, var(--neon-green), #00cc6a);
             color: #000; box-shadow: 0 0 30px rgba(0,255,136,0.4);
             animation: spinPulse 2s infinite;
+        }
+        .btn-spin:disabled { 
+            background: #333; animation: none; box-shadow: none;
+            color: #666; cursor: not-allowed;
         }
         @keyframes spinPulse { 0%, 100% { box-shadow: 0 0 20px rgba(0,255,136,0.4); } 50% { box-shadow: 0 0 40px rgba(0,255,136,0.7); } }
         .btn-double { background: #444; color: var(--gold); }
@@ -219,33 +317,21 @@
         }
         .result-card {
             background: linear-gradient(135deg, #111, #222);
-            padding: 50px; border-radius: 30px; text-align: center;
+            padding: 40px 30px; border-radius: 30px; text-align: center;
             border: 3px solid var(--gold); box-shadow: 0 0 60px rgba(255,215,0,0.3);
-            animation: resultPop 0.5s ease;
+            animation: resultPop 0.5s ease; max-width: 90vw;
         }
         @keyframes resultPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         .result-number {
-            width: 120px; height: 120px; border-radius: 50%;
+            width: 100px; height: 100px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 60px; font-weight: 900; margin: 0 auto 20px;
+            font-size: 48px; font-weight: 900; margin: 0 auto 20px;
             border: 5px solid; box-shadow: 0 0 40px currentColor;
         }
-        .result-win { font-size: 48px; color: var(--neon-green); font-weight: 900; text-shadow: 0 0 20px var(--neon-green); }
-        .result-lose { font-size: 36px; color: var(--neon-red); }
-
-        /* --- ТРЕКИ --- */
-        .track-panel {
-            position: fixed; top: 50%; right: 10px; transform: translateY(-50%);
-            background: rgba(0,0,0,0.9); padding: 15px; border-radius: 20px;
-            border: 2px solid #333; display: none;
-        }
-        .track-btn {
-            display: block; width: 100%; padding: 12px; margin: 5px 0;
-            background: #222; border: 1px solid #444; color: #fff;
-            border-radius: 10px; cursor: pointer; font-weight: 700;
-        }
-        .track-btn:hover { border-color: var(--gold); }
+        .result-win { font-size: 36px; color: var(--neon-green); font-weight: 900; text-shadow: 0 0 20px var(--neon-green); }
+        .result-lose { font-size: 28px; color: var(--neon-red); }
+        .win-details { color: #888; font-size: 14px; margin-top: 10px; }
 
         /* --- НАЗАД --- */
         .back-btn {
@@ -256,8 +342,46 @@
         }
         .back-btn:hover { border-color: var(--gold); }
 
+        /* --- ТОСТЫ --- */
+        .toast {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            padding: 12px 25px; border-radius: 10px; font-weight: 900;
+            z-index: 3000; animation: toastSlide 0.3s ease;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        @keyframes toastSlide {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
         /* --- АНИМАЦИИ --- */
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes confettiFall { 
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; } 
+        }
+        
+        .confetti {
+            position: fixed; width: 10px; height: 10px;
+            z-index: 2000; pointer-events: none;
+        }
+
+        /* --- МОДАЛЬНОЕ ОКНО СТАТИСТИКИ --- */
+        .stats-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 500; align-items: center; justify-content: center;
+        }
+        .stats-content {
+            background: #111; padding: 30px; border-radius: 20px;
+            border: 2px solid var(--gold); max-width: 90vw; width: 400px;
+        }
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px;
+        }
+        .stat-box {
+            background: #222; padding: 15px; border-radius: 10px; text-align: center;
+        }
+        .stat-value { font-size: 24px; font-weight: 900; color: var(--gold); }
+        .stat-label { font-size: 12px; color: #888; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -266,47 +390,82 @@
 
     <!-- БАЛАНС -->
     <div class="balance-bar">
-        <div class="balance-item coins">🪙 <span id="coins">0</span></div>
+        <div class="balance-item coins" onclick="showStats()">🪙 <span id="coins">0</span></div>
         <div class="balance-item crystals">💎 <span id="crystals">0</span></div>
     </div>
 
     <!-- КОЛЕСО -->
-    <div class="wheel-container">
-        <div class="pointer"></div>
-        <div class="wheel" id="wheel"></div>
-        <div class="ball" id="ball"></div>
-        <div class="wheel-center"></div>
+    <div class="wheel-section">
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel"></div>
+            <div class="ball-track"></div>
+            <div class="ball" id="ball"></div>
+            <div class="wheel-center"></div>
+        </div>
     </div>
 
     <!-- СТАТИСТИКА -->
-    <div class="stats-bar" id="statsBar"></div>
+    <div class="stats-section">
+        <div class="stats-bar" id="statsBar"></div>
+        
+        <!-- Горячие/Холодные числа -->
+        <div class="hot-cold">
+            <div class="hot-cold-section">
+                <div class="hot-cold-title">🔥 Горячие</div>
+                <div class="hot-numbers" id="hotNumbers"></div>
+            </div>
+            <div class="hot-cold-section">
+                <div class="hot-cold-title">❄️ Холодные</div>
+                <div class="hot-numbers" id="coldNumbers"></div>
+            </div>
+        </div>
+        
+        <!-- Треки (соседи) -->
+        <div class="tracks-toggle">
+            <button class="tracks-btn" onclick="toggleTracks()">🎯 ТРЕКИ (СОСЕДИ)</button>
+        </div>
+        <div class="tracks-panel" id="tracksPanel">
+            <div class="track-row">
+                <div class="track-label">0 Соседи</div>
+                <div class="track-numbers" id="track0"></div>
+            </div>
+            <div class="track-row">
+                <div class="track-label">Voisins</div>
+                <div class="track-numbers" id="trackVoisins"></div>
+            </div>
+            <div class="track-row">
+                <div class="track-label">Orphelins</div>
+                <div class="track-numbers" id="trackOrphelins"></div>
+            </div>
+            <div class="track-row">
+                <div class="track-label">Tiers</div>
+                <div class="track-numbers" id="trackTiers"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- СТОЛ -->
     <div class="table-container">
         <div class="roulette-table">
-            <!-- Ноль -->
             <div class="zero-row">
                 <div class="zero-cell" data-bet="0" onclick="placeBet('0')">0</div>
             </div>
             
-            <!-- Числа 1-36 -->
             <div class="numbers-grid" id="numbersGrid"></div>
             
-            <!-- 2 к 1 -->
             <div class="dozens-row">
                 <div class="dozen-cell" onclick="placeBet('col1')">2 к 1</div>
                 <div class="dozen-cell" onclick="placeBet('col2')">2 к 1</div>
                 <div class="dozen-cell" onclick="placeBet('col3')">2 к 1</div>
             </div>
             
-            <!-- Дюжины -->
             <div class="dozens-row">
                 <div class="dozen-cell" onclick="placeBet('doz1')">1-12</div>
                 <div class="dozen-cell" onclick="placeBet('doz2')">13-24</div>
                 <div class="dozen-cell" onclick="placeBet('doz3')">25-36</div>
             </div>
             
-            <!-- Внешние -->
             <div class="outside-bets">
                 <div class="outside-cell" onclick="placeBet('small')">1-18</div>
                 <div class="outside-cell" onclick="placeBet('even')">ЧЁТ</div>
@@ -320,6 +479,8 @@
 
     <!-- УПРАВЛЕНИЕ -->
     <div class="controls">
+        <div class="last-win" id="lastWin"></div>
+        
         <div class="bet-controls">
             <div class="chip-selector">
                 <div class="chip-value chip-10 active" onclick="selectChip(10)">10</div>
@@ -333,19 +494,60 @@
                 <b id="totalBet">0 🪙</b>
             </div>
         </div>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="repeatLastBet()" id="repeatBtn" disabled>Повтор</button>
+            <button class="quick-btn" onclick="clearBets()">Очистить</button>
+            <button class="quick-btn" onclick="undoLastBet()" id="undoBtn" disabled>Отмена</button>
+            <button class="quick-btn" onclick="doubleBets()">×2</button>
+        </div>
+        
         <div class="action-buttons">
-            <button class="action-btn btn-clear" onclick="clearBets()">🗑️</button>
-            <button class="action-btn btn-double" onclick="doubleBets()">×2</button>
-            <button class="action-btn btn-spin" onclick="spin()">🎰 КРУТИТЬ</button>
+            <button class="action-btn btn-spin" onclick="spin()" id="spinBtn">🎰 КРУТИТЬ</button>
         </div>
     </div>
 
     <!-- РЕЗУЛЬТАТ -->
-    <div class="result-overlay" id="resultOverlay" onclick="this.style.display='none'">
+    <div class="result-overlay" id="resultOverlay" onclick="closeResult()">
         <div class="result-card">
             <div class="result-number" id="resultNumber">0</div>
             <div id="resultText"></div>
-            <p style="color: #888; margin-top: 20px; font-size: 14px;">Нажмите чтобы продолжить</p>
+            <div class="win-details" id="winDetails"></div>
+            <p style="color: #666; margin-top: 20px; font-size: 12px;">Нажмите чтобы продолжить</p>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СТАТИСТИКИ -->
+    <div class="stats-modal" id="statsModal" onclick="closeStats()">
+        <div class="stats-content" onclick="event.stopPropagation()">
+            <h2 style="text-align: center; color: var(--gold); margin-bottom: 10px;">📊 СТАТИСТИКА</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="statTotal">0</div>
+                    <div class="stat-label">Всего спинов</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statWinRate">0%</div>
+                    <div class="stat-label">Процент побед</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRed">0</div>
+                    <div class="stat-label">Красных</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statBlack">0</div>
+                    <div class="stat-label">Чёрных</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statGreen">0</div>
+                    <div class="stat-label">Зелёных</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statMaxWin">0</div>
+                    <div class="stat-label">Макс. выигрыш</div>
+                </div>
+            </div>
+            <button onclick="closeStats()" style="width: 100%; margin-top: 20px; padding: 12px; background: #333; border: 1px solid #555; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 700;">Закрыть</button>
         </div>
     </div>
 
@@ -364,23 +566,37 @@
         {n:36, color:'red'}
     ];
 
-    // Порядок чисел на колесе (европейская)
     const wheelOrder = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+    
+    // Треки (соседи на колесе)
+    const tracks = {
+        zero: [3,26,0,32,15],
+        voisins: [22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25],
+        orphelins: [1,20,14,31,9,17,34,6],
+        tiers: [27,13,36,11,30,8,23,10,5,24,16,33]
+    };
 
     let state = {
-        coins: +localStorage.getItem("coins") || 100000,
-        crystals: +localStorage.getItem("crystals") || 10,
+        coins: parseInt(localStorage.getItem("coins")) || 100000,
+        crystals: parseInt(localStorage.getItem("crystals")) || 10,
         currentChip: 10,
         bets: {},
+        lastBets: {},
+        betHistory: [],
         history: JSON.parse(localStorage.getItem("rouletteHistory")) || [],
-        isSpinning: false
+        isSpinning: false,
+        stats: JSON.parse(localStorage.getItem("rouletteStats")) || {
+            totalSpins: 0, wins: 0, totalWagered: 0, totalWon: 0, maxWin: 0
+        }
     };
 
     // --- ИНИЦИАЛИЗАЦИЯ ---
     initWheel();
     renderTable();
+    renderTracks();
     updateUI();
     renderHistory();
+    updateHotCold();
 
     function initWheel() {
         const wheel = document.getElementById('wheel');
@@ -391,9 +607,10 @@
             const el = document.createElement('div');
             el.className = 'wheel-number';
             el.textContent = num;
-            el.style.transform = `rotate(${angle}deg) translateY(-120px)`;
-            el.style.background = numbers.find(n => n.n === num).color === 'red' ? '#cc0000' : 
-                                  numbers.find(n => n.n === num).color === 'black' ? '#111' : '#00ff88';
+            const color = numbers.find(n => n.n === num).color;
+            el.style.background = color === 'red' ? '#cc0000' : color === 'black' ? '#1a1a1a' : '#00ff88';
+            el.style.color = color === 'green' ? '#000' : '#fff';
+            el.style.transform = `rotate(${angle}deg) translateY(-110px)`;
             wheel.appendChild(el);
         });
     }
@@ -406,84 +623,165 @@
             cell.className = `number-cell ${num.color}`;
             cell.textContent = i;
             cell.dataset.bet = i;
-            cell.onclick = () => placeBet(i.toString());
+            cell.onclick = (e) => placeBet(i.toString(), e.target);
             grid.appendChild(cell);
         }
     }
 
+    function renderTracks() {
+        // Рендер треков
+        const renderTrack = (nums, containerId) => {
+            const container = document.getElementById(containerId);
+            nums.forEach(n => {
+                const numData = numbers.find(x => x.n === n);
+                const div = document.createElement('div');
+                div.className = `track-num stat-${numData.color}`;
+                div.textContent = n;
+                div.onclick = () => placeBet(n.toString(), div);
+                container.appendChild(div);
+            });
+        };
+        
+        renderTrack(tracks.zero, 'track0');
+        renderTrack(tracks.voisins, 'trackVoisins');
+        renderTrack(tracks.orphelins, 'trackOrphelins');
+        renderTrack(tracks.tiers, 'trackTiers');
+    }
+
     function renderHistory() {
         const bar = document.getElementById('statsBar');
-        bar.innerHTML = state.history.slice(-12).map(h => {
+        bar.innerHTML = state.history.slice(-15).map((h, i) => {
             const color = numbers.find(n => n.n === h).color;
-            return `<div class="stat-number stat-${color}">${h}</div>`;
+            return `<div class="stat-number stat-${color}" style="animation-delay: ${i * 0.05}s">${h}</div>`;
         }).join('');
+    }
+
+    function updateHotCold() {
+        if(state.history.length < 5) return;
+        
+        const counts = {};
+        state.history.forEach(n => counts[n] = (counts[n] || 0) + 1);
+        
+        const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+        const hot = sorted.slice(0, 5).map(x => parseInt(x[0]));
+        const cold = sorted.slice(-5).map(x => parseInt(x[0]));
+        
+        const renderNums = (nums, containerId) => {
+            const container = document.getElementById(containerId);
+            container.innerHTML = nums.map(n => {
+                const color = numbers.find(x => x.n === n).color;
+                return `<div class="hot-num stat-${color}">${n}</div>`;
+            }).join('');
+        };
+        
+        renderNums(hot, 'hotNumbers');
+        renderNums(cold, 'coldNumbers');
     }
 
     // --- СТАВКИ ---
     function selectChip(value) {
         state.currentChip = value;
         document.querySelectorAll('.chip-value').forEach(c => c.classList.remove('active'));
-        document.querySelector(`.chip-${value === 1000 ? '1k' : value}`).classList.add('active');
+        const className = value === 1000 ? 'chip-1k' : `chip-${value}`;
+        document.querySelector(`.${className}`).classList.add('active');
     }
 
-    function placeBet(bet) {
+    function placeBet(bet, target) {
         if(state.isSpinning) return;
         
-        const total = Object.values(state.bets).reduce((a,b) => a+b, 0);
-        if(total + state.currentChip > state.coins) {
+        const currentTotal = Object.values(state.bets).reduce((a,b) => a+b, 0);
+        if(currentTotal + state.currentChip > state.coins) {
             showToast("Недостаточно монет!", "error");
             return;
         }
 
+        // Сохраняем историю для отмены
+        state.betHistory.push({...state.bets});
+        if(state.betHistory.length > 10) state.betHistory.shift();
+        document.getElementById('undoBtn').disabled = false;
+
         state.bets[bet] = (state.bets[bet] || 0) + state.currentChip;
         updateBetDisplay(bet);
         updateTotal();
-        createChipEffect(event.target);
+        
+        if(target) createChipEffect(target);
     }
 
     function updateBetDisplay(bet) {
-        // Найти ячейку и добавить/обновить фишку
-        let cell;
-        if(bet === '0') cell = document.querySelector('.zero-cell');
-        else if(!isNaN(bet)) cell = document.querySelector(`[data-bet="${bet}"]`);
+        let selector;
+        if(bet === '0') selector = '.zero-cell';
+        else if(!isNaN(bet)) selector = `[data-bet="${bet}"]`;
+        else selector = `[onclick="placeBet('${bet}')"]`;
         
-        if(cell) {
+        const cells = document.querySelectorAll(selector);
+        cells.forEach(cell => {
+            if(!cell) return;
             let chip = cell.querySelector('.chip');
             if(!chip) {
                 chip = document.createElement('div');
                 chip.className = 'chip';
+                cell.style.position = 'relative';
                 cell.appendChild(chip);
             }
-            chip.textContent = state.bets[bet] >= 1000 ? (state.bets[bet]/1000).toFixed(1) + 'k' : state.bets[bet];
-        }
+            const val = state.bets[bet];
+            chip.textContent = val >= 1000 ? (val/1000).toFixed(1) + 'k' : val;
+        });
     }
 
     function createChipEffect(target) {
         const chip = document.createElement('div');
+        chip.className = 'confetti';
         chip.style.cssText = `
-            position: fixed; width: 30px; height: 30px; background: var(--gold);
-            border-radius: 50%; border: 3px solid #fff; z-index: 1000;
-            pointer-events: none; transition: all 0.3s ease;
+            background: var(--gold); border-radius: 50%; border: 3px solid #fff;
+            width: 30px; height: 30px; z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         `;
         const rect = target.getBoundingClientRect();
         chip.style.left = rect.left + rect.width/2 - 15 + 'px';
         chip.style.top = rect.top + rect.height/2 - 15 + 'px';
         document.body.appendChild(chip);
         
+        // Анимация полета к центру экрана (имитация полета в колесо)
         setTimeout(() => {
-            chip.style.transform = 'scale(0)';
-            setTimeout(() => chip.remove(), 300);
+            chip.style.transform = 'scale(0.5)';
+            chip.style.opacity = '0';
+            setTimeout(() => chip.remove(), 400);
         }, 100);
     }
 
     function clearBets() {
+        state.lastBets = {...state.bets};
         state.bets = {};
         document.querySelectorAll('.chip').forEach(c => c.remove());
         updateTotal();
+        document.getElementById('repeatBtn').disabled = Object.keys(state.lastBets).length === 0;
+    }
+
+    function undoLastBet() {
+        if(state.betHistory.length === 0) return;
+        state.bets = state.betHistory.pop();
+        document.querySelectorAll('.chip').forEach(c => c.remove());
+        Object.keys(state.bets).forEach(bet => updateBetDisplay(bet));
+        updateTotal();
+        if(state.betHistory.length === 0) document.getElementById('undoBtn').disabled = true;
+    }
+
+    function repeatLastBet() {
+        if(Object.keys(state.lastBets).length === 0) return;
+        const total = Object.values(state.lastBets).reduce((a,b) => a+b, 0);
+        if(total > state.coins) {
+            showToast("Недостаточно монет для повтора!", "error");
+            return;
+        }
+        state.bets = {...state.lastBets};
+        Object.keys(state.bets).forEach(bet => updateBetDisplay(bet));
+        updateTotal();
+        showToast("Ставки повторены!", "success");
     }
 
     function doubleBets() {
         const total = Object.values(state.bets).reduce((a,b) => a+b, 0);
+        if(total === 0) return;
         if(total * 2 > state.coins) {
             showToast("Недостаточно монет!", "error");
             return;
@@ -493,20 +791,21 @@
             updateBetDisplay(bet);
         }
         updateTotal();
+        showToast("Ставки удвоены!", "success");
     }
 
     function updateTotal() {
         const total = Object.values(state.bets).reduce((a,b) => a+b, 0);
         document.getElementById('totalBet').textContent = total.toLocaleString() + ' 🪙';
+        document.getElementById('spinBtn').disabled = total === 0 || state.isSpinning;
     }
 
     // --- КРУЧЕНИЕ ---
+    let currentRotation = 0;
+
     function spin() {
         const total = Object.values(state.bets).reduce((a,b) => a+b, 0);
-        if(total === 0) {
-            showToast("Сделайте ставку!", "error");
-            return;
-        }
+        if(total === 0) return;
         if(total > state.coins) {
             showToast("Недостаточно монет!", "error");
             return;
@@ -514,26 +813,54 @@
 
         state.isSpinning = true;
         state.coins -= total;
+        state.stats.totalSpins++;
+        state.stats.totalWagered += total;
         updateUI();
+        updateTotal();
 
-               // Анимация
         const wheel = document.getElementById('wheel');
         const ball = document.getElementById('ball');
+        
+        // Генерируем результат
         const winningNum = Math.floor(Math.random() * 37);
         const winningIndex = wheelOrder.indexOf(winningNum);
-        const finalAngle = 360 - (winningIndex * (360 / 37)) - (360 / 37 / 2); // Центрируем на числе
         
-        const spins = 5 + Math.random() * 3; // 5-8 оборотов
-        const totalRotation = spins * 360 + finalAngle;
+        // Рассчитываем угол
+        const anglePerSector = 360 / 37;
+        const targetAngle = winningIndex * anglePerSector;
         
-        wheel.style.transform = `rotate(${totalRotation}deg)`;
+        // Добавляем полные обороты (5-8) и случайный разброс внутри сектора
+        const spins = 5 + Math.floor(Math.random() * 4);
+        const randomOffset = (Math.random() - 0.5) * anglePerSector * 0.8;
+        const finalRotation = spins * 360 + (360 - targetAngle) + randomOffset;
         
-        // Анимация шарика (противоположное направление)
-        ball.style.transition = 'all 3s ease-out';
-        ball.style.transform = `translate(-50%, -50%) rotate(${-totalRotation * 1.5}deg) translateY(-100px)`;
+        currentRotation += finalRotation;
         
-        // Звуковой эффект (если есть)
-        playSound('spin');
+        // Анимация колеса
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+        
+        // Анимация шарика - крутится вокруг центра и замедляется
+        ball.style.transition = 'none';
+        ball.style.transform = 'translate(-50%, -50%)';
+        
+        setTimeout(() => {
+            ball.style.transition = 'all 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            // Шарик крутится против часовой стрелки и приземляется в сектор
+            const ballRotations = spins + 2;
+            const ballFinalAngle = -(ballRotations * 360 + targetAngle + randomOffset);
+            const radius = 100; // Радиус трека шарика
+            
+            // Используем CSS анимацию для шарика
+            ball.animate([
+                { transform: `translate(-50%, -50%) rotate(0deg) translateX(${radius}px) rotate(0deg)` },
+                { transform: `translate(-50%, -50%) rotate(${ballFinalAngle * 0.7}deg) translateX(${radius}px) rotate(${-ballFinalAngle * 0.7}deg)`, offset: 0.7 },
+                { transform: `translate(-50%, -50%) rotate(${ballFinalAngle}deg) translateX(${radius * 0.3}px) rotate(${-ballFinalAngle}deg)`, offset: 1 }
+            ], {
+                duration: 4000,
+                easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)',
+                fill: 'forwards'
+            });
+        }, 50);
 
         setTimeout(() => {
             finishSpin(winningNum);
@@ -543,45 +870,45 @@
     function finishSpin(winningNum) {
         state.isSpinning = false;
         
-        // Рассчет выигрыша
         const winAmount = calculateWin(winningNum);
         const totalBet = Object.values(state.bets).reduce((a,b) => a+b, 0);
         const netWin = winAmount - totalBet;
         
-        // Обновление баланса
+        // Обновляем статистику
         if(winAmount > 0) {
+            state.stats.wins++;
+            state.stats.totalWon += winAmount;
+            if(winAmount > state.stats.maxWin) state.stats.maxWin = winAmount;
             state.coins += winAmount;
-            showResult(winningNum, netWin, true);
-        } else {
-            showResult(winningNum, netWin, false);
         }
         
-        // Сохранение истории
+        // Сохраняем историю
         state.history.push(winningNum);
-        if(state.history.length > 50) state.history.shift();
+        if(state.history.length > 100) state.history.shift();
+        
         localStorage.setItem("rouletteHistory", JSON.stringify(state.history));
+        localStorage.setItem("rouletteStats", JSON.stringify(state.stats));
         localStorage.setItem("coins", state.coins);
         
+        // Обновляем UI
         renderHistory();
+        updateHotCold();
         updateUI();
         
-        // Сброс ставок
-        clearBets();
+        // Показываем результат
+        showResult(winningNum, netWin, winAmount > 0);
         
-        // Сброс позиции колеса для следующего спина (без анимации)
-        setTimeout(() => {
-            const wheel = document.getElementById('wheel');
-            const ball = document.getElementById('ball');
-            wheel.style.transition = 'none';
-            ball.style.transition = 'none';
-            wheel.style.transform = 'rotate(0deg)';
-            ball.style.transform = 'translate(-50%, -50%)';
-            
-            setTimeout(() => {
-                wheel.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                ball.style.transition = 'all 3s ease-out';
-            }, 50);
-        }, 500);
+        // Сохраняем ставки для повтора и очищаем
+        state.lastBets = {...state.bets};
+        state.bets = {};
+        document.querySelectorAll('.chip').forEach(c => c.remove());
+        updateTotal();
+        document.getElementById('repeatBtn').disabled = false;
+        
+        // Обновляем последний выигрыш
+        if(netWin > 0) {
+            document.getElementById('lastWin').textContent = `Последний выигрыш: +${netWin.toLocaleString()} 🪙`;
+        }
     }
 
     function calculateWin(winningNum) {
@@ -592,55 +919,21 @@
             const amount = state.bets[bet];
             let multiplier = 0;
             
-            // Прямая ставка на число
-            if(bet === winningNum.toString()) {
-                multiplier = 35;
-            }
-            // Красное/Черное
-            else if(bet === 'red' && winningNumber.color === 'red') {
-                multiplier = 1;
-            }
-            else if(bet === 'black' && winningNumber.color === 'black') {
-                multiplier = 1;
-            }
-            // Чет/Нечет (0 не выигрывает)
-            else if(bet === 'even' && winningNum !== 0 && winningNum % 2 === 0) {
-                multiplier = 1;
-            }
-            else if(bet === 'odd' && winningNum !== 0 && winningNum % 2 === 1) {
-                multiplier = 1;
-            }
-            // Малые/Большие (1-18, 19-36)
-            else if(bet === 'small' && winningNum >= 1 && winningNum <= 18) {
-                multiplier = 1;
-            }
-            else if(bet === 'big' && winningNum >= 19 && winningNum <= 36) {
-                multiplier = 1;
-            }
-            // Дюжины
-            else if(bet === 'doz1' && winningNum >= 1 && winningNum <= 12) {
-                multiplier = 2;
-            }
-            else if(bet === 'doz2' && winningNum >= 13 && winningNum <= 24) {
-                multiplier = 2;
-            }
-            else if(bet === 'doz3' && winningNum >= 25 && winningNum <= 36) {
-                multiplier = 2;
-            }
-            // Колонки
-            else if(bet === 'col1' && winningNum % 3 === 1 && winningNum !== 0) {
-                multiplier = 2;
-            }
-            else if(bet === 'col2' && winningNum % 3 === 2) {
-                multiplier = 2;
-            }
-            else if(bet === 'col3' && winningNum % 3 === 0 && winningNum !== 0) {
-                multiplier = 2;
-            }
+            if(bet === winningNum.toString()) multiplier = 35;
+            else if(bet === 'red' && winningNumber.color === 'red') multiplier = 1;
+            else if(bet === 'black' && winningNumber.color === 'black') multiplier = 1;
+            else if(bet === 'even' && winningNum !== 0 && winningNum % 2 === 0) multiplier = 1;
+            else if(bet === 'odd' && winningNum !== 0 && winningNum % 2 === 1) multiplier = 1;
+            else if(bet === 'small' && winningNum >= 1 && winningNum <= 18) multiplier = 1;
+            else if(bet === 'big' && winningNum >= 19 && winningNum <= 36) multiplier = 1;
+            else if(bet === 'doz1' && winningNum >= 1 && winningNum <= 12) multiplier = 2;
+            else if(bet === 'doz2' && winningNum >= 13 && winningNum <= 24) multiplier = 2;
+            else if(bet === 'doz3' && winningNum >= 25 && winningNum <= 36) multiplier = 2;
+            else if(bet === 'col1' && winningNum % 3 === 1 && winningNum !== 0) multiplier = 2;
+            else if(bet === 'col2' && winningNum % 3 === 2) multiplier = 2;
+            else if(bet === 'col3' && winningNum % 3 === 0 && winningNum !== 0) multiplier = 2;
             
-            if(multiplier > 0) {
-                win += amount + (amount * multiplier);
-            }
+            if(multiplier > 0) win += amount + (amount * multiplier);
         }
         
         return win;
@@ -650,111 +943,114 @@
         const overlay = document.getElementById('resultOverlay');
         const numEl = document.getElementById('resultNumber');
         const textEl = document.getElementById('resultText');
+        const detailsEl = document.getElementById('winDetails');
         const numData = numbers.find(n => n.n === number);
         
         numEl.textContent = number;
         numEl.className = 'result-number stat-' + numData.color;
         
         if(isWin) {
-            textEl.innerHTML = `<div class="result-win">+${amount.toLocaleString()} 🪙</div><div style="color: #888; margin-top: 10px;">ПОБЕДА!</div>`;
-            playSound('win');
-            
-            // Конфетти эффект
+            textEl.innerHTML = `<div class="result-win">+${amount.toLocaleString()} 🪙</div>`;
+            detailsEl.textContent = `Выпало ${numData.color === 'red' ? 'КРАСНОЕ' : numData.color === 'black' ? 'ЧЁРНОЕ' : 'ЗЕЛЁНОЕ'}`;
             createConfetti();
         } else {
-            textEl.innerHTML = `<div class="result-lose">-${Math.abs(amount).toLocaleString()} 🪙</div><div style="color: #666; margin-top: 10px;">ПОПРОБУЙТЕ ЕЩЁ</div>`;
-            playSound('lose');
+            textEl.innerHTML = `<div class="result-lose">-${Math.abs(amount).toLocaleString()} 🪙</div>`;
+            detailsEl.textContent = `Попробуйте ещё раз!`;
         }
         
         overlay.style.display = 'flex';
     }
 
+    function closeResult() {
+        document.getElementById('resultOverlay').style.display = 'none';
+    }
+
     function createConfetti() {
-        for(let i = 0; i < 50; i++) {
+        for(let i = 0; i < 60; i++) {
             const confetti = document.createElement('div');
-            confetti.style.cssText = `
-                position: fixed; width: 10px; height: 10px; background: hsl(${Math.random() * 360}, 100%, 50%);
-                left: ${Math.random() * 100}vw; top: -10px; z-index: 2000;
-                animation: confettiFall ${2 + Math.random() * 2}s linear forwards;
-            `;
+            confetti.className = 'confetti';
+            confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.animation = `confettiFall ${2 + Math.random() * 2}s linear forwards`;
             document.body.appendChild(confetti);
             setTimeout(() => confetti.remove(), 4000);
         }
     }
 
-    // Добавляем стиль для конфетти
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes confettiFall {
-            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-    `;
-    document.head.appendChild(style);
-
+    // --- УТИЛИТЫ ---
     function updateUI() {
         document.getElementById('coins').textContent = state.coins.toLocaleString();
         document.getElementById('crystals').textContent = state.crystals;
     }
 
     function showToast(message, type = 'info') {
+        const existing = document.querySelector('.toast');
+        if(existing) existing.remove();
+        
         const toast = document.createElement('div');
         const colors = { error: '#ff3131', success: '#00ff88', info: '#00d2ff' };
-        toast.style.cssText = `
-            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
-            background: ${colors[type]}; color: #000; padding: 15px 30px;
-            border-radius: 10px; font-weight: 900; z-index: 3000;
-            animation: toastSlide 0.3s ease; box-shadow: 0 0 20px ${colors[type]};
-        `;
+        toast.className = 'toast';
+        toast.style.background = colors[type];
+        toast.style.color = type === 'success' ? '#000' : '#fff';
         toast.textContent = message;
         document.body.appendChild(toast);
         
         setTimeout(() => {
-            toast.style.animation = 'toastSlide 0.3s ease reverse';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(-20px)';
             setTimeout(() => toast.remove(), 300);
         }, 2000);
     }
 
-    // Добавляем стиль для тостов
-    const toastStyle = document.createElement('style');
-    toastStyle.textContent = `
-        @keyframes toastSlide {
-            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-    `;
-    document.head.appendChild(toastStyle);
-
-    function playSound(type) {
-        // Заглушка для звуков - можно добавить реальные звуки
-        // const audio = new Audio(`sounds/${type}.mp3`);
-        // audio.play().catch(e => console.log('Audio play failed'));
+    function toggleTracks() {
+        const panel = document.getElementById('tracksPanel');
+        panel.style.display = panel.style.display === 'none' || panel.style.display === '' ? 'block' : 'none';
     }
 
-    // Загрузка сохраненных данных при старте
+    function showStats() {
+        const modal = document.getElementById('statsModal');
+        const s = state.stats;
+        document.getElementById('statTotal').textContent = s.totalSpins;
+        document.getElementById('statWinRate').textContent = s.totalSpins > 0 ? Math.round((s.wins / s.totalSpins) * 100) + '%' : '0%';
+        document.getElementById('statMaxWin').textContent = s.maxWin.toLocaleString();
+        
+        const colors = {red: 0, black: 0, green: 0};
+        state.history.forEach(n => {
+            const c = numbers.find(x => x.n === n).color;
+            colors[c]++;
+        });
+        document.getElementById('statRed').textContent = colors.red;
+        document.getElementById('statBlack').textContent = colors.black;
+        document.getElementById('statGreen').textContent = colors.green;
+        
+        modal.style.display = 'flex';
+    }
+
+    function closeStats() {
+        document.getElementById('statsModal').style.display = 'none';
+    }
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
     window.addEventListener('load', () => {
-        const savedCoins = localStorage.getItem("coins");
-        const savedCrystals = localStorage.getItem("crystals");
-        const savedHistory = localStorage.getItem("rouletteHistory");
-        
-        if(savedCoins) state.coins = parseInt(savedCoins);
-        if(savedCrystals) state.crystals = parseInt(savedCrystals);
-        if(savedHistory) state.history = JSON.parse(savedHistory);
-        
         updateUI();
         renderHistory();
+        updateHotCold();
     });
 
-    // Сохранение перед закрытием
     window.addEventListener('beforeunload', () => {
         localStorage.setItem("coins", state.coins);
         localStorage.setItem("crystals", state.crystals);
         localStorage.setItem("rouletteHistory", JSON.stringify(state.history));
+        localStorage.setItem("rouletteStats", JSON.stringify(state.stats));
     });
 
-    // Обработка ошибок
-    window.addEventListener('error', (e) => {
-        console.error('Roulette Error:', e);
-        showToast('Произошла ошибка!', 'error');
+    // Защита от случайного закрытия во время спина
+    window.addEventListener('beforeunload', (e) => {
+        if(state.isSpinning) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
     });
 </script>
 
